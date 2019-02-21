@@ -7,7 +7,7 @@
 \usepackage{polski}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 
-\newtheorem{definition}[chapter]{Definicja}
+\newtheorem{definition}[section]{Definicja}
 
 \newcommand{\transpose}[1]{{#1}^T}
 
@@ -19,6 +19,8 @@
 \maketitle
 
 
+\tableofcontents
+
 \chapter{Wstęp}
 
 
@@ -26,20 +28,21 @@
 
 \subsection{Definicje dotyczące macierzy} 
 
-\begin{definition}[Definicja macierzy]
+\begin{definition}[Definicja macierzy] \label{definicja-macierzy}
 Macierzą $m \times n$ (tzn. o m wierszach i n kolumnach) o wyrazach w zbiorze X nazywamy tablicę:
 $$
 \mathbf{X} =
-\begin{matrix}
+\begin{bmatrix}
 x_{11} & x_{12} & \ldots & x_{1n}&   \\
 x_{21} & x_{22} & \ldots & x_{2n}& \\
 \vdots & \vdots & \ddots & \vdots \\
 x_{m1} & x_{m2} & \ldots & x_{mn}&
-\end{matrix}
+\end{bmatrix}
 $$
 gdzie $x_{ij} \in X$  dla $1\le i\le m$, $1\le j\le n$.
 \end{definition}
 
+Korzystając z definicji \ref{definicja-macierzy}
 
 \noindent \textbf{Definicja 2.0.1.2}\\
 \noindent Macierzą kwadratową o wymiarze n x n nazywamy macierz o liczbie wierszy równiej liczbie kolumn. Liczbę n nazywamy stopniem macierzy.\\
