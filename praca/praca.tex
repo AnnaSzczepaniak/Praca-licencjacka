@@ -2,34 +2,44 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{polski}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+\newtheorem{definition}[chapter]{Definicja}
+
+\newcommand{\transpose}[1]{{#1}^T}
+
+
 \author{Anna Szczepaniak}
 \title{Algorytm dekompozycji QR}
 \begin{document}
 
 \maketitle
 
+
 \chapter{Wstęp}
+
 
 \chapter{Preliminaria}
 
 \subsection{Definicje dotyczące macierzy} 
 
-\textbf{Definicja 2.0.1.1}\\
-\noindent Macierzą m x n (tzn. o m wierszach i n kolumnach) o wyrazach w zbiorze X nazywamy tablicę:\par
+\begin{definition}[Definicja macierzy]
+Macierzą $m \times n$ (tzn. o m wierszach i n kolumnach) o wyrazach w zbiorze X nazywamy tablicę:
 $$
 \mathbf{X} =
-\left| \begin{matrix}
+\begin{matrix}
 x_{11} & x_{12} & \ldots & x_{1n}&   \\
 x_{21} & x_{22} & \ldots & x_{2n}& \\
 \vdots & \vdots & \ddots & \vdots \\
 x_{m1} & x_{m2} & \ldots & x_{mn}&
 \end{matrix}
-\right|
-$$\par
-\noindent  gdzie $x_{ij} \in X$  dla $1\le i\le m$, $1\le j\le n.$\\
+$$
+gdzie $x_{ij} \in X$  dla $1\le i\le m$, $1\le j\le n$.
+\end{definition}
+
 
 \noindent \textbf{Definicja 2.0.1.2}\\
 \noindent Macierzą kwadratową o wymiarze n x n nazywamy macierz o liczbie wierszy równiej liczbie kolumn. Liczbę n nazywamy stopniem macierzy.\\
@@ -43,14 +53,20 @@ a_{ij} = \left\{ \begin{array}{ll}
 $$
 
 \noindent \textbf{Definicja 2.0.1.4}\\
-\noindent Macierzą symetryczną nazywamy macierz kwadratową, której wyrazy położone symetrycznie względem głównej przekątnej są równe. Formalnie jest to macierz kwadratowa $$A=[a_{ij}]$$ stopnia n, która dla $$i,j=1,...,n$$ spełnia warunek $$a_{ij}=a_{ji}.$$\\
+\noindent Macierzą symetryczną nazywamy macierz kwadratową, której wyrazy położone symetrycznie względem głównej przekątnej są równe. Formalnie jest to macierz kwadratowa $$A=[a_{ij}]$$ stopnia n, która dla $$i,j=1,...,n$$ spełnia warunek 
+$$
+a_{ij}=a_{ji}.
+$$
 
 \noindent \textbf{Definicja 2.0.1.5}\\
 \noindent Macierz trójkątna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną lub wszystkie współczynniki nad tą przekątną są równe zero.\\
 
 \noindent \textbf{Definicja 2.0.1.6}\\
 \noindent Macierzą transponowaną (przestawioną) macierzy A nazywamy macierz $A^{T},$ która powstaje z danej poprzez zamianę jej wierszy na kolumny i kolumn na wiersze. Operację tworzenia macierzy transponowanej nazywamy transpozycją (przestawianiem).\\
-Dla macierzy $A=(a_{ij}):$ $$ A^{T}=(a_{ij})^T=(a_{ji})$$.\\
+Dla macierzy $A=(a_{ij}):$ 
+$$ 
+\transpose{A} = \transpose{(a_{ij})}=(a_{ji})
+$$.
 
 \noindent \textbf{Definicja 2.0.1.7}\\
 \noindent Iloczynem macierzy $A = [a_{ij} ]$ i $B = [b_{jk}]$, gdzie $A\in M_{m}^{n}(F), $ $B\in M_{p}^{m}(F)$ nazywamy macierz $C = [c_{ik}], $ $C \in M_{p}^{n}(F), $ daną wzorem $$ c_{ik} = \sum_{j=1}^{n} a_{ij}\cdot b_{jk}. $$\\
@@ -83,9 +99,11 @@ $$A^{T}\cdot A=A\cdot A^{T}=I_{n},$$ gdzie $I_{n}$ oznacza macierz jednostkową 
 \subsection{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
 
 \noindent \textbf{Definicja 2.0.3.1}\\
-\noindent Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy A wymiaru n × n przyporządkowuje dokładnie jedną liczbę rzeczywistą detA. Jeśli macierz jest stopnia $n = 1, $ to jej wyznacznik $detA = a_{11}. $
+\noindent Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy A wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą detA. Jeśli macierz jest stopnia $n = 1, $ to jej wyznacznik $detA = a_{11}$. 
 Jeśli stopień macierzy jest większy niż 1, to jej wyznacznik obliczamy według następującego wzoru: 
-$$detA = \sum_{i=1}^{n}(−1)^{i+j}\cdot a_{ij}\cdot detM_{ij}, $$
+$$
+detA = \sum_{i=1}^{n} (-1)^{i+j}\cdot a_{ij}\cdot detM_{ij},
+$$
 gdzie $detM_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skreślenie i-tego wiersza i j-tej kolumny.\\
 \newpage
 \noindent \textbf{Definicja 2.0.3.2}\\
