@@ -1,4 +1,14 @@
-*.gz
-*.toc
-*.log
+*.acn
+*.acr
+*.alg
 *.aux
+*.glg
+*.glo
+*.gls
+*.ist
+*.log
+*.out
+*.gz
+*.bbl
+*.blg
+*.toc
