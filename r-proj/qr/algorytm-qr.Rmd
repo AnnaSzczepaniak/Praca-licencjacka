@@ -9,71 +9,170 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Przykład
+# Schemat dowodu rozkładu QR
+
+Rozważmy następująca macierz za przykład postępowania
 
 ```{r}
-A = matrix ( c(1,2,3,0,1,4,7,0,2), byrow = TRUE, nrow=3, ncol=3)
+A = matrix ( c(1,2,3,0,1,4,7,0,2), byrow = FALSE, nrow=3, ncol=3)
 A
 ```
 
+## Etap pierwszy - algorytm Grama Schmidta
+
+Przeprowadzmy algorytm Grama Schmidta
+
+Najpierw zgodnie z [literaturą](https://pl.wikipedia.org/wiki/Ortogonalizacja_Grama-Schmidta). Najpierw podzielmy macierz na wektory
+
 ```{r}
-QR = qr(A)
-Q = qr.Q(QR)
-R = qr.R(QR)
-Q
-R
+v1 = t(A[,1])
+v2 = t(A[,2])
+v3 = t(A[,3])
+```
+
+Pomocniczo funkcje do wyliczenia współczynnika projekcji czy normy wektora
+
+```{r}
+proj = function(u, v){
+  return( ( (v %*% t(u)) / (u %*% t(u)))[1,1])
+}
+
+norm = function(u){
+  return (sqrt(( ( u %*% t(u) )[1,1] )))
+}
+```
+
+Przeprowadźmy dekompozycję GS
+
+```{r}
+u1 = v1
+u2 = v2 - proj(u1,v2) * u1
+u3 = v3 - proj(u1,v3) * u1 - proj(u2,v3) * u2
+```
+Zgromadźmy uzyskaną postać w macierzy o nazwie B
+
+```{r}
+B = matrix( c(u1, u2, u3), byrow = FALSE, ncol=3, nrow=3)
+T2 = matrix( c(1, -proj(u1,v2), 0, 0, 1, 0, 0, 0, 1), byrow = TRUE, nrow=3, ncol =3)
+T3 = matrix( c(1, 0, -proj(u1,v3), 0, 1, -proj(u2,v3), 0, 0, 1), byrow = TRUE, nrow=3, ncol =3)
+```
+
+Na tę chwilę wypracowany za pomocą algorytmu Grama Schmidta jest rozkład
+
+$$
+B = A \cdot T2 \cdot T3
+$$
+
+Dodatkowo widać, że iloczyn tych macierzy da macierz trójkątną górną
+
+```{r}
+T = T2 %*% T3
+T
+```
+
+
+```{r}
+A %*% T2 %*% T3
 ```
 
 ```{r}
-Q %*% R
+B
 ```
 
-```{r}
-Q_1 = matrix(c(1,0,0,-1,1,0,-13/14,-8/17,1), nrow=3, ncol=3, byrow=TRUE)
-Q_1
-```
+## Normalizacja B
+
+Drugim etapem procesu jest normalizacja B. Aby znormalizować macierz kolumnowo wystarczy pomnożyć ją prawostronnie przez macierz przekątniową D. Efektem tego mnożenia będzie macierz ortogonalna Q
+
+$$
+Q = B \cdot D
+$$
 
 ```{r}
-R_1 = Q_1 %*% A
+D = matrix(0, nrow=3, ncol=3)
+D[1,1] = 1/norm(u1)
+D[2,2] = 1/norm(u2)
+D[3,3] = 1/norm(u3)
+D
+Q_1 = B %*% D
+Q_1%*%t(Q_1)
+```
+Przypomnijmy, że do tej pory mieliśmy dostępny rozkład
+
+$$
+B = A \cdot T
+$$
+
+Wykonajmny prawostronne mnożenie równania przez $D$
+
+$$
+B \cdot D = Q_1 = A \cdot T \cdot D
+$$
+Zauważmy, że $T \cdot D$ jest macierzą trójkątną górną - nazwijmy ją $W$. Mamy zatem postać
+
+$$
+Q_1 = A \cdot W
+$$
+
+```{r}
+W = T %*% D
+W
+```
+
+# Odwrócenie macierzy W
+
+Pozostaje nam jedynie odwrócić macierz $W$. Na szczęście okazuje się, że macierz odwrotna do macierzy górnej trójkątnej jest górno trójkątna. Zastosowanie do tego ma algorytm Gaussa Jordana wyznaczania macierzy odwrotnej. Skoro wyznacznik macierzy W jest różny od $0$ to istnieje macierz odwrotna do danej i oznaczać ją będziemy $R_1$
+
+```{r}
+library(matlib)
+R_1 = inv(W)
 R_1
 ```
 
+Przekształcając otrzymujemy
+$$
+Q_1 = A \cdot W
+$$
+Skąd
+$$
+Q_1 \cdot R_1 = A \cdot W \cdot R_1 = A
+$$
+Co pokazuje jak wygląda procedura wyznaczania rozkładu QR
+
+
 ```{r}
-eigen(R_1)
+Q_1
+R_1
 ```
 
+Porównajmy z wynikami w R
+
 ```{r}
-eigen(A)
+QR = qr(A)
+qr.Q(QR)
+qr.R(QR)
 ```
 
-# Teraz zgodnie z Demmel
+Widzimy jeszcze różnice w znakach w kolumnie. Wystarczy do tego odpowiednia macierz
 
 ```{r}
-A
-Q = matrix(0, 3, 3)
+J = matrix(c(-1,0,0,0,1,0,0,0,-1), byrow = TRUE, nrow=3, ncol=3)
+```
+
+Takie macierze mają tę ceche, że są swoją odwrotnością. Zatem możemy przeprowadzić 
+
+$$
+(Q_1 \cdot J) \cdot (J \cdot R_1) = Q \cdot R = A 
+$$
+```{r}
+Q = Q_1 %*% J
+R = J %*% R_1
 Q
-R = matrix(0, 3, 3)
 R
+qr.Q(QR)
+qr.R(QR)
 ```
 
-## Iteracja 1
 
-```{r}
-Q[,1] = A[,1]
-Q
-R[1,1]=t(Q[,1])%*%Q[,1]
-R
-```
+# Ćwiczenie
 
-## Iteracja 2
-
-```{r}
-R[1,2] = t(Q[,1]) %*% A[,2]
-R[1,2]
-```
-
-```{r}
-Q[,2] = Q[,2] - R[1,2] * Q[,1]
-Q[,2]
-```
-
+Trzeba jeszcze pokazać, że rozkład taki jest jedyny.
