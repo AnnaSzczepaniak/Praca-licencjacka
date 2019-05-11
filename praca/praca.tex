@@ -8,6 +8,8 @@
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 
 \newtheorem{definition}[section]{Definicja}
+\newtheorem{theorem} [section] {Twierdzenie]
+\newtheorem{algorithm}[section]{Algorytm}
 
 \newcommand{\transpose}[1]{{#1}^T}
 
@@ -28,7 +30,7 @@
 
 \subsection{Definicje dotyczące macierzy} 
 
-\begin{definition}[Definicja macierzy] \label{definicja-macierzy}
+\begin{definition}[Definicja macierzy]
 Macierzą $m \times n$ (tzn. o m wierszach i n kolumnach) o wyrazach w zbiorze X nazywamy tablicę:
 $$
 \mathbf{X} =
@@ -44,76 +46,101 @@ gdzie $x_{ij} \in X$  dla $1\le i\le m$, $1\le j\le n$.
 
 Korzystając z definicji \ref{definicja-macierzy}
 
-\noindent \textbf{Definicja 2.0.1.2}\\
-\noindent Macierzą kwadratową o wymiarze n x n nazywamy macierz o liczbie wierszy równiej liczbie kolumn. Liczbę n nazywamy stopniem macierzy.\\
+begin{definition} \label{definicja-macierzy}
+Macierzą kwadratową o wymiarze n x n nazywamy macierz o liczbie wierszy równiej liczbie kolumn. Liczbę n nazywamy stopniem macierzy.
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.1.3}\\
-\noindent Macierzą jednostkową nazywamy macierz kwadratową, która na swojej głównej przekątnej posiada same wartości równe 1, natomiast reszta jest wypełniona zerami. Współczynniki tej macierzy są określone następującymi wzorami: $$
+begin{definition}
+Macierzą jednostkową nazywamy macierz kwadratową, która na swojej głównej przekątnej posiada same wartości równe 1, natomiast reszta jest wypełniona zerami. Współczynniki tej macierzy są określone następującymi wzorami: 
+$$
 a_{ij} = \left\{ \begin{array}{ll}
 1 & \textrm{dla $j=i$}\\
 0 & \textrm{dla $j\ne i$}\\
 \end{array} \right.
 $$
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.1.4}\\
-\noindent Macierzą symetryczną nazywamy macierz kwadratową, której wyrazy położone symetrycznie względem głównej przekątnej są równe. Formalnie jest to macierz kwadratowa $$A=[a_{ij}]$$ stopnia n, która dla $$i,j=1,...,n$$ spełnia warunek 
+begin{definition}
+Macierzą symetryczną nazywamy macierz kwadratową, której wyrazy położone symetrycznie względem głównej przekątnej są równe. Formalnie jest to macierz kwadratowa 
+$$A=[a_{ij}]$$ 
+stopnia n, która dla 
+$$i,j=1,...,n$$ 
+spełnia warunek 
 $$
 a_{ij}=a_{ji}.
 $$
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.1.5}\\
-\noindent Macierz trójkątna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną lub wszystkie współczynniki nad tą przekątną są równe zero.\\
+begin{definition}
+Macierz trójkątna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną lub wszystkie współczynniki nad tą przekątną są równe zero.
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.1.6}\\
-\noindent Macierzą transponowaną (przestawioną) macierzy A nazywamy macierz $A^{T},$ która powstaje z danej poprzez zamianę jej wierszy na kolumny i kolumn na wiersze. Operację tworzenia macierzy transponowanej nazywamy transpozycją (przestawianiem).\\
+begin{definition}
+Macierzą transponowaną (przestawioną) macierzy A nazywamy macierz $A^{T},$ która powstaje z danej poprzez zamianę jej wierszy na kolumny i kolumn na wiersze. Operację tworzenia macierzy transponowanej nazywamy transpozycją (przestawianiem).
 Dla macierzy $A=(a_{ij}):$ 
 $$ 
 \transpose{A} = \transpose{(a_{ij})}=(a_{ji})
 $$.
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.1.7}\\
-\noindent Iloczynem macierzy $A = [a_{ij} ]$ i $B = [b_{jk}]$, gdzie $A\in M_{m}^{n}(F), $ $B\in M_{p}^{m}(F)$ nazywamy macierz $C = [c_{ik}], $ $C \in M_{p}^{n}(F), $ daną wzorem $$ c_{ik} = \sum_{j=1}^{n} a_{ij}\cdot b_{jk}. $$\\
-Oznaczamy C = A · B.\\
+begin{definition}
+Iloczynem macierzy $A = [a_{ij} ]$ i $B = [b_{jk}]$, gdzie $A\in M_{m}^{n}(F), $ $B\in M_{p}^{m}(F)$ nazywamy macierz $C = [c_{ik}], $ $C \in M_{p}^{n}(F), $ daną wzorem 
+$$ c_{ik} = \sum_{j=1}^{n} a_{ij}\cdot b_{jk}. $$
+Oznaczamy C = A · B.
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.1.8}\
-\noindent Niech A będzie macierzą kwadratową ustalonego stopnia. Macierz A jest odwracalna, jeśli istnieje taka macierz B, że zachodzi
+begin{definition}
+Niech A będzie macierzą kwadratową ustalonego stopnia. Macierz A jest odwracalna, jeśli istnieje taka macierz B, że zachodzi
+$$A\cdot B=B\cdot A=I, $$ 
+gdzie I jest macierzą jednostkową. Macierz B nazywa się wówczas macierzą odwrotną do macierzy A i oznacza się przez  $A^{-1}.$
+\end{definition}
 
- $$A\cdot B=B\cdot A=I, $$ gdzie I jest macierzą jednostkową. Macierz B nazywa się wówczas macierzą odwrotną do macierzy A i oznacza się przez  $A^{-1}.$\\
+begin{definition}
+Macierz A nazywamy macierzą nieosobliwą, jeśli istnieje macierz B, która jest do niej odwrotna.
+\end{definition}  
 
-\noindent \textbf{Definicja 2.0.1.9}\\
-\noindent Macierz A nazywamy macierzą nieosobliwą, jeśli istnieje macierz B, która jest do niej odwrotna.\\  
+begin{definition}
+Macierzą ortogonalną nazywamy macierz kwadratową $A\in M_{n}(R)$ o elementach będących liczbami rzeczywistymi spełniająca równość:
+$$A^{T}\cdot A=A\cdot A^{T}=I_{n},$$ 
+gdzie $I_{n}$ oznacza macierz jednostkową wymiaru n, $A^{T}$ oznacza macierz transponowaną względem A.
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.1.10}\\
-\noindent Macierzą ortogonalną nazywamy macierz kwadratową $A\in M_{n}(R)$ o elementach będących liczbami rzeczywistymi spełniająca równość:
-$$A^{T}\cdot A=A\cdot A^{T}=I_{n},$$ gdzie $I_{n}$ oznacza macierz jednostkową wymiaru n, $A^{T}$ oznacza macierz transponowaną względem A.\\
-
-\noindent \textbf{Definicja 2.0.1.11}\\
-\noindent Dwie macierze kwadratowe A i B nazywamy macierzami podobnymi, jeśli istnieje taka macierz nieosobliwa P, że zachodzi związek: $$ B=P^{-1}\cdot A\cdot P. $$
+begin{definition}
+Dwie macierze kwadratowe A i B nazywamy macierzami podobnymi, jeśli istnieje taka macierz nieosobliwa P, że zachodzi związek: 
+$$ B=P^{-1}\cdot A\cdot P. $$
+\end{definition}
 
 
 \subsection{Definicje dotyczące wektorów} 
 
-\noindent \textbf{Definicja 2.0.2.1}\\
-\noindent Wektorem nazywamy uporządkowaną parę punktów, z których jeden jest początkiem a drugi końcem tego\\ wektora. Każdy wektor posiada zwrot, kierunek i długość.\\
+begin{definition}
+Wektorem nazywamy uporządkowaną parę punktów, z których jeden jest początkiem a drugi końcem tego wektora. Każdy wektor posiada zwrot, kierunek i długość.
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.2.2}\\
-\noindent Układ wektorów  $ (v_{1}, v_{2}, ..., v_{k}) $ w przestrzeni liniowej $ V $ nad ciałem $ K $ nazywamy liniowo niezależnym, jeśli\\ z $ a_{1}\cdot v_{1}+ a_{2}\cdot v_{2} + ... + a_{k}\cdot v_{k} = 0 $ wynika, że $a_{1}=a_{2}=...=a_{k}=0 $.\\
+begin{definition}
+Układ wektorów  $ (v_{1}, v_{2}, ..., v_{k}) $ w przestrzeni liniowej $ V $ nad ciałem $ K $ nazywamy liniowo niezależnym, jeśli z $ a_{1}\cdot v_{1}+ a_{2}\cdot v_{2} + ... + a_{k}\cdot v_{k} = 0 $ wynika, że $a_{1}=a_{2}=...=a_{k}=0 $.
+\end{definition}
 
 \subsection{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
 
-\noindent \textbf{Definicja 2.0.3.1}\\
-\noindent Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy A wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą detA. Jeśli macierz jest stopnia $n = 1, $ to jej wyznacznik $detA = a_{11}$. 
+begin{definition}
+Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy A wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą detA. Jeśli macierz jest stopnia $n = 1, $ to jej wyznacznik $detA = a_{11}$. 
 Jeśli stopień macierzy jest większy niż 1, to jej wyznacznik obliczamy według następującego wzoru: 
 $$
 detA = \sum_{i=1}^{n} (-1)^{i+j}\cdot a_{ij}\cdot detM_{ij},
 $$
-gdzie $detM_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skreślenie i-tego wiersza i j-tej kolumny.\\
+gdzie $detM_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skreślenie i-tego wiersza i j-tej kolumny.
+\end{definition}
 \newpage
-\noindent \textbf{Definicja 2.0.3.2}\\
-\noindent Niech B będzie macierzą wymiaru m x m i niech I będzie macierzą jednostkową wymiaru m x m. Wówczas skalary (liczby o wymiarze 1 x 1 ) $\lambda_{1}, \lambda_{2}, ..., \lambda_{m} $ nazywamy wartościami własnymi macierzy B, jeśli spełniają $$|B-\lambda\cdot I|=0. $$ \\
+begin{definition}
+Niech B będzie macierzą wymiaru m x m i niech I będzie macierzą jednostkową wymiaru m x m. Wówczas skalary (liczby o wymiarze 1 x 1 ) $\lambda_{1}, \lambda_{2}, ..., \lambda_{m} $ nazywamy wartościami własnymi macierzy B, jeśli spełniają 
+$$|B-\lambda\cdot I|=0. $$ 
+\end{definition}
 
-\noindent \textbf{Definicja 2.0.3.3}\\
-\noindent Niech B będzie macierzą wymiaru m x m i niech $\lambda$ będzie wartością własną macierzy B. Wówczas niezerowy wektor e wymiaru m x 1 nazywamy wektorem własnym macierzy B, jeżeli $$B\cdot e = \lambda\cdot e. $$\\
+begin{definition}
+Niech B będzie macierzą wymiaru m x m i niech $\lambda$ będzie wartością własną macierzy B. Wówczas niezerowy wektor e wymiaru m x 1 nazywamy wektorem własnym macierzy B, jeżeli 
+$$B\cdot e = \lambda\cdot e. $$
+\end{definition}
 
 
 
@@ -127,34 +154,45 @@ gdzie $detM_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skre
 
 \chapter{Algorytm QR}
 
-\noindent \textbf{Twierdzienie 3.1 (O rozkładzie QR)}\\
-\noindent Niech A będzie macierzą o wymiarach m x n, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład A=QR na dwa czynniki: macierz Q o wymiarach m x n taka, że $Q^{T}\cdot Q=D,$ gdzie\\ $D= diag (d_{1}, d_{2}, ..., d_{n}),$  $d_{k}>0$ dla $(k = 1, 2, ..., n)$ i macierz trójkątną górną R z elementami\\ $r_{kk}= 1 (k = 1, 2, ..., n).$\\
+begin{theorem}[Twierdzienie]\label{(O rozkładzie QR)}
+Niech A będzie macierzą o wymiarach m x n, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład A=QR na dwa czynniki: macierz Q o wymiarach m x n taka, że $Q^{T}\cdot Q=D,$ gdzie $D= diag (d_{1}, d_{2}, ..., d_{n}),$  $d_{k}>0$ dla $(k = 1, 2, ..., n)$ i macierz trójkątną górną R z elementami $r_{kk}= 1 (k = 1, 2, ..., n).$
+\end{theorem}
 
 \noindent \textbf{Dowód twierdzenia 3.1}\\
-\noindent Podane wyżej twierdzenie jest przekształceniem
+Podane wyżej twierdzenie jest przekształceniem
 procesu ortogonalizacji Grama-Schmidta. Jeśli zastosujemy Grama-Schmidta do kolumn $a_{i}$ macierzy
  $A = [a_{1}, a_{2}, ..., a_{n}]$ od lewej do prawej, otrzymamy
 sekwencje ortonormalnych wektorów od $q_{1}$ do $q_{n}$ obejmujących tę samą przestrzeń:
 te ortogonalne wektory są kolumnami Q. Gram-Schmidt również wylicza
 współczynniki wyrażające każdą kolumnę $a_{i}$
- jako liniową kombinację $q_{1}$ przez $$q_{i}: a_{i}= \sum_{j=1}^i r_{ji}\cdot q_{i}, $$ gdzie $r_{ji}$ to współczynniki macierzy R.\\
+ jako liniową kombinację $q_{1}$ przez 
+ $$q_{i}: a_{i}= \sum_{j=1}^i r_{ji}\cdot q_{i}, $$ 
+ gdzie $r_{ji}$ to współczynniki macierzy R.
+ 
 
 
-\noindent Algorytm QR został wynaleziony w 1961 roku przez Francisa i Kubłanowską. Jest jedną z efektywniejszych znanych metod rozwiązywania pełnego zadania własnego dla macierzy symetrycznych lub niesymetrycznych.\\
-\noindent W podstawowym algorytmie QR tworzy się ciąg macierzy $A= A_{0}, A_{1}, A_{2}, ...$ taki, że $$ A_{s}=Q_{s}R_{s},$$ $$R_{s}Q_{s}=A_{s+1},$$ $$(s=0, 1, ...),$$ gdzie $Q_{s}$ jest macierzą ortogonalną, a $R_{s}$ - trójkątną górną. Łatwo widać, że z twierdzenia o rozkładzie QR wynika, że ciąg $A_{s}$ $(s=0, 1, ...)$ jest w zasadzie określony jednoznacznie. Ponieważ $$ A_{s+1}=R_{s}Q_{s}=Q_{s}^{T}A_{s}Q_{s},$$ więc każdy krok w algorytmie QR jest przekształceniem przez podobieństwo. \\
+
+Algorytm QR został wynaleziony w 1961 roku przez Francisa i Kubłanowską. Jest jedną z efektywniejszych znanych metod rozwiązywania pełnego zadania własnego dla macierzy symetrycznych lub niesymetrycznych.
+W podstawowym algorytmie QR tworzy się ciąg macierzy $A= A_{0}, A_{1}, A_{2}, ...$ taki, że 
+$$ A_{s}=Q_{s}R_{s},$$
+$$R_{s}Q_{s}=A_{s+1},$$
+$$(s=0, 1, ...),$$ 
+gdzie $Q_{s}$ jest macierzą ortogonalną, a $R_{s}$ - trójkątną górną. Łatwo widać, że z twierdzenia o rozkładzie QR wynika, że ciąg $A_{s}$ $(s=0, 1, ...)$ jest w zasadzie określony jednoznacznie. Ponieważ 
+$$ A_{s+1}=R_{s}Q_{s}=Q_{s}^{T}A_{s}Q_{s},$$ 
+więc każdy krok w algorytmie QR jest przekształceniem przez podobieństwo. 
 
 \subsection*{Metoda Householdera}
 
-\noindent Metoda Householdera pozwala znaleźć rozkład QR dowolnej macierzy prostokątnej m x n ($m\ge n$).\\
+Metoda Householdera pozwala znaleźć rozkład QR dowolnej macierzy prostokątnej m x n ($m\ge n$).
 
-\noindent \textbf{Macierz Householdera}\\
-\noindent Macierzą Householdera H zwaną również refleksją nazywamy symetryczną i ortogonalną macierz przekształcenia wektora, które odbija go względem pewnej płaszczyzny. 
+{Macierz Householdera}
+Macierzą Householdera H zwaną również refleksją nazywamy symetryczną i ortogonalną macierz przekształcenia wektora, które odbija go względem pewnej płaszczyzny. 
 \newpage
-\noindent \textbf{Transformacja Householdera}\\
-\noindent Niech  $v\in R^{m}, $ i $v\neq 0. $ Wówczas transformacją Householdera nazywamy macierz postaci:\\
+{Transformacja Householdera}
+Niech  $v\in R^{m}, $ i $v\neq 0. $ Wówczas transformacją Householdera nazywamy macierz postaci:
 
-$${\displaystyle H=I-Wvv^{T}, } {\displaystyle H=I-Wvv^{T}, }       {\displaystyle W={\frac {2}{v^{T}v}}} {\displaystyle W={\frac {2}{v^{T}v}}}$$ \\
-Macierz H jest macierzą symetryczną i ortogonalną oraz ma taką własność, że dowolny wektor x wymiaru m jest odbiciem lustrzanym wektora Hx względem hiperpłaszczyzny (wymiaru m-1) prostopadłej do wektora v[3]. Łatwo sprawdzić, że tak jest ponieważ: \\
+$${\displaystyle H=I-Wvv^{T}, } {\displaystyle H=I-Wvv^{T}, }       {\displaystyle W={\frac {2}{v^{T}v}}} {\displaystyle W={\frac {2}{v^{T}v}}}$$ 
+Macierz H jest macierzą symetryczną i ortogonalną oraz ma taką własność, że dowolny wektor x wymiaru m jest odbiciem lustrzanym wektora Hx względem hiperpłaszczyzny (wymiaru m-1) prostopadłej do wektora v[3]. Łatwo sprawdzić, że tak jest ponieważ: 
 
 $${\displaystyle H^{2}=\left(I-{\frac {2vv^{T}}{v^{T}v}}\right)^{2}=I-{\frac {4vv^{T}}{v^{T}v}}+4\left({\frac {vv^{T}}{v^{T}v}}\right)^{2}=I} {\displaystyle H^{2}=\left(I-{\frac {2vv^{T}}{v^{T}v}}\right)^{2}}$$ \newline  $$= {I-{\frac {4vv^{T}}{v^{T}v}}+4\left({\frac {vv^{T}}{v^{T}v}}\right)^{2}=I}       {\displaystyle ((vv^{T})(v^{T}v)=(vv^{T})^{2})} {\displaystyle ((vv^{T})(v^{T}v)=(vv^{T})^{2})}$$\\
 oraz\\
