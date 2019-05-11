@@ -1,0 +1,79 @@
+---
+title: "algorytm qr"
+author: "Anna Szczepaniak"
+date: "11 maja 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Przykład
+
+```{r}
+A = matrix ( c(1,2,3,0,1,4,7,0,2), byrow = TRUE, nrow=3, ncol=3)
+A
+```
+
+```{r}
+QR = qr(A)
+Q = qr.Q(QR)
+R = qr.R(QR)
+Q
+R
+```
+
+```{r}
+Q %*% R
+```
+
+```{r}
+Q_1 = matrix(c(1,0,0,-1,1,0,-13/14,-8/17,1), nrow=3, ncol=3, byrow=TRUE)
+Q_1
+```
+
+```{r}
+R_1 = Q_1 %*% A
+R_1
+```
+
+```{r}
+eigen(R_1)
+```
+
+```{r}
+eigen(A)
+```
+
+# Teraz zgodnie z Demmel
+
+```{r}
+A
+Q = matrix(0, 3, 3)
+Q
+R = matrix(0, 3, 3)
+R
+```
+
+## Iteracja 1
+
+```{r}
+Q[,1] = A[,1]
+Q
+R[1,1]=t(Q[,1])%*%Q[,1]
+R
+```
+
+## Iteracja 2
+
+```{r}
+R[1,2] = t(Q[,1]) %*% A[,2]
+R[1,2]
+```
+
+```{r}
+Q[,2] = Q[,2] - R[1,2] * Q[,1]
+Q[,2]
+```
+
