@@ -4,14 +4,15 @@
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{amssymb}
+\usepackage{natbib}
 \usepackage{polski}
+\usepackage{hyperref}
+\usepackage[polish, chapter]{dyschemist}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 
-\newtheorem{definition}[section]{Definicja}
-\newtheorem{theorem} [section] {Twierdzenie]
-\newtheorem{algorithm}[section]{Algorytm}
 
-\newcommand{\transpose}[1]{{#1}^T}
+\newcommand{\vr}[1]{\overrightarrow{#1}}%{\mathbf{#1}}
+\newcommand{\mx}[1]{{#1}}
 
 
 \author{Anna Szczepaniak}
@@ -25,68 +26,72 @@
 
 \chapter{Wstęp}
 
-
 \chapter{Preliminaria}
 
-\subsection{Definicje dotyczące macierzy} 
+W niniejszym rozdziale przypomniane zostaną wybrane elementy z zakresu algebry liniowej, potrzebne do wyjaśnienia działania algorytmu QR.
 
-\begin{definition}[Definicja macierzy]
-Niech $n,m \in \mathbb{N}$. Macierzą o $m$ wierszach, $n$ kolumnach (o wymiarach $m \times n$) i wyrazach w ciele $\mathbb{K}$ nazywamy funkcję 
+\section{Elementy algebry liniowej} 
+
+Niniejszą część rozpocznijmy od zdefiniowania pojęcia macierzy. Warto nadmienić, że w znaczącej części literatury - pojęcie te nie jest definiowane w sposób matematycznie precyzyjny.
+
+\begin{definition}[Macierz \cite{poreda11}]
+Niech $n,m \in \setN$. Macierzą o $m$ wierszach oraz $n$ kolumnach (nazywaną również macierzą o wymiarach $m \times n$) i wyrazach w ciele $\setR$ nazywamy funkcję 
 $$
-\mathbb{A}: \set{1,2, \ldots ,m}\times \set{1,2, \ldots ,n} \to \mathbb{K}.
+\mx{A}: \set{1,2, \ldots ,m}\times \set{1,2, \ldots ,n} \to \setR.
 $$
-Wartością funkcji dla argumentu $(i,j)$ jest element $a_{ij}$  należący do ciała $\mathbb{K}$. Macierz zapisujemy w postaci tabeli
+Wartością funkcji dla argumentu $(i,j)$, gdzie $i \in \set{1,2, \ldots ,m}$, $j \in \set{1,2, \ldots ,n}$ jest element $a_{ij} \in \setR$. Macierz często zapisujemy w postaci tabeli
 $$
-\mathbb{A} = \left[
-        \begin{array}{cccc}
-         a_{11} & a_{12} & \cdots & a_{1n} \\
+\mx{A} = \begin{bmatrix}
+ a_{11} & a_{12} & \cdots & a_{1n} \\
          a_{21} & a_{22} & \cdots & a_{2n} \\
          \vdots & \vdots & \ddots & \vdots \\
          a_{m1} & a_{m2} & \cdots & a_{mn} \\
-         \end{array}
-      \right].
+\end{bmatrix}.
 $$
 
-Przez $\mathbb{M}_{m \times n}(\mathbb{K})$ oznaczmy zbiór wszystkich macierzy o wymiarach $m \times n$ i elementach z ciała $\mathbb{K}$.
+Przez $\setR^{m \times n}$ oznaczmy zbiór wszystkich macierzy o wymiarach $m \times n$ i elementach z $\setR$ .
 \end{definition}
 
-Korzystając z definicji \ref{definicja-macierzy}
+Macierze posiadają wiele istotnych dla nas podklas, posiadający określone cechy. Wymieńmy kilka typów macierzy, szczególnie interesujących z perspektywy omawianego przez nas tematu.
 
-\begin{definition} \label{definicja-macierzy}
-Macierzą kwadratową o wymiarze n x n nazywamy macierz o liczbie wierszy równiej liczbie kolumn. Liczbę n nazywamy stopniem macierzy.
+\begin{definition}[Macierz kwadratowa\citep{poreda11}] \label{definicja-macierzy}
+Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej.
 \end{definition}
 
-\begin{definition}
+\begin{definition}[Macierz jednostkowa \cite{}]
 Macierzą jednostkową nazywamy macierz kwadratową, która na swojej głównej przekątnej posiada same wartości równe 1, natomiast reszta jest wypełniona zerami. Współczynniki tej macierzy są określone następującymi wzorami: 
 $$
 a_{ij} = \left\{ \begin{array}{ll}
-1 & \textrm{dla $j=i$}\\
-0 & \textrm{dla $j\ne i$}\\
+1 &, j=i\\
+0 &, j\ne i
 \end{array} \right.
 $$
+dla $i \in \set{1,2,\ldots,m} $ oraz $j \in \set{1,2,\ldots, n}$.
 \end{definition}
 
 \begin{definition}
-Macierzą symetryczną nazywamy macierz kwadratową, której wyrazy położone symetrycznie względem głównej przekątnej są równe. Formalnie jest to macierz kwadratowa 
-$$A=[a_{ij}]$$ 
-stopnia n, która dla 
-$$i,j=1,...,n$$ 
-spełnia warunek 
+Macierzą symetryczną nazywamy macierz kwadratową $A=[a_{ij}]$, której wyrazy spełniają warunek 
 $$
-a_{ij}=a_{ji}.
+\forall_{i,j \in \set{1,\ldots,n}} \quad a_{ij}=a_{ji}.
 $$
 \end{definition}
 
 \begin{definition}
-Macierz trójkątna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną lub wszystkie współczynniki nad tą przekątną są równe zero.
+Macierz trójkątna górna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną są równe $0$. Analogicznie macierzą trójkątna dolną nazywamy macierz kwadratową dla której wszystkie współczynniki ponad przekątną są równe $0$.
 \end{definition}
 
 \begin{definition}
-Niech $A=[a_{ij}]_{i\le j}$ będzie macierzą o wymiarach $m\timesn$. Dla $j=1,..,n$ oraz $i=1,...,n$, niech $d_{ji}=a_{ij}$. Wówczas macierz $A^{T}=[d_{ji}]_{j\le n}$ nazywamy macierzą transponowaną do A.
+Niech $A=[a_{ij}] \in \setR^{m \times n}$. Wtedy macierz $D \in \setR^{n \times m}$ spełniająca warunek taki, że
+$$
+d_{ij} = a_{ji},
+$$
+dla dowolnych $i \in \set{1,\ldots, n}$ oraz $j \in \set{1,\ldots,m}$ nazywamy macierzą transponowaną do $A$. Z reguły tę macierz $D$ oznaczamy symbolem $\transpose{A}$.
 \end{definition}
 
+%TODO proszę kontynuować poprawki definicji poniżej
+
 \begin{definition}
-Niech $A=[a_{ij}]_{i\le m, j\le k}$ będzie macierzą o wymiarach $m\times k$, a $B=[b_{ij}]_{i\le k, j\le n}$ macierzą o wymiarach $k\times n$. Iloczynem macierzy A,B nazywamy macierz $AB=[c_{ij}]_{i\le m, j\le n}$ o wymiarach $m\timesn$, gdzie dla $$i=1,...,m, j=1,...,n c_{ij}= \sum_{l=1}^{n} a_{il} \cdot b_{lj}$$.
+Niech $A=[a_{ij}]_{i\le m, j\le k}$ będzie macierzą o wymiarach $m\times k$, a $B=[b_{ij}]_{i\le k, j\le n}$ macierzą o wymiarach $k\times n$. Iloczynem macierzy A,B nazywamy macierz $AB=[c_{ij}]_{i\le m, j\le n}$ o wymiarach $m\times n$, gdzie dla $$i=1,...,m, j=1,...,n c_{ij}= \sum_{l=1}^{n} a_{il} \cdot b_{lj}$$.
 \end{definition}
 
 \begin{definition}
@@ -111,54 +116,96 @@ $$ B=P^{-1}\cdot A\cdot P. $$
 \end{definition}
 
 
-\subsection{Definicje dotyczące wektorów} 
+%\section{Definicje dotyczące wektorów} 
+%
+%\begin{definition}
+%Jeżeli $p,q\in \mathbb{R}^{n}$, to parę (p,q) nazywamy wektorem zaczepionym o początku p i końcu q.
+%\end{definition}
+%
+%\begin{definition}
+%Niech $v_{1},..., v_{n}$ będą różnymi elementami przestrzeni liniowe V. Zbiór wektorów ${v_{1},...,v_{n}}$ nazywamy liniowo niezależnymi jeżeli 
+%$$\forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot v_{1} + ... + a_{n}\cdot v_{n} = 0 \Rrightarrow a_{1}=...=a_{n}=0)
+%$$ 
+%\end{definition}
 
-\begin{definition}
-Jeżeli $p,q\in \mathbb{R}^{n}$, to parę (p,q) nazywamy wektorem zaczepionym o początku p i końcu q.
-\end{definition}
+%\section{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
 
-\begin{definition}
-Niech $v_{1},..., v_{n}$ będą różnymi elementami przestrzeni liniowe V. Zbiór wektorów ${v_{1},...,v_{n}}$ nazywamy liniowo niezależnymi jeżeli 
-$$\forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot v_{1} + ... + a_{n}\cdot v_{n} = 0 \Rrightarrow a_{1}=...=a_{n}=0)
-$$ 
-\end{definition}
-
-\subsection{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
-
-\begin{definition}
-Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy A wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą detA. Jeśli macierz jest stopnia $n = 1, $ to jej wyznacznik $detA = a_{11}$. 
+\begin{definition}[??]
+Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy $A$ wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą $\det A$. Jeśli macierz jest stopnia $n = 1$, to jej wyznacznik $\det A  = a_{11}$. 
 Jeśli stopień macierzy jest większy niż 1, to jej wyznacznik obliczamy według następującego wzoru: 
 $$
-detA = \sum_{i=1}^{n} (-1)^{i+j}\cdot a_{ij}\cdot detM_{ij},
+\det A = \sum_{i=1}^{n} (-1)^{i+j}\cdot a_{ij}\cdot \det M_{ij},
 $$
-gdzie $detM_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skreślenie i-tego wiersza i j-tej kolumny.
-\end{definition}
-\newpage
-\begin{definition}
-Niech B będzie macierzą wymiaru m x m i niech I będzie macierzą jednostkową wymiaru m x m. Wówczas skalary (liczby o wymiarze 1 x 1 ) $\lambda_{1}, \lambda_{2}, ..., \lambda_{m} $ nazywamy wartościami własnymi macierzy B, jeśli spełniają 
-$$|B-\lambda\cdot I|=0. $$ 
+gdzie $\det M_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skreślenie i-tego wiersza i j-tej kolumny.
 \end{definition}
 
 \begin{definition}
-Niech B będzie macierzą wymiaru m x m i niech $\lambda$ będzie wartością własną macierzy B. Wówczas niezerowy wektor e wymiaru m x 1 nazywamy wektorem własnym macierzy B, jeżeli 
-$$B\cdot e = \lambda\cdot e. $$
+Niech $B$ będzie macierzą wymiaru $m$ na $m$ i niech $I$ będzie macierzą jednostkową wymiaru $m$ na $m$. Wówczas wartościami własnymi macierzy $B$ nazywamy takie $\lambda \in \setC$, które spełniają następujące równanie:
+$$
+\det (\mx{B}-\lambda\cdot \mx{I})=0. 
+$$ 
+Ponadto każdy wektor $\vr{v} \in \setR^m$ spełniają dwa warunki
+\begin{enumerate}
+\item Nie będący wektorem zerowym - $v \neq 0$, oraz
+\item spełniającym równość
+$$
+\mx{B} \vr{v} = \lambda \vr{v},
+$$
+\end{enumerate}
+nazywać będziemy wektorem własnym stowarzyszonym z wartością własną $\lambda$.
 \end{definition}
-
-
-
-
-
-
-
-
-
-
 
 \chapter{Algorytm QR}
 
-\begin{theorem}[Twierdzienie]\label{(O rozkładzie QR)}
-Niech A będzie macierzą o wymiarach m x n, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład A=QR na dwa czynniki: macierz Q o wymiarach m x n taka, że $Q^{T}\cdot Q=D,$ gdzie $D= diag (d_{1}, d_{2}, ..., d_{n}),$  $d_{k}>0$ dla $(k = 1, 2, ..., n)$ i macierz trójkątną górną R z elementami $r_{kk}= 1 (k = 1, 2, ..., n).$
+W tym rozdziale zaprezentujemy elementy teorii dokonywania rozkładów QR macierzy. Rozpoczniemy od sformułowania i udowodnienia twierdzenia o istnieniu takiego rozkładu. Wiele analizowanych pozycji literaturowych sygnalizowało posiadanie dowodu poniższego twierdzenia. W naszej ocenie prezentowane tam dowody bliższe są jednak jedynie ich szkicowi. W efekcie pracy własnej poniżej prezentujemy własne opracowanie dowodu twierdzenia o istnieniu rozkładu QR, stworzonego na podstawie szkiców omówionych w literaturze. 
+
+\begin{theorem}[O rozkładzie QR]\label{theorem-qr-docomposition}
+Niech $\mx{A} \in \setR^{m \times n}$, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład 
+$$
+\mx{A} = \mx{Q} \mx{R}
+$$ 
+na dwa czynniki
+\begin{itemize}
+\item macierz $\mx{Q}$ taką, że 
+$$
+Q^{T}\cdot Q=D,
+$$
+gdzie $D= diag (d_{1}, d_{2}, ..., d_{n})$, oraz $d_{k}>0$ dla $k = 1, 2, \ldots, n$, oraz
+\item macierz trójkątną górną $\mx{R}$ spełniającą dodatkowo warunek 
+$$
+r_{kk}= 1 
+$$ 
+dla $k = 1, 2, \ldots, n$.
+\end{itemize} 
 \end{theorem}
+
+%TODO twierdzenie Grama Schmidta z poredy + dowód
+
+\begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta]
+Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy: Załóżmy, że wektory $\vr{v_1}, \ldots, \vr{v_n}$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależna. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $\vr{u_1}, \ldots, \vr{u_n}$ , które są transformacją wektorów v, przez algorytm Grama Schmidta. Niech $\mx{U}$ będzie macierza utworzoną kolumnowo z tych wektorów U. Wtedy
+$$
+U = A \cdot \ldots
+$$
+\end{lemma}
+\begin{proof}
+
+\end{proof}
+
+\begin{lemma}[O iloczynie macierzy trójkątnych górnych]
+... iloczyn dwóch macierzy trójkątnych górnych jest macierzą trójkątną górną
+\end{lemma}
+
+\begin{lemma}[O odwracaniu macierzy trójkątnej górnej]
+...
+\end{lemma}
+
+\begin{lemma}[O macierzy zmieniającej znak na przekątnej]
+
+\end{lemma}
+
+\begin{proof}[Dowód twierdzenia \ref{theorem-qr-docomposition}]
+
+\end{proof}
 
 \noindent \textbf{Dowód twierdzenia 3.1}\\
 Podane wyżej twierdzenie jest przekształceniem
@@ -214,5 +261,9 @@ $${\displaystyle Hx=x-{\frac {2vv^{T}x}{v^{T}v}}=x+(-2{\frac {vv^{T}x}{v^{T}v}})
 \chapter{Eksperymenty numeryczne}
 
 \chapter{Podsumowanie}
+
+
+\bibliographystyle{plain}
+\bibliography{bibliografia}
 
 \end{document}
