@@ -31,26 +31,32 @@
 \subsection{Definicje dotyczące macierzy} 
 
 \begin{definition}[Definicja macierzy]
-Macierzą $m \times n$ (tzn. o m wierszach i n kolumnach) o wyrazach w zbiorze X nazywamy tablicę:
+Niech $n,m \in \mathbb{N}$. Macierzą o $m$ wierszach, $n$ kolumnach (o wymiarach $m \times n$) i wyrazach w ciele $\mathbb{K}$ nazywamy funkcję 
 $$
-\mathbf{X} =
-\begin{bmatrix}
-x_{11} & x_{12} & \ldots & x_{1n}&   \\
-x_{21} & x_{22} & \ldots & x_{2n}& \\
-\vdots & \vdots & \ddots & \vdots \\
-x_{m1} & x_{m2} & \ldots & x_{mn}&
-\end{bmatrix}
+\mathbb{A}: \set{1,2, \ldots ,m}\times \set{1,2, \ldots ,n} \to \mathbb{K}.
 $$
-gdzie $x_{ij} \in X$  dla $1\le i\le m$, $1\le j\le n$.
+Wartością funkcji dla argumentu $(i,j)$ jest element $a_{ij}$  należący do ciała $\mathbb{K}$. Macierz zapisujemy w postaci tabeli
+$$
+\mathbb{A} = \left[
+        \begin{array}{cccc}
+         a_{11} & a_{12} & \cdots & a_{1n} \\
+         a_{21} & a_{22} & \cdots & a_{2n} \\
+         \vdots & \vdots & \ddots & \vdots \\
+         a_{m1} & a_{m2} & \cdots & a_{mn} \\
+         \end{array}
+      \right].
+$$
+
+Przez $\mathbb{M}_{m \times n}(\mathbb{K})$ oznaczmy zbiór wszystkich macierzy o wymiarach $m \times n$ i elementach z ciała $\mathbb{K}$.
 \end{definition}
 
 Korzystając z definicji \ref{definicja-macierzy}
 
-begin{definition} \label{definicja-macierzy}
+\begin{definition} \label{definicja-macierzy}
 Macierzą kwadratową o wymiarze n x n nazywamy macierz o liczbie wierszy równiej liczbie kolumn. Liczbę n nazywamy stopniem macierzy.
 \end{definition}
 
-begin{definition}
+\begin{definition}
 Macierzą jednostkową nazywamy macierz kwadratową, która na swojej głównej przekątnej posiada same wartości równe 1, natomiast reszta jest wypełniona zerami. Współczynniki tej macierzy są określone następującymi wzorami: 
 $$
 a_{ij} = \left\{ \begin{array}{ll}
@@ -60,7 +66,7 @@ a_{ij} = \left\{ \begin{array}{ll}
 $$
 \end{definition}
 
-begin{definition}
+\begin{definition}
 Macierzą symetryczną nazywamy macierz kwadratową, której wyrazy położone symetrycznie względem głównej przekątnej są równe. Formalnie jest to macierz kwadratowa 
 $$A=[a_{ij}]$$ 
 stopnia n, która dla 
@@ -71,41 +77,35 @@ a_{ij}=a_{ji}.
 $$
 \end{definition}
 
-begin{definition}
+\begin{definition}
 Macierz trójkątna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną lub wszystkie współczynniki nad tą przekątną są równe zero.
 \end{definition}
 
-begin{definition}
-Macierzą transponowaną (przestawioną) macierzy A nazywamy macierz $A^{T},$ która powstaje z danej poprzez zamianę jej wierszy na kolumny i kolumn na wiersze. Operację tworzenia macierzy transponowanej nazywamy transpozycją (przestawianiem).
-Dla macierzy $A=(a_{ij}):$ 
-$$ 
-\transpose{A} = \transpose{(a_{ij})}=(a_{ji})
-$$.
+\begin{definition}
+Niech $A=[a_{ij}]_{i\le j}$ będzie macierzą o wymiarach $m\timesn$. Dla $j=1,..,n$ oraz $i=1,...,n$, niech $d_{ji}=a_{ij}$. Wówczas macierz $A^{T}=[d_{ji}]_{j\le n}$ nazywamy macierzą transponowaną do A.
 \end{definition}
 
-begin{definition}
-Iloczynem macierzy $A = [a_{ij} ]$ i $B = [b_{jk}]$, gdzie $A\in M_{m}^{n}(F), $ $B\in M_{p}^{m}(F)$ nazywamy macierz $C = [c_{ik}], $ $C \in M_{p}^{n}(F), $ daną wzorem 
-$$ c_{ik} = \sum_{j=1}^{n} a_{ij}\cdot b_{jk}. $$
-Oznaczamy C = A · B.
+\begin{definition}
+Niech $A=[a_{ij}]_{i\le m, j\le k}$ będzie macierzą o wymiarach $m\times k$, a $B=[b_{ij}]_{i\le k, j\le n}$ macierzą o wymiarach $k\times n$. Iloczynem macierzy A,B nazywamy macierz $AB=[c_{ij}]_{i\le m, j\le n}$ o wymiarach $m\timesn$, gdzie dla $$i=1,...,m, j=1,...,n c_{ij}= \sum_{l=1}^{n} a_{il} \cdot b_{lj}$$.
 \end{definition}
 
-begin{definition}
+\begin{definition}
 Niech A będzie macierzą kwadratową ustalonego stopnia. Macierz A jest odwracalna, jeśli istnieje taka macierz B, że zachodzi
 $$A\cdot B=B\cdot A=I, $$ 
 gdzie I jest macierzą jednostkową. Macierz B nazywa się wówczas macierzą odwrotną do macierzy A i oznacza się przez  $A^{-1}.$
 \end{definition}
 
-begin{definition}
+\begin{definition}
 Macierz A nazywamy macierzą nieosobliwą, jeśli istnieje macierz B, która jest do niej odwrotna.
 \end{definition}  
 
-begin{definition}
+\begin{definition}
 Macierzą ortogonalną nazywamy macierz kwadratową $A\in M_{n}(R)$ o elementach będących liczbami rzeczywistymi spełniająca równość:
 $$A^{T}\cdot A=A\cdot A^{T}=I_{n},$$ 
 gdzie $I_{n}$ oznacza macierz jednostkową wymiaru n, $A^{T}$ oznacza macierz transponowaną względem A.
 \end{definition}
 
-begin{definition}
+\begin{definition}
 Dwie macierze kwadratowe A i B nazywamy macierzami podobnymi, jeśli istnieje taka macierz nieosobliwa P, że zachodzi związek: 
 $$ B=P^{-1}\cdot A\cdot P. $$
 \end{definition}
@@ -113,17 +113,19 @@ $$ B=P^{-1}\cdot A\cdot P. $$
 
 \subsection{Definicje dotyczące wektorów} 
 
-begin{definition}
-Wektorem nazywamy uporządkowaną parę punktów, z których jeden jest początkiem a drugi końcem tego wektora. Każdy wektor posiada zwrot, kierunek i długość.
+\begin{definition}
+Jeżeli $p,q\in \mathbb{R}^{n}$, to parę (p,q) nazywamy wektorem zaczepionym o początku p i końcu q.
 \end{definition}
 
-begin{definition}
-Układ wektorów  $ (v_{1}, v_{2}, ..., v_{k}) $ w przestrzeni liniowej $ V $ nad ciałem $ K $ nazywamy liniowo niezależnym, jeśli z $ a_{1}\cdot v_{1}+ a_{2}\cdot v_{2} + ... + a_{k}\cdot v_{k} = 0 $ wynika, że $a_{1}=a_{2}=...=a_{k}=0 $.
+\begin{definition}
+Niech $v_{1},..., v_{n}$ będą różnymi elementami przestrzeni liniowe V. Zbiór wektorów ${v_{1},...,v_{n}}$ nazywamy liniowo niezależnymi jeżeli 
+$$\forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot v_{1} + ... + a_{n}\cdot v_{n} = 0 \Rrightarrow a_{1}=...=a_{n}=0)
+$$ 
 \end{definition}
 
 \subsection{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
 
-begin{definition}
+\begin{definition}
 Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy A wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą detA. Jeśli macierz jest stopnia $n = 1, $ to jej wyznacznik $detA = a_{11}$. 
 Jeśli stopień macierzy jest większy niż 1, to jej wyznacznik obliczamy według następującego wzoru: 
 $$
@@ -132,12 +134,12 @@ $$
 gdzie $detM_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skreślenie i-tego wiersza i j-tej kolumny.
 \end{definition}
 \newpage
-begin{definition}
+\begin{definition}
 Niech B będzie macierzą wymiaru m x m i niech I będzie macierzą jednostkową wymiaru m x m. Wówczas skalary (liczby o wymiarze 1 x 1 ) $\lambda_{1}, \lambda_{2}, ..., \lambda_{m} $ nazywamy wartościami własnymi macierzy B, jeśli spełniają 
 $$|B-\lambda\cdot I|=0. $$ 
 \end{definition}
 
-begin{definition}
+\begin{definition}
 Niech B będzie macierzą wymiaru m x m i niech $\lambda$ będzie wartością własną macierzy B. Wówczas niezerowy wektor e wymiaru m x 1 nazywamy wektorem własnym macierzy B, jeżeli 
 $$B\cdot e = \lambda\cdot e. $$
 \end{definition}
@@ -154,7 +156,7 @@ $$B\cdot e = \lambda\cdot e. $$
 
 \chapter{Algorytm QR}
 
-begin{theorem}[Twierdzienie]\label{(O rozkładzie QR)}
+\begin{theorem}[Twierdzienie]\label{(O rozkładzie QR)}
 Niech A będzie macierzą o wymiarach m x n, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład A=QR na dwa czynniki: macierz Q o wymiarach m x n taka, że $Q^{T}\cdot Q=D,$ gdzie $D= diag (d_{1}, d_{2}, ..., d_{n}),$  $d_{k}>0$ dla $(k = 1, 2, ..., n)$ i macierz trójkątną górną R z elementami $r_{kk}= 1 (k = 1, 2, ..., n).$
 \end{theorem}
 
