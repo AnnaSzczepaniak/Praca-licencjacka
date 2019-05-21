@@ -6,6 +6,7 @@
 \usepackage{amssymb}
 \usepackage{natbib}
 \usepackage{polski}
+\usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage[polish, chapter]{dyschemist}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
@@ -14,6 +15,7 @@
 \newcommand{\vr}[1]{\mathbf{#1}}
 \newcommand{\mx}[1]{{#1}}
 
+\newcommand{\proj}[2]{\frac{\scalar{#2}{#1}}{\scalar{#1}{#1}}}
 
 \author{Anna Szczepaniak}
 \title{Algorytm dekompozycji QR}
@@ -194,7 +196,7 @@ nazywać będziemy wektorem własnym stowarzyszonym z wartością własną $\lam
 
 \chapter{Algorytm QR}
 
-W tym rozdziale zaprezentujemy elementy teorii dokonywania rozkładów QR macierzy. Rozpoczniemy od sformułowania i udowodnienia twierdzenia o istnieniu takiego rozkładu. Wiele analizowanych pozycji literaturowych sygnalizowało posiadanie dowodu poniższego twierdzenia. W naszej ocenie prezentowane tam dowody bliższe są jednak jedynie ich szkicowi. W efekcie pracy własnej poniżej prezentujemy własne opracowanie dowodu twierdzenia o istnieniu rozkładu QR, stworzonego na podstawie szkiców omówionych w literaturze. 
+W tym rozdziale zaprezentujemy elementy teorii dokonywania rozkładów QR macierzy. Rozpoczniemy od sformułowania i udowodnienia twierdzenia o istnieniu takiego rozkładu. Wiele analizowanych pozycji literaturowych sygnalizowało posiadanie dowodu poniższego twierdzenia. W naszej ocenie prezentowane tam dowody bliższe są jednak jedynie ich szkicowi. Dla powyższego powoduje prezentujemy własne opracowanie dowodu twierdzenia o istnieniu rozkładu QR, stworzonego na podstawie szkiców omówionych w literaturze oraz pracy własnej. 
 
 \begin{theorem}[O rozkładzie QR]\label{theorem-qr-docomposition}
 Niech $\mx{A} \in \setR^{m \times n}$, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład 
@@ -203,12 +205,12 @@ $$
 $$ 
 na dwa czynniki
 \begin{itemize}
-\item macierz $\mx{Q}$ taką, że 
+\item macierz $\mx{Q} \in \setR^{m \times n} $ taką, że 
 $$
 Q^{T}\cdot Q=D,
 $$
 gdzie $D= diag (d_{1}, d_{2}, ..., d_{n})$, oraz $d_{k}>0$ dla $k = 1, 2, \ldots, n$, oraz
-\item macierz trójkątną górną $\mx{R}$ spełniającą dodatkowo warunek 
+\item macierz trójkątną górną $\mx{R} \in \setR^{n \times n}$ spełniającą dodatkowo warunek 
 $$
 r_{kk}= 1 
 $$ 
@@ -233,29 +235,191 @@ $$
 \end{proof}
 TODO twierdzenie Grama Schmidta z poredy + dowód
 
-\begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta]
-Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy: Załóżmy, że wektory $\vr{v_1}, \ldots, \vr{v_n}$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależna. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $\vr{u_1}, \ldots, \vr{u_n}$ , które są transformacją wektorów v, przez algorytm Grama Schmidta. Niech $\mx{U}$ będzie macierza utworzoną kolumnowo z tych wektorów U. Wtedy
+
+\begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta] \label{lemma-matrix-formulation-of-gs}
+Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $\vr{v_1}, \ldots, \vr{v_n}$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $\vr{u_1}, \ldots, \vr{u_n}$ , które są transformacją wektorów $\vr{v_1}, \ldots, \vr{v_n}$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierza utworzoną kolumnowo z tych wektorów $\vr{u_1}, \ldots, \vr{u_n}$. Wtedy
+{\small
 $$
-U = A \cdot \ldots
-$$
+U = A \cdot 
+\begin{bmatrix}
+1 & -\proj{u_1}{v_2} & \cdots & 0 \\
+0 & 1 & \cdots & 0 \\
+\vdots & \vdots & & \vdots \\
+0 & 0 & \cdots & 1
+\end{bmatrix} \cdot
+\begin{bmatrix}
+1 & 0 & -\proj{u_1}{v_3} &\cdots & 0 \\
+0 & 1 & -\proj{u_2}{v_3} &\cdots & 0 \\
+0 & 0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \vdots &  & \vdots \\
+0 & 0 & 0 & \cdots & 1
+\end{bmatrix}
+ \cdots
+\begin{bmatrix}
+1 & 0 & 0 & \cdots & 0 & -\proj{u_1}{v_n} \\
+0 & 1 & 0 & \cdots & 0 &-\proj{u_2}{v_n} \\
+0 & 0 & 1 & \cdots & 0 & -\proj{u_3}{v_n} \\
+\vdots & \vdots & \vdots &  & \vdots & \vdots \\
+0 & 0 & 0 & \cdots & 1 & -\proj{u_{n-1}}{v_n} \\
+0 & 0 & 0 & \cdots & 0 & 1
+\end{bmatrix}
+$$ 
+}
 \end{lemma}
 \begin{proof}
-
+Dówód powyższego faktu jest niemal automatyczny. Wykonujemy operacje kolejnych iteracji algorytmu Grama-Schmidta. Pierwsza z operacji odpowiada utworzeniu wektora $u_2$ i ławo zauważyć, że powyższe mnożenie macierzowe dostarcza dokładnie tę operację. Macierz jest prawie jednostkową, jedynie 2 kolumna się wyróżnia. W efekcie oznacza to, że wszystkie zmiany przez nią wykonane zostaną składowane w drugiej kolumnie macierzy wynikowej. Dokładnie jak w algorytmie. Kolejne iteracje algorytmu modyfikują wyniki działania poprzednich iteracji - stąd należy w mnożeniu macierzowym zastosować mnożenie wyniku poprzedniej iteracji z prawej strony. 
 \end{proof}
 
-\begin{lemma}[O iloczynie macierzy trójkątnych górnych]
-... iloczyn dwóch macierzy trójkątnych górnych jest macierzą trójkątną górną
+\begin{lemma}[O iloczynie macierzy trójkątnych górnych] \label{lemma-upper-triangle-multiplication}
+Niech $\mx{A}, \mx{B} \in \setR^{n \times n}$ bedą dwiema nieosobliwymi macierzami trójkątnymi górnymi. Wtedy
+$$
+\mx{C} = \mx{A} \cdot \mx{B},
+$$
+jest też nieosobliwą macierzą trójkątną górną.
 \end{lemma}
 
-\begin{lemma}[O odwracaniu macierzy trójkątnej górnej]
-...
+\begin{proof}
+Niech $\mx{A}, \mx{B}$ jak w założeniach, oraz $\mx{C} = \mx{A} \cdot \mx{B}$. 
+Korzystająć z twierdzenia Cauchy'ego o iloczynie macierzy otrzymujemy natychmiast, że macierz $\mx{C} \in \setR^{n \times n}$ jest również nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną górną. Rozważmy dowolny $i,j \in \set{1, \ldots, n}$ parę indeksów z poniżej przekątnej, tj. takich dla których $i > j$. Wtedy
+\begin{equation}\label{eq-proof-upper-triangle-mutliplication}
+c_{ij} = a_{i1} b_{1j} + \ldots +a_{in} b_{nj}.
+\end{equation}
+Zauważmy, że elementy $a_{i1}, \ldots , a_{i(i-1)}$ są równe $0$ gdyż pochodzą z macierzy trójkątnej górnej. Ponadto elementy $b_{j(j+1)}, \ldots, b_{jn}$ są z analogicznego powodu również równe $0$. Skoro $i > j$ to każdy składnik sumy \eqref{eq-proof-upper-triangle-mutliplication} posiada czynnik równy $0$. Zatem $c_{ij}$ dla rozważanego indeksu jest równe $0$. W dowolności wyboru $i,j$ macierz $\mx{C}$ jest macierzą trójkątną górną.
+\end{proof}
+
+\begin{lemma}[Macierz transformująca algorytmu Grama-Schmidta]\label{lemma-gram-schmidt-matrix}
+Niech $\mx{A} \in \setR^{m \times n}$ będzie macierzą, której kolumny są liniowo niezależne. Niech $\mx{U} \in \setR^{m \times n}$ będzie macierzą uzyskaną poprzez połączenie jako kolumn wektorów uzyskanych z algorytmu Grama-Schmidta. Wtedy istnieje trójkąta górna macierz $\mx{T} \in \setR^{n \times n}$ taka, że
+$$
+\mx{U} = \mx{A} \cdot \mx{T},
+$$
+i $T_{kk} = 1$ dla dowolnego $k \in \set{1,\ldots,n}$.
 \end{lemma}
 
-\begin{lemma}[O macierzy zmieniającej znak na przekątnej]
+\begin{proof}
+Niech $\mx{A}, \mx{U}$ takie jak w założeniach lematu. Wtedy wobec lematu \ref{lemma-matrix-formulation-of-gs} zachodzi 
+$$
+U = A \cdot 
+\begin{bmatrix}
+1 & -\proj{u_1}{v_2} & \cdots & 0 \\
+0 & 1 & \cdots & 0 \\
+\vdots & \vdots & & \vdots \\
+0 & 0 & \cdots & 1
+\end{bmatrix} \cdot
+\begin{bmatrix}
+1 & 0 & -\proj{u_1}{v_3} &\cdots & 0 \\
+0 & 1 & -\proj{u_2}{v_3} &\cdots & 0 \\
+0 & 0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \vdots &  & \vdots \\
+0 & 0 & 0 & \cdots & 1
+\end{bmatrix}
+ \cdots
+\begin{bmatrix}
+1 & 0 & 0 & \cdots & 0 & -\proj{u_1}{v_n} \\
+0 & 1 & 0 & \cdots & 0 &-\proj{u_2}{v_n} \\
+0 & 0 & 1 & \cdots & 0 & -\proj{u_3}{v_n} \\
+\vdots & \vdots & \vdots &  & \vdots & \vdots \\
+0 & 0 & 0 & \cdots & 1 & -\proj{u_{n-1}}{v_n} \\
+0 & 0 & 0 & \cdots & 0 & 1
+\end{bmatrix}.
+$$ 
+Zauważmy, że mnożenie macierzowe jest łączne. Możemy je mnożyć wykonując kolejne mnożenia patrząc od prawej strony. Stosując $n-2$ krotnie lemat \ref{lemma-upper-triangle-multiplication} otrzymujemy macierz $\mx{T}$ która jest nieosobliwą macierzą trójkątną górną. Łatwo zauważyć, że na przekątnej tej macierzy wszystkie elementy to właśnie $1$. 
+\end{proof}
 
+Istotną obserwacją jaką można poczynić jest taka, że macierzy tej nie można sobie w łatwy sposób od tak wyznaczyć. Aby ją uzyskać trzeba przeprowadzić cały algorytm Grama-Schmidta i dopiero po jego przeprowadzeniu macierz tę daje się jawnie wyznaczyć.
+
+\begin{lemma}[O odwracaniu macierzy trójkątnej górnej]\label{lemma-upper-triangle-invertion}
+Niech $\mx{A} \in \setR^{n \times n}$ będzie nieosobliwą macierzą trójkątną górną. Wtedy istnieje macierz $\inverse{\mx{A}}$ i jest ona nieosobliwą macierzą trójkątną górną.
 \end{lemma}
+
+\begin{proof}
+Niech $\mx{A}$ będzie macierzą jak w założeniach twierdzenia.
+Na mocy wniosku z twierdzenia Cauchy'ego o iloczynie macierzy wiemy, że macierz $\inverse{\mx{A}} $ istnieje i jest nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną. Pokazać ten fakt można na kilka różnych sposobów, zaprezentujemy tutaj najprostszy pod względem wiedzy teoretycznej dowód.
+Wykorzystamy drugi krok z algorytmu elimininacji Gaussa. Przypomnijmy, że algorytm ten służy rozwiązaniu układu równań postaci 
+$$
+\mx{A} \vr{x} = \vr{b},
+$$
+i składa się z dwóch kroków. Pierwszym jest redukcja macierzy metodą eliminacji do macierzy trójkątnej górnej. Drugim etapem jest iteracyjne policzenie rozwiązania. Przyjmijmy, że mamy
+$$
+\begin{bmatrix}
+a_{11} & a_{12} & \ldots & a_{1n} \\
+0 & a_{22} & \ldots & a_{2n} \\
+\vdots & \vdots & & \vdots\\
+0 & 0 & \ldots & a_{nn}
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{bmatrix}
+=
+\begin{bmatrix}
+b_1 \\ b_2 \\ \vdots \\ b_n
+\end{bmatrix}.
+$$
+Skoro macierz $\mx{A}$ jest nieosobliwa to wiemy, że elementy na przekątnej są różne od $0$, tzn.
+$$
+\forall k \in \set{1, \ldots, n} \quad a_{kk} \neq 0.
+$$
+Wtedy prawdziwy jest wzór pozwalający na iteracyjne policzenie 
+\begin{equation}
+x_k = \frac{1}{a_{kk}} \bracket{b_k - \sum_{i=k+1}^{n} a_{ki} x_{i}}.
+\end{equation}
+{\color{red} Poniższa część dowodu, jest trochę dziurawa - może należałoby ją jeszcze rozszerzyć. Ogólnie chodzi o to, że $x_k$ zależy jedynie od $b_k, \ldots, b_n$ co sprawia, że ta transformacja odwrotna jest reprezentowana przez macierz trójkątną górną.}
+W powyższej formule zauważmy, że istnieje takie $\alpha_n \in \setR^{n}$, że $x_n = \alpha_n \cdot
+\transpose{\begin{bmatrix}
+0, 0 , \ldots, 0, b_n
+\end{bmatrix}}$. W efekcie istnieje takie $\alpha_{n-1} \in \setR^{n}$, że $x_{n-1}= \alpha_{n-1} \cdot
+\transpose{\begin{bmatrix}
+0, 0 , \ldots, b_{n-1}, b_n
+\end{bmatrix}} $, a ostatecznie
+\begin{equation} \label{eq-proof-lemma-upper-triangle-invertion}
+\exists_{\alpha_1,\ldots,\alpha_n \in \setR^{n}}
+\forall_{b \in \setR^{n} } 
+\forall_{k \in \set{1,\ldots, n}} \quad x_{k} = \alpha_{k} \cdot
+\transpose{\begin{bmatrix}
+0, \ldots, 0 , b_{k} , \ldots, b_n
+\end{bmatrix}}. 
+\end{equation}
+Przypuśćmy, że macierz $\inverse{\mx{A}}$ nie jest trójkątna górna. Wtedy istnieje pewien element ${\inverse{a}}_{ij} \neq 0$, gdzie $i > j$. To z kolei oznaczałoby, że \eqref{eq-proof-lemma-upper-triangle-invertion} nie jest spełnione. Zatem macierz ta istotnie musi być trójkątną górną.
+\end{proof}
+
+Teraz możemy przystąpić do dowodu głównego twierdzenia.
 
 \begin{proof}[Dowód twierdzenia \ref{theorem-qr-docomposition}]
+Niech $\mx{A} \in \setR^{m \times n}$ będzie macierzą jak w założeniach. Wtedy z lematu \ref{lemma-gram-schmidt-matrix} przy zastosowaniu algorytmu Grama-Schmidta otrzymujemy równość
+$$
+\mx{U} = \mx{A} \cdot \mx{T}.
+$$
+Na mocy lematu \ref{lemma-upper-triangle-invertion} wiemy, że macierz $\mx{T}$ jest odwracalna i macierz do niej odwrotna jest trójkątną górną. Wykonując mnożenie prawostronne przez tę macierz otrzymujemy:
+\begin{align*}
+\mx{U} \cdot \inverse{\mx{T}} & = \mx{A}\cdot\mx{T}\cdot \inverse{\mx{T}}, \\
+\mx{U} \cdot \inverse{\mx{T}} & = \mx{A}.
+\end{align*}  
+Postać którą mamy powyżej jest już bliska faktycznemu rozkładowi QR. Macierze te jednak różnią się własnościami. Macierz $\mx{U}$ nie jest macierzą ortogonalną. Jest utworzona z kolumn które są wzajemnie ortogonalne, ale macierz ortogonalna musi posiadać znomalizowane ortonormalne kolumny. Trzeba wprowadzić w nich zatem pewną korektę. Rozważmy macierz $\mx{D}$ następującej postaci
+$$
+\mx{D} = \begin{bmatrix}
+\sqrt{\scalar{u_1}{u_1}} & 0 & 0 & \ldots & 0 \\
+0 & \sqrt{\scalar{u_2}{u_2}} & 0 & \ldots & 0 \\
+0 & 0 & \sqrt{\scalar{u_3}{u_3}} & \ldots & 0 \\
+\vdots & \vdots & \vdots & & \vdots \\
+0 & 0 & 0 & \ldots & \sqrt{\scalar{u_n}{u_n}}
+\end{bmatrix}.
+$$
+Zauważmy natychmiast, że 
+$$
+\inverse{\mx{D}} = 
+\begin{bmatrix}
+\frac{1}{\sqrt{\scalar{u_1}{u_1}}} & 0 & 0 & \ldots & 0 \\
+0 & \frac{1}{\sqrt{\scalar{u_2}{u_2}}} & 0 & \ldots & 0 \\
+0 & 0 & \frac{1}{\sqrt{\scalar{u_3}{u_3}}} & \ldots & 0 \\
+\vdots & \vdots & \vdots & & \vdots \\
+0 & 0 & 0 & \ldots & \frac{1}{\sqrt{\scalar{u_n}{u_n}}}
+\end{bmatrix}.
+$$
+Wtedy możemy wykonać następujące mnożenia
+\begin{align*}
+\mx{U} \cdot \mx{I_n} \cdot \inverse{\mx{T}} & = \mx{A} ,\\
+\mx{U} \cdot \inverse{\mx{D}} \cdot \mx{D} \cdot \inverse{\mx{T}} & = \mx{A}.
+\end{align*}
+Wtedy oznaczmy $\mx{Q}= \mx{U} \cdot \inverse{\mx{D}}$ oraz $ \mx{R} = \mx{D}\cdot \inverse{\mx{T}}$. Zauważmy, że tak otrzymana macierz $\mx{Q}$ jest ortonormalna. Natomiast $\mx{R}$ jako iloczyn dwóch macierzy górnie trójkątnych jest macierzą górnie trójkątną. Dokładne rachunki pokazały by ponadto, że elementy macierzy $\inverse{\mx{T}} $ na przekątnej były $1$ co sprawia, że na przekątnej znajdują się dokładnie elementy macierzy $\mx{D}$.
 
 \end{proof}
 
