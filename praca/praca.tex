@@ -11,7 +11,7 @@
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 
 
-\newcommand{\vr}[1]{\overrightarrow{#1}}%{\mathbf{#1}}
+\newcommand{\vr}[1]{\mathbf{#1}}
 \newcommand{\mx}[1]{{#1}}
 
 
@@ -24,13 +24,13 @@
 
 \tableofcontents
 
-\chapter{Wstęp}
+%\chapter{Wstęp}
 
 \chapter{Preliminaria}
 
 W niniejszym rozdziale przypomniane zostaną wybrane elementy z zakresu algebry liniowej, potrzebne do wyjaśnienia działania algorytmu QR.
 
-\section{Elementy algebry liniowej} 
+%\section{Elementy algebry liniowej} 
 
 Niniejszą część rozpocznijmy od zdefiniowania pojęcia macierzy. Warto nadmienić, że w znaczącej części literatury - pojęcie te nie jest definiowane w sposób matematycznie precyzyjny.
 
@@ -58,30 +58,28 @@ Macierze posiadają wiele istotnych dla nas podklas, posiadający określone cec
 Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej.
 \end{definition}
 
-\begin{definition}[Macierz jednostkowa \cite{}]
-Macierzą jednostkową nazywamy macierz kwadratową, która na swojej głównej przekątnej posiada same wartości równe 1, natomiast reszta jest wypełniona zerami. Współczynniki tej macierzy są określone następującymi wzorami: 
-$$
-a_{ij} = \left\{ \begin{array}{ll}
-1 &, j=i\\
-0 &, j\ne i
-\end{array} \right.
-$$
-dla $i \in \set{1,2,\ldots,m} $ oraz $j \in \set{1,2,\ldots, n}$.
+\begin{definition}[Macierz diagonalna\citep{poreda11}]
+Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poza główną przekątną są równe zeru, to taką macierz nazywamy macierzą diagonalną, oznaczamy ją jako $diag(a_{11}, a_{22},\ldots,a_{nn})$.
 \end{definition}
 
-\begin{definition}
-Macierzą symetryczną nazywamy macierz kwadratową $A=[a_{ij}]$, której wyrazy spełniają warunek 
+\begin{definition}[Macierz jednostkowa \citep{poreda11}]
+Macierz jednostkową stopnia $n$ nazywamy taką macierz diagonalną, w której wszystkie elementy na głównej przekątnej są równe 1.
+\end{definition}
+
+\begin{definition}[Macierz symetryczna]
+Macierzą symetryczną nazywamy macierz kwadratową $\mx{A}=[a_{ij}]$, której wyrazy spełniają warunek 
 $$
 \forall_{i,j \in \set{1,\ldots,n}} \quad a_{ij}=a_{ji}.
 $$
 \end{definition}
 
-\begin{definition}
-Macierz trójkątna górna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną są równe $0$. Analogicznie macierzą trójkątna dolną nazywamy macierz kwadratową dla której wszystkie współczynniki ponad przekątną są równe $0$.
+\begin{definition}[Macierz trójkątna górna oraz trójkątna dolna\citep{poreda11}]
+Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poniżej głównej przekątnej są równe $0$, to taką macierz nazywamy macierzą trójkątną górną.
+Analogicznie jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy powyżej głównej przekątnej są równe $0$ to taką macierz nazywamy trójkątną dolną.
 \end{definition}
 
 \begin{definition}
-Niech $A=[a_{ij}] \in \setR^{m \times n}$. Wtedy macierz $D \in \setR^{n \times m}$ spełniająca warunek taki, że
+Niech $\mx{A}=[a_{ij}] \in \setR^{m \times n}$. Wtedy macierz $D \in \setR^{n \times m}$ spełniająca warunek taki, że
 $$
 d_{ij} = a_{ji},
 $$
@@ -90,13 +88,47 @@ dla dowolnych $i \in \set{1,\ldots, n}$ oraz $j \in \set{1,\ldots,m}$ nazywamy m
 
 %TODO proszę kontynuować poprawki definicji poniżej
 
-\begin{definition}
-Niech $A=[a_{ij}]_{i\le m, j\le k}$ będzie macierzą o wymiarach $m\times k$, a $B=[b_{ij}]_{i\le k, j\le n}$ macierzą o wymiarach $k\times n$. Iloczynem macierzy A,B nazywamy macierz $AB=[c_{ij}]_{i\le m, j\le n}$ o wymiarach $m\times n$, gdzie dla $$i=1,...,m, j=1,...,n c_{ij}= \sum_{l=1}^{n} a_{il} \cdot b_{lj}$$.
+\begin{definition}[Iloczyn macierzy\citep{poreda11}]
+Niech $\mx{A}\in \mx{M}_{m\times n}(\set{K})$ i $\mx{B}\in \mx{M}_{k\times m}(\set{K})$. Jeśli
+$$
+\mx{A} = \begin{bmatrix}
+ a_{11} & a_{12} & \cdots & a_{1n} \\
+         a_{21} & a_{22} & \cdots & a_{2n} \\
+         \vdots & \vdots & \ddots & \vdots \\
+         a_{m1} & a_{m2} & \cdots & a_{mn} \\
+\end{bmatrix}.
+$$ 
+i 
+$$
+\mx{B} = \begin{bmatrix}
+ b_{11} & b_{12} & \cdots & b_{1m} \\
+         b_{21} & b_{22} & \cdots & b_{2m} \\
+         \vdots & \vdots & \ddots & \vdots \\
+         b_{k1} & b_{k2} & \cdots & b_{km} \\
+\end{bmatrix}.
+$$
+to iloczynem macierzy $\mx{B}$ i $\mx{A}$ nazywamy macierz $\mx{C}$ taką, że
+$$
+\mx{C} = [c_{lj}]_{j=1,\ldots,n}^{l=1,\ldots,k}
+$$
+i
+$$
+c_{lj}= \sum_{l=1}^{m} b_{li} \cdot a_{ij}
+$$.
 \end{definition}
 
-\begin{definition}
+%[a_{ij}]_{i\le m, j\le k}$ będzie macierzą o wymiarach $m\times k$, a $\mx{B}=[b_{ij}]_{i\le k, j\le n}$ macierzą o wymiarach $k\times n$. Iloczynem macierzy $\mx{A}$,$\mx{B}$ nazywamy macierz $\mx{A} \mx{B}=[c_{ij}]_{i\le m, j\le n}$ o wymiarach $m\times n$, gdzie dla 
+$$
+i=1,\ldots,m, j=1,\ldots,n 
+$$.
+
+
+\begin{definition}[Macierz odwrotna\citep{poreda11}]
+Macierz $\mx{A}$ ze zbioru $\mx{M}_{n}(\set{K})$ nazywamy macierzą odwracalną, jeśli istnieje macierz $\mx{B}$ w zbiorze.
 Niech A będzie macierzą kwadratową ustalonego stopnia. Macierz A jest odwracalna, jeśli istnieje taka macierz B, że zachodzi
-$$A\cdot B=B\cdot A=I, $$ 
+$$
+A\cdot B=B\cdot A=I
+$$, 
 gdzie I jest macierzą jednostkową. Macierz B nazywa się wówczas macierzą odwrotną do macierzy A i oznacza się przez  $A^{-1}.$
 \end{definition}
 
@@ -106,29 +138,34 @@ Macierz A nazywamy macierzą nieosobliwą, jeśli istnieje macierz B, która jes
 
 \begin{definition}
 Macierzą ortogonalną nazywamy macierz kwadratową $A\in M_{n}(R)$ o elementach będących liczbami rzeczywistymi spełniająca równość:
-$$A^{T}\cdot A=A\cdot A^{T}=I_{n},$$ 
+$$
+A^{T}\cdot A=A\cdot A^{T}=I_{n}
+$$, 
 gdzie $I_{n}$ oznacza macierz jednostkową wymiaru n, $A^{T}$ oznacza macierz transponowaną względem A.
 \end{definition}
 
 \begin{definition}
 Dwie macierze kwadratowe A i B nazywamy macierzami podobnymi, jeśli istnieje taka macierz nieosobliwa P, że zachodzi związek: 
-$$ B=P^{-1}\cdot A\cdot P. $$
+$$
+B=P^{-1}\cdot A\cdot P
+$$.
 \end{definition}
 
 
-%\section{Definicje dotyczące wektorów} 
-%
-%\begin{definition}
-%Jeżeli $p,q\in \mathbb{R}^{n}$, to parę (p,q) nazywamy wektorem zaczepionym o początku p i końcu q.
-%\end{definition}
-%
-%\begin{definition}
-%Niech $v_{1},..., v_{n}$ będą różnymi elementami przestrzeni liniowe V. Zbiór wektorów ${v_{1},...,v_{n}}$ nazywamy liniowo niezależnymi jeżeli 
-%$$\forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot v_{1} + ... + a_{n}\cdot v_{n} = 0 \Rrightarrow a_{1}=...=a_{n}=0)
-%$$ 
-%\end{definition}
+\section{Definicje dotyczące wektorów} 
 
-%\section{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
+\begin{definition}
+Jeżeli $\vr{p},\vr{q}\in \set{R}^{n}$, to parę $(\vr{p},\vr{q})$ nazywamy wektorem zaczepionym o początku $\vr{p}$ i końcu $\vr{q}$.
+\end{definition}
+
+\begin{definition}
+Niech $\vr{v_{1}},..., \vr{v_{n}}$ będą różnymi elementami przestrzeni liniowe V. Zbiór wektorów ${\vr{v_{1}},...,\vr{v_{n}}}$ nazywamy liniowo niezależnymi jeżeli 
+$$
+\forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot v_{1} + ... + a_{n}\cdot v_{n} = 0 \implies a_{1}=...=a_{n}=0)
+$$ 
+\end{definition}
+
+\section{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
 
 \begin{definition}[??]
 Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy $A$ wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą $\det A$. Jeśli macierz jest stopnia $n = 1$, to jej wyznacznik $\det A  = a_{11}$. 
@@ -140,7 +177,7 @@ gdzie $\det M_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez sk
 \end{definition}
 
 \begin{definition}
-Niech $B$ będzie macierzą wymiaru $m$ na $m$ i niech $I$ będzie macierzą jednostkową wymiaru $m$ na $m$. Wówczas wartościami własnymi macierzy $B$ nazywamy takie $\lambda \in \setC$, które spełniają następujące równanie:
+Niech $\mx{B}$ będzie macierzą wymiaru $m$ na $m$ i niech $I$ będzie macierzą jednostkową wymiaru $m$ na $m$. Wówczas wartościami własnymi macierzy $B$ nazywamy takie $\lambda \in \setC$, które spełniają następujące równanie:
 $$
 \det (\mx{B}-\lambda\cdot \mx{I})=0. 
 $$ 
@@ -179,7 +216,22 @@ dla $k = 1, 2, \ldots, n$.
 \end{itemize} 
 \end{theorem}
 
-%TODO twierdzenie Grama Schmidta z poredy + dowód
+\begin{theorem}[Twierdzenie(Grama-Schmidta)\citep{poreda11}]
+Dla każdego układu liniowo niezależnego wektorów $\vr(x_{1}),\ldots,\vr(x_{n})$ w przestrzeni euklidesowej istnieje układ ortonormalny $(\vr(b_{1},\ldots,b_{n})$ taki, że 
+$$
+span(\vr(b_{1},\ldots,b_{k}) = span(\vr(x_{1},\ldots,x_{k})
+$$
+dla każdej liczby $k$ ze zbioru $(1,\ldots,n)$.
+\end{theorem}
+
+\begin{proof}[Dowód\citep{poreda11}]
+Oczywiście wektory $\vr(x_{i})$ są niezerowe, zatem mają długość dodatnią. Niech więc
+$$
+\vr(b_{1})=(1\div\Vert\vr(x_{1})\Vert)\cdot\vr(x_{1})
+$$
+
+\end{proof}
+TODO twierdzenie Grama Schmidta z poredy + dowód
 
 \begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta]
 Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy: Załóżmy, że wektory $\vr{v_1}, \ldots, \vr{v_n}$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależna. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $\vr{u_1}, \ldots, \vr{u_n}$ , które są transformacją wektorów v, przez algorytm Grama Schmidta. Niech $\mx{U}$ będzie macierza utworzoną kolumnowo z tych wektorów U. Wtedy
