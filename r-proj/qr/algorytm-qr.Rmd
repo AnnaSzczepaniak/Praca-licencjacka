@@ -176,3 +176,4 @@ qr.R(QR)
 # Ćwiczenie
 
 Trzeba jeszcze pokazać, że rozkład taki jest jedyny.
+

@@ -1,0 +1,191 @@
+---
+title: "Dekompozycja QR- Metoda Householdera"
+author: "Ania Szczepaniak"
+date: "3 wrzeœnia 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Rozwa¿my sobie nastêpuj¹c¹ macierz
+
+```{r}
+A <- matrix(c(2,-2,18,2,1,0,1,2,0), 3, 3, byrow=TRUE)
+A
+```
+
+Szukamy przekszta³cenia pierwszego wektora, tj. pierwszej kolumny.
+
+```{r}
+house = function(x) {
+  norm_x = sqrt(t(x) %*% x)
+  if (x[1] > 0) {
+    x[1] = x[1] + norm_x;
+  } else {
+    x[1] = x[1] - norm_x;
+  }
+  return(x)
+}
+house(A)
+```
+
+Tworzymy rozk³ad QR korzystaj¹c z transformacji Householdera 
+
+
+```{r}
+qr_householer = function(A)
+{
+  
+  R = A
+  print(A)
+  dimm = dim(A)
+  n = dimm[2]
+  m = dimm[1]
+  Q = diag(n)
+  for (i in 1:min(m-1,n)){
+    
+    u = house(R[i:m,i])
+    den =  (t(u) %*% u)[1,1]
+    P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
+    R[i:m,i:n] = P %*% R[i:m,i:n]
+    
+  
+
+    print(R)
+  }
+  return(R)
+  return(Q)
+}
+qr_householer(A)
+```
+
+
+
+
+```{r}
+
+givens = function(i,j,A){
+  dimm = dim(A)
+  n = dimm[1]
+  G = diag(n)
+  p = sqrt((A[i,i])^2 + (A[j,i])^2)
+  G[i,i] = A[i,i]/ p
+  G[i,j] = (A[j,i])/p
+  G[j,i] = -(A[j,i])/p
+  G[j,j] = A[i,i]/ p
+  
+return(G)  
+  
+}
+A= matrix(c(1,2,2,2,2,1,2,1,2), 3,3, byrow = TRUE)
+A
+G = givens(1,2,A)
+G
+A2= G %*% A
+A2
+G = givens(1,3,A2)
+A3 = G%*% A2
+A3
+```
+
+```{r}
+givens(3,1,A) %*% A
+```
+
+```{r}
+qr_givens = function(A){
+  R = A
+  
+  n = dim(A)[2]
+  m = dim(A)[1]
+  Q = diag(n)
+  for (i in 1:(n-1)) {
+    for (j in (i+1):m) {
+      G = givens(i,j,R)
+      R = G %*% R
+      Q = Q %*% t(G)
+    }
+  }
+  return(list(R=R, Q=Q))
+}
+
+qr_givens(A)
+```
+
+Teraz czas na eksperymenty, które poka¿¹, jak bardzo ró¿ni siê b³¹d naszych algorytmów  od tego z gotowej funkcji R Studio, s³u¿¹cej do rozk³adu QR. 
+Do wy¿ej wymienionych eksperymentów wykorzystamy losowo wybrane trzy macierze. 
+1. Wymiarów 5 na 5.
+2. Wymiarów 25 na 25.
+3. Wymiarów 125 na 125. 
+
+Na pocz¹tek zajmijmy siê macierz¹ wymiarów 5 na 5.
+```{r}
+M_1<-matrix(c(replicate(5, rnorm(5)) ), 5, 5, byrow=TRUE) 
+M_1
+```
+
+Najpierw przeprowadŸmy rozk³ad wbudowan¹ funkcj¹ w R Studio.
+
+```{r}
+QR = qr(M_1)
+qr.Q(QR)
+qr.R(QR)
+```
+
+Nastêpnie przeprowadzimy rozk³ad naszym algorytmem qr_givens
+
+```{r}
+qr_givens(M_1)
+```
+SprawdŸmy, który rozk³ad jest bli¿szy naszej wyjœciowej macierzy A.
+
+```{r}
+A_givens = R %*% Q
+blad = sqrt(A_givens^2 + A^2)
+```
+
+
+
+Teraz kolej na macierzy wymiarów 25 na 25.
+
+```{r}
+M_2<-matrix(c(replicate(25, rnorm(25)) ), 25, 25, byrow=TRUE) 
+```
+
+Rozk³ad wbudowan¹ funkcj¹ w R Studio:
+
+```{r}
+QR = qr(M_2)
+qr.Q(QR)
+qr.R(QR)
+```
+
+Rozk³ad naszym algorytmem:
+
+```{r}
+qr_householer(M_2)
+```
+
+
+W koñcu sprawdŸmy jak wygl¹daj¹ rozk³ady macierzy wymiarów 125 na 125.
+
+```{r}
+M_3<-matrix(c(replicate(125, rnorm(125)) ), 125, 125, byrow=TRUE) 
+```
+
+Rozk³ad funkcj¹ qr:
+
+```{r}
+QR = qr(M_3)
+qr.Q(QR)
+qr.R(QR)
+```
+
+Rozk³ad algorytmem qr_householder:
+
+```{r}
+qr_householer(M_3)
+```
+
