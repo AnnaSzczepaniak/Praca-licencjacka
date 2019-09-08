@@ -20,6 +20,7 @@ Szukamy przekszta³cenia pierwszego wektora, tj. pierwszej kolumny.
 
 ```{r}
 house = function(x) {
+  print(t(x) %*% x)
   norm_x = sqrt(t(x) %*% x)
   if (x[1] > 0) {
     x[1] = x[1] + norm_x;
@@ -28,7 +29,6 @@ house = function(x) {
   }
   return(x)
 }
-house(A)
 ```
 
 Tworzymy rozk³ad QR korzystaj¹c z transformacji Householdera 
@@ -45,18 +45,15 @@ qr_householer = function(A)
   m = dimm[1]
   Q = diag(n)
   for (i in 1:min(m-1,n)){
-    
     u = house(R[i:m,i])
     den =  (t(u) %*% u)[1,1]
     P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
     R[i:m,i:n] = P %*% R[i:m,i:n]
-    
-  
-
-    print(R)
+    if (i>1)
+      Q[i:n,1:(i-1)] = P %*% Q[i:n,1:(i-1)]
+    Q[i:n,i:n] = P %*% Q[i:n,i:n]
   }
-  return(R)
-  return(Q)
+  return(list(R=R, Q=t(Q)))
 }
 qr_householer(A)
 ```
