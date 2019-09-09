@@ -50,6 +50,7 @@ qr_householer = function(A)
     den =  (t(u) %*% u)[1,1]
     P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
     R[i:m,i:n] = P %*% R[i:m,i:n]
+    Q[i:n,i:n] =Q[i:n,i:n] %*% P 
     
   
 
@@ -142,8 +143,12 @@ qr_givens(M_1)
 SprawdŸmy, który rozk³ad jest bli¿szy naszej wyjœciowej macierzy A.
 
 ```{r}
-A_givens = R %*% Q
-blad = sqrt(A_givens^2 + A^2)
+M_1_givens = R %*% Q
+S = M_1_givens^2 - M_1^2
+blad_givens = sqrt(S^2)
+M_1_qr = qr.Q(QR) %*% qr.R(QR)
+S_1 = M_1_qr - M_1
+blad_qr = sqrt(S_1^2)
 ```
 
 
@@ -165,7 +170,7 @@ qr.R(QR)
 Rozk³ad naszym algorytmem:
 
 ```{r}
-qr_householer(M_2)
+qr_givens(M_2)
 ```
 
 
@@ -186,6 +191,6 @@ qr.R(QR)
 Rozk³ad algorytmem qr_householder:
 
 ```{r}
-qr_householer(M_3)
+qr_givens(M_3)
 ```
 
