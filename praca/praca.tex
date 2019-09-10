@@ -1,12 +1,18 @@
-\documentclass[10pt,a4paper]{report}
+\documentclass[12pt,a4paper]{report}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amsthm}
+\usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{natbib}
 \usepackage{polski}
 \usepackage{xcolor}
+\usepackage{url}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
 \usepackage{hyperref}
 \usepackage[polish, chapter]{dyschemist}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
@@ -14,30 +20,116 @@
 
 \newcommand{\vr}[1]{\mathbf{#1}}
 \newcommand{\mx}[1]{{#1}}
-
+\newcommand{\sign}{\operatorname{sign}}
 \newcommand{\proj}[2]{\frac{\scalar{#2}{#1}}{\scalar{#1}{#1}}}
 
-\author{Anna Szczepaniak}
-\title{Algorytm dekompozycji QR}
+
 \begin{document}
 
-\maketitle
+
+\begin{titlepage}
+\begin{flushleft}
+\end{flushleft}
+\begin{center}
+\textsc{{\huge Politechnika Łódzka}}
+\end{center}
+\bigskip
+\bigskip
+\begin{center}
+\textsc{{\Large Wydział Fizyki Technicznej, Informatyki i Matematyki Stosowanej}}
+\end{center}
+\bigskip
+\bigskip
+%\begin{center}
+\begin{Large}
+Kierunek: Matematyka\\   
+Specjalność: Matematyczne Metody Analizy Danych Biznesowych %TU WPISZ SPECJALNOŚĆ% 
+
+\end{Large}
+%\end{center}
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\noindent\hrulefill
+\begin{center}
+\textsc{\textbf{{\Large Algorytmy Dekompozycji QR %TU WPISZ TYTUŁ PRACY%
+\\}}}
+\end{center}
+\bigskip
+\bigskip
+\begin{flushright}
+{\large 
+Anna Szczepaniak %TU WPISZ SWOJE IMIĘ I NAZWISKO%
+\\
+Nr albumu: 
+210094 %TU WPISZ SWÓJ NUMER ALBUMU%
+\\}
+\end{flushright}
+\noindent\hrulefill
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\begin{center}
+{\large Praca licencjacka\\ %TU WPISZ RODZAJ PRACY DYPLOMOWEJ: magisterska/licencjacka%
+napisana w Instytucie Matematyki Politechniki Łódzkiej\\ 
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+Promotor: dr inż. Piotr Kowalski %TU WPISZ TYTUŁ ORAZ IMIĘ I NAZWISKO PROMOTORA%
+ }
+\end{center}
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\begin{center}
+{\textsc{\large Łódź, wrzesień 2019 %TU WPISZ  MIESIĄC I ROK ODDANIA PRACY%
+}}
+\end{center}
+\end{titlepage}
+
 
 
 \tableofcontents
 
 \chapter{Wstęp}
+Tematem niniejszej pracy jest algorytm QR dekompozycji macierzy, który to został wynaleziony w 1961 roku przez Francisa i Kubłanowską. Jest on jedną z efektywniejszych znanych metod rozwiązywania pełnego zadania własnego dla macierzy symetrycznych lub niesymetrycznych. Należy on do najważniejszych algorytmów opracowanych w XX wieku. Pomimo tego, iż w czasie studiów podobne operacje wykonywane są za pomocą procesu ortogonalizacji Grama-Schmidta sam algorytm dekompozycji QR rozwiązywany jest na inne sposoby, które dalej zostaną dokładnie omówione. W pracy tej chcieliśmy zgromadzić informacje o samym algorytmie, matematycznych podstawach na których jest oparty oraz matematycznie opisać operacje, które są wykonywane przez rzeczywiste implementacje.
+
+Praca uporządkowana jest w następujący sposób. W rozdziale 2 znajdują się preliminaria, w których umieszczone zostały wybrane elementy algebry liniowej wraz z kilkoma znanymi lematami, które zostały udowodnione samodzielnie na potrzeby tej pracy. W rozdziale 3 znajduje się twierdzenie o rozkładzie QR wraz z dowodem. Dowód ten został samodzielnie opracowany na podstawie szkiców z książek \citep{bjorck14,demmel12,poreda11,wilkinson13}. W tym samym rozdziale omówimy również podstawy działania algorytmów służących do dekompozycji, tj. algorytmu QR metodą odbić Householdera oraz algorytmu QR metodą rotacji Givensa. W rozdziale 4 przedstawiamy opracowane własne implementacje z wykorzystaniem dokumentacji języka R \citep{dokumentacjaR} wraz z eksperymentami numerycznymi oraz obserwacjami jakie poczyniliśmy przy tychże eksperymentach. W rozdziale 5 zaprezentowane są wnioski z wyników naszej pracy w rozdziale 4. 
+
+
+
+
+
+
+
+
+
 
 \chapter{Preliminaria}
 
-W niniejszym rozdziale przypomniane zostaną wybrane elementy z zakresu algebry liniowej, potrzebne do wyjaśnienia działania algorytmu QR.
+W niniejszym rozdziale przypomniane zostaną wybrane elementy z zakresu algebry liniowej, potrzebne do wyjaśnienia działania algorytmu QR. 
+ 
+\section{Oznaczenia użyte w pracy}
+
+Poniżej prezentuję oznaczenia jakich będziemy używać w pracy: \\
+$\bullet\setR^{m \times n}$ - przestrzeń wszystkim macierzy o $m$ wierszach i $n$ kolumnach \\
+$\bullet span$ - przestrzeń rozpięta na wektorach \\ 
+$\bullet(\cdot |\cdot )$ - iloczyn skalarny \\
+$\bullet ||\cdot || $ - norma \\
+$\bullet \mx{A}, \mx{B}$ - macierze \\
+$\bullet x$ - szukana \\
+$\bullet \mx{I}$ - macierz identycznościowa
 
 \section{Elementy algebry liniowej} 
 
 Niniejszą część rozpocznijmy od zdefiniowania pojęcia macierzy. Warto nadmienić, że w znaczącej części literatury - pojęcie te nie jest definiowane w sposób matematycznie precyzyjny.
 
 \begin{definition}[Macierz \cite{poreda11}]
-Niech $n,m \in \setN$. Macierzą o $m$ wierszach oraz $n$ kolumnach (nazywaną również macierzą o wymiarach $m \times n$) i wyrazach w ciele $\setR$ nazywamy funkcję 
+Niech $n,m \in \setN$. Macierzą o $m$ wierszach oraz $n$ kolumnach (nazywaną również macierzą o wymiarach $m$ na $n$) i wyrazach w ciele $\setR$ nazywamy funkcję 
 $$
 \mx{A}: \set{1,2, \ldots ,m}\times \set{1,2, \ldots ,n} \to \setR.
 $$
@@ -51,141 +143,281 @@ $$
 \end{bmatrix}.
 $$
 
-Przez $\setR^{m \times n}$ oznaczmy zbiór wszystkich macierzy o wymiarach $m \times n$ i elementach z $\setR$ .
+Przez $\setR^{m \times n}$ oznaczmy zbiór wszystkich macierzy o wymiarach $m$ na $n$ i elementach z $\setR$ .
 \end{definition}
 
-Macierze posiadają wiele istotnych dla nas podklas, posiadający określone cechy. Wymieńmy kilka typów macierzy, szczególnie interesujących z perspektywy omawianego przez nas tematu.
+Macierze posiadają wiele istotnych dla nas podklas, posiadających określone cechy. Wymieńmy kilka typów macierzy, szczególnie interesujących z perspektywy omawianego przez nas tematu.
 
-\begin{definition}[Macierz kwadratowa\citep{poreda11}] \label{definicja-macierzy}
-Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej.
-\end{definition}
 
-\begin{definition}[Macierz jednostkowa \cite{}]
-Macierzą jednostkową nazywamy macierz kwadratową, która na swojej głównej przekątnej posiada same wartości równe 1, natomiast reszta jest wypełniona zerami. Współczynniki tej macierzy są określone następującymi wzorami: 
-$$
-a_{ij} = \left\{ \begin{array}{ll}
-1 &, j=i\\
-0 &, j\ne i
-\end{array} \right.
-$$
-dla $i \in \set{1,2,\ldots,m} $ oraz $j \in \set{1,2,\ldots, n}$.
-\end{definition}
-
-\begin{definition}
-Macierzą symetryczną nazywamy macierz kwadratową $A=[a_{ij}]$, której wyrazy spełniają warunek 
+\begin{definition}[Rodzaje macierzy\citep{poreda11}] \label{definicja-macierzy}
+$\bullet$ Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej. \\
+$\bullet$ Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poza główną przekątną są równe zeru, to taką macierz nazywamy macierzą diagonalną, oznaczamy ją jako $diag(a_{11}, a_{22},\ldots,a_{nn})$. \\
+$\bullet$ Macierz jednostkową stopnia $n$ nazywamy taką macierz diagonalną, w której wszystkie elementy na głównej przekątnej są równe 1. \\
+$\bullet$ Macierzą symetryczną nazywamy macierz kwadratową $\mx{A}=[a_{ij}]$, której wyrazy spełniają warunek 
 $$
 \forall_{i,j \in \set{1,\ldots,n}} \quad a_{ij}=a_{ji}.
+$$ \\
+$\bullet$ Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poniżej głównej przekątnej są równe $0$, to taką macierz nazywamy macierzą trójkątną górną.
+Analogicznie jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy powyżej głównej przekątnej są równe $0$ to taką macierz nazywamy trójkątną dolną.
+
+\end{definition}
+Następujące lematy zostały opracowane na potrzeby dowodu w rozdziale 3.
+\begin{lemma}[O iloczynie macierzy trójkątnych górnych] \label{lemma-upper-triangle-multiplication}
+Niech $\mx{A}, \mx{B} \in \setR^{n \times n}$ będą dwiema nieosobliwymi macierzami trójkątnymi górnymi. Wtedy
 $$
-\end{definition}
+\mx{C} = \mx{A} \cdot \mx{B},
+$$
+jest też nieosobliwą macierzą trójkątną górną. Ponadto, jeśli macierze $\mx{A}$ i $\mx{B}$ mają na przekątnej same $1$, to również macierz $\mx{C}$ tak ma.
+\end{lemma}
+
+\begin{proof}
+Niech $\mx{A}, \mx{B}$ jak w założeniach, oraz $\mx{C} = \mx{A} \cdot \mx{B}$. 
+Korzystając z twierdzenia Cauchy'ego o iloczynie macierzy otrzymujemy natychmiast, że macierz $\mx{C} \in \setR^{n \times n}$ jest również nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną górną. Rozważmy dowolną $i,j \in \set{1, \ldots, n}$ parę indeksów poniżej przekątnej, tj. takich dla których $i > j$. Wtedy
+\begin{equation}\label{eq-proof-upper-triangle-mutliplication}
+c_{ij} = a_{i1} b_{1j} + \ldots +a_{in} b_{nj}.
+\end{equation}
+Zauważmy, że elementy $a_{i1}, \ldots , a_{i(i-1)}$ są równe $0$ gdyż pochodzą z macierzy trójkątnej górnej. Ponadto elementy $b_{j(j+1)}, \ldots, b_{jn}$ są z analogicznego powodu również równe $0$. Skoro $i > j$ to każdy składnik sumy \eqref{eq-proof-upper-triangle-mutliplication} posiada czynnik równy $0$. Zatem $c_{ij}$ dla rozważanego indeksu jest równe $0$. W dowolności wyboru $i,j$ macierz $\mx{C}$ jest macierzą trójkątną górną. 
+Załóżmy dalej, że $\mx{A}$ i $\mx{B}$ mają na przekątnej same $1$. Niech $i \in \set{1, \ldots, n}$. Wtedy 
+$$
+c_{ii} = a_{i1} b_{1i}+ \ldots+ a_{in} b_{ni} = \sum_{k=1}^{n} a_{ik} b_{ki} = a_{ii}b_{ii} = 1.
+$$
+Z dowolności wyboru $i$ macierz $\mx{C}$ ma na przekątnej same $1$. 
+\end{proof}
+
+\begin{lemma}[O odwracaniu macierzy trójkątnej górnej]\label{lemma-upper-triangle-invertion}
+Niech $\mx{A} \in \setR^{n \times n}$ będzie nieosobliwą macierzą trójkątną górną. Wtedy istnieje macierz $\inverse{\mx{A}} = [\overline{a}_{ij}]_{i = 1, \ldots , n}^{j = 1, \ldots, n}$ i jest ona nieosobliwą macierzą trójkątną górną. Ponadto jeśli macierz $\mx{A}$ ma na przekątnej wyłącznie $1$, to również macierz $\inverse{\mx{A}}$ ma na przekątnej same $1$.
+\end{lemma}
+
+\begin{proof}
+Niech $\mx{A}$ będzie macierzą jak w założeniach twierdzenia.
+Na mocy twierdzenia 9.23 z \citep{poreda11} i twierdzenia 9.22 z \citep{poreda11} i nieosobliwości macierzy $\mx{A}$ wiemy, że macierz $\inverse{\mx{A}} $ istnieje i jest nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną. Pokazać ten fakt można na kilka różnych sposobów, zaprezentujemy tutaj najprostszy pod względem wiedzy teoretycznej dowód.
+Wykorzystamy drugi krok z algorytmu elimininacji Gaussa. Przypomnijmy, że algorytm ten służy rozwiązaniu układu równań postaci 
+$$
+\mx{A} \vr{x} = \vr{b},
+$$
+i składa się z dwóch kroków. Pierwszym jest redukcja macierzy metodą eliminacji do macierzy trójkątnej górnej. Drugim etapem jest iteracyjne policzenie rozwiązania. Przyjmijmy, że mamy
+$$
+\begin{bmatrix}
+a_{11} & a_{12} & \ldots & a_{1n} \\
+0 & a_{22} & \ldots & a_{2n} \\
+\vdots & \vdots & & \vdots\\
+0 & 0 & \ldots & a_{nn}
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{bmatrix}
+=
+\begin{bmatrix}
+b_1 \\ b_2 \\ \vdots \\ b_n
+\end{bmatrix}.
+$$
+Skoro macierz $\mx{A}$ jest nieosobliwa to wiemy, że elementy na przekątnej są różne od $0$, tzn.
+$$
+\forall k \in \set{1, \ldots, n} \quad a_{kk} \neq 0.
+$$
+Wtedy prawdziwy jest wzór pozwalający na iteracyjne policzenie wektora $\vr{x}$, tj. dla każdego $k$ począwszy od $n$ do $1$.
+\begin{equation}
+x_k = \frac{1}{a_{kk}} \bracket{b_k - \sum_{i=k+1}^{n} a_{ki} x_{i}}.
+\end{equation}
+Przypuśćmy nie wprost, że macierz $\inverse{\mx{A}}$ nie jest trójkątną górną. Istnieje zatem takie $i,j \in \set{1, \ldots, n}$, $i > j$ i $\overline{a}_{ij} \neq 0 $. Rozważmy $\vr{b}= [0,0, \ldots, 1,0,0, \ldots]^{T}$, gdzie $\vr{b}_{j} = 1$. Wtedy dla każdego $k>i>j$, $k \in \set{1, \ldots, n}$, $x_{k} = 0$ oraz $x_{i} = \frac{1}{a_{ii}} \cdot(0 - 0 ) = 0$. Z drugiej strony $\vr{x} = \inverse{\mx{A}} \vr{b}$. Stąd 
+$$
+x_{i} = \overline{a}_{i1} \vr{b}_{1} + \overline{a}_{i2} \vr{b}_{2} + \ldots + \overline{a}_{in} \vr{b}_{n} = \overline{a}_{ij} \vr{b}_{j} = \overline{a}_{ij} \neq 0.
+$$ 
+Sprzeczność jest efektem przypuszczenia, że macierz $\inverse{\mx{A}}$ nie jest macierzą trójkątną górną.
+Rozważmy dalej przypadek, że macierz $\mx{A}$ ma na przekątnej same $1$. Przypuśćmy nie wprost, że macierz $\inverse{\mx{A}}$ nie ma wyłączenie $1$ na przekątnej. Istnieje zatem takie $ i \in \set{1, \ldots, n}$, że $\overline{a}_{ii} \neq 1$. Rozważmy $\vr{b} = [0,0, \ldots, 1,0,0, \ldots]^{T}$, gdzie $\vr{b}_{i} = 1$. Wtedy dla każdego $k>i$, $\vr{x}_{k} = 0$ oraz $x_{i} = \frac{1}{a_{ii}} \cdot(1 - 0 ) = 1$. Z drugiej strony $\vr{x} = \inverse{\mx{A}} \vr{b}$. Stąd 
+$$
+x_{i} = \overline{a}_{i1} \vr{b}_{1} + \overline{a}_{i2} \vr{b}_{2} + \ldots + \overline{a}_{in} \vr{b}_{n} = \overline{a}_{ii} \vr{b}_{i} = \overline{a}_{ii} \neq 1.
+$$
+Sprzeczność jest efektem przypuszczenia, że macierz $\inverse{\mx{A}}$ nie ma na przekątnej wyłącznie $1$.
+
+\end{proof}
+
 
 \begin{definition}
-Macierz trójkątna górna to macierz kwadratowa, której wszystkie współczynniki pod główną przekątną są równe $0$. Analogicznie macierzą trójkątna dolną nazywamy macierz kwadratową dla której wszystkie współczynniki ponad przekątną są równe $0$.
-\end{definition}
-
-\begin{definition}
-Niech $A=[a_{ij}] \in \setR^{m \times n}$. Wtedy macierz $D \in \setR^{n \times m}$ spełniająca warunek taki, że
+Niech $\mx{A}=[a_{ij}] \in \setR^{m \times n}$. Wtedy macierz $D \in \setR^{n \times m}$ spełniająca warunek taki, że
 $$
 d_{ij} = a_{ji},
 $$
 dla dowolnych $i \in \set{1,\ldots, n}$ oraz $j \in \set{1,\ldots,m}$ nazywamy macierzą transponowaną do $A$. Z reguły tę macierz $D$ oznaczamy symbolem $\transpose{A}$.
 \end{definition}
 
-%TODO proszę kontynuować poprawki definicji poniżej
 
-\begin{definition}
-Niech $A=[a_{ij}]_{i\le m, j\le k}$ będzie macierzą o wymiarach $m\times k$, a $B=[b_{ij}]_{i\le k, j\le n}$ macierzą o wymiarach $k\times n$. Iloczynem macierzy A,B nazywamy macierz $AB=[c_{ij}]_{i\le m, j\le n}$ o wymiarach $m\times n$, gdzie dla $$i=1,...,m, j=1,...,n c_{ij}= \sum_{l=1}^{n} a_{il} \cdot b_{lj}$$.
-\end{definition}
-
-\begin{definition}
-Niech A będzie macierzą kwadratową ustalonego stopnia. Macierz A jest odwracalna, jeśli istnieje taka macierz B, że zachodzi
-$$A\cdot B=B\cdot A=I, $$ 
-gdzie I jest macierzą jednostkową. Macierz B nazywa się wówczas macierzą odwrotną do macierzy A i oznacza się przez  $A^{-1}.$
-\end{definition}
-
-\begin{definition}
-Macierz A nazywamy macierzą nieosobliwą, jeśli istnieje macierz B, która jest do niej odwrotna.
-\end{definition}  
-
-\begin{definition}
-Macierzą ortogonalną nazywamy macierz kwadratową $A\in M_{n}(R)$ o elementach będących liczbami rzeczywistymi spełniająca równość:
-$$A^{T}\cdot A=A\cdot A^{T}=I_{n},$$ 
-gdzie $I_{n}$ oznacza macierz jednostkową wymiaru n, $A^{T}$ oznacza macierz transponowaną względem A.
-\end{definition}
-
-\begin{definition}
-Dwie macierze kwadratowe A i B nazywamy macierzami podobnymi, jeśli istnieje taka macierz nieosobliwa P, że zachodzi związek: 
-$$ B=P^{-1}\cdot A\cdot P. $$
-\end{definition}
-
-
-%\section{Definicje dotyczące wektorów} 
-%
-%\begin{definition}
-%Jeżeli $p,q\in \mathbb{R}^{n}$, to parę (p,q) nazywamy wektorem zaczepionym o początku p i końcu q.
-%\end{definition}
-%
-%\begin{definition}
-%Niech $v_{1},..., v_{n}$ będą różnymi elementami przestrzeni liniowe V. Zbiór wektorów ${v_{1},...,v_{n}}$ nazywamy liniowo niezależnymi jeżeli 
-%$$\forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot v_{1} + ... + a_{n}\cdot v_{n} = 0 \Rrightarrow a_{1}=...=a_{n}=0)
-%$$ 
-%\end{definition}
-
-%\section{Definicje dotyczące wyznacznika macierzy, jej wartości własnej oraz wektorów własnych.}
-
-\begin{definition}[??]
-Niech będzie dana macierz kwadratowa A stopnia n. Wyznacznikiem nazywamy takie odwzorowanie, które danej macierzy $A$ wymiaru $n \times n$ przyporządkowuje dokładnie jedną liczbę rzeczywistą $\det A$. Jeśli macierz jest stopnia $n = 1$, to jej wyznacznik $\det A  = a_{11}$. 
-Jeśli stopień macierzy jest większy niż 1, to jej wyznacznik obliczamy według następującego wzoru: 
+\begin{definition}[Iloczyn macierzy\citep{poreda11}]
+Niech $\mx{A}\in \setR^{m \times n }$ i $\mx{B}\in \setR^{m \times n }$. Jeśli
 $$
-\det A = \sum_{i=1}^{n} (-1)^{i+j}\cdot a_{ij}\cdot \det M_{ij},
-$$
-gdzie $\det M_{ij}$ oznacza wyznacznik macierzy powstałej z macierzy A przez skreślenie i-tego wiersza i j-tej kolumny.
-\end{definition}
-
-\begin{definition}
-Niech $B$ będzie macierzą wymiaru $m$ na $m$ i niech $I$ będzie macierzą jednostkową wymiaru $m$ na $m$. Wówczas wartościami własnymi macierzy $B$ nazywamy takie $\lambda \in \setC$, które spełniają następujące równanie:
-$$
-\det (\mx{B}-\lambda\cdot \mx{I})=0. 
+\mx{A} = \begin{bmatrix}
+ a_{11} & a_{12} & \cdots & a_{1n} \\
+         a_{21} & a_{22} & \cdots & a_{2n} \\
+         \vdots & \vdots & \ddots & \vdots \\
+         a_{m1} & a_{m2} & \cdots & a_{mn} \\
+\end{bmatrix}, \mx{B} = \begin{bmatrix}
+ b_{11} & b_{12} & \cdots & b_{1m} \\
+         b_{21} & b_{22} & \cdots & b_{2m} \\
+         \vdots & \vdots & \ddots & \vdots \\
+         b_{k1} & b_{k2} & \cdots & b_{km} \\
+\end{bmatrix},
 $$ 
-Ponadto każdy wektor $\vr{v} \in \setR^m$ spełniają dwa warunki
-\begin{enumerate}
-\item Nie będący wektorem zerowym - $v \neq 0$, oraz
-\item spełniającym równość
+to iloczynem macierzy $\mx{B}$ i $\mx{A}$ nazywamy taką macierz $\mx{C} = [c_{lj}]_{j=1,\ldots,n}^{l=1,\ldots,k},$ że dla $i=1,\ldots,m, j=1,\ldots,n $
 $$
-\mx{B} \vr{v} = \lambda \vr{v},
+c_{lj}= \sum_{l=1}^{m} b_{li} \cdot a_{ij}.
 $$
-\end{enumerate}
-nazywać będziemy wektorem własnym stowarzyszonym z wartością własną $\lambda$.
 \end{definition}
+
+
+\begin{definition}[Macierz odwrotna\citep{poreda11}] 
+Macierz $\mx{A}$ jest odwracalna, jeśli istnieje taka macierz $\mx{B}$, że zachodzi
+$$
+\mx{A}\cdot \mx{B}=\mx{B}\cdot \mx{A}=\mx{I},
+$$ 
+gdzie $\mx{I}$ jest macierzą jednostkową. Macierz $\mx{B}$ nazywa się wówczas macierzą odwrotną do macierzy $\mx{A}$ i oznacza się przez  $\inverse{\mx{A}}$. \\
+Macierz $\mx{A}$ nazywamy nieosobliwą, jeśli istnieje macierz $\mx{B},$ która jest do niej odwrotna.
+
+\end{definition}
+
+
+\begin{definition}
+Macierzą ortogonalną nazywamy macierz kwadratową $\mx{A}\in \setR^{n\times n}$ o elementach będących liczbami rzeczywistymi spełniająca równość:
+$$
+\mx{A}^{T}\cdot \mx{A}=\mx{A}\cdot \mx{A}^{T}=\mx{I}_{n}.
+$$
+\end{definition}
+
+\begin{lemma}[O iloczynie macierzy ortogonalnych]
+Niech $\mx{A},\mx{B} \in \setR^{n \times n }$ będą dwiema ortogonalnymi macierzami. Wówczas 
+$$
+\mx{C}=\mx{A}\mx{B}
+$$
+jest też macierzą ortogonalną. 
+\end{lemma}
+
+\begin{proof}
+Niech $\mx{A}$ i $\mx{B}$ będą dwiema ortogonalnymi macierzami, tzn. że zachodzi:
+$$
+\mx{A}^{T}\mx{A} = \mx{I}
+$$
+$$
+\mx{B}^{T}\mx{B} = \mx{I}
+$$
+Niech dalej $\mx{C}=\mx{A}\mx{B}$. Należy sprawdzić, czy $\mx{C}^{T}\mx{C}=\mx{I}$. Istotnie
+$$
+\mx{C}^{T}\mx{C} = \mx{B}^{T}\mx{A}^{T}\mx{A}\mx{B} = \mx{B}^{T}\mx{I}\mx{B} = \mx{B}^{T}\mx{B} = \mx{I}.
+$$
+Zatem $\mx{C}$ jest ortogonalna.
+\end{proof}
+
+\begin{definition}
+Wektorem kolumnowym nazywamy macierz z przestrzeni $\setR^{n\times 1}.$
+\end{definition}
+
+Tak zdefiniowane wektory można utożsamiać z elementami przestrzeni $\setR^{n}.$
+
+\begin{definition}
+Niech $\vr{v_{1}},..., \vr{v_{n}}$ będą różnymi elementami przestrzeni liniowej $\setR^{k}$. Zbiór wektorów ${\vr{v_{1}},...,\vr{v_{n}}}$ nazywamy liniowo niezależnymi jeżeli 
+$$
+\forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot \vr{v}_{1} + ... + a_{n}\cdot \vr{v}_{n} = 0 \implies a_{1}=...=a_{n}=0)
+$$ 
+\end{definition}
+
 
 \chapter{Algorytm QR}
 
-W tym rozdziale zaprezentujemy elementy teorii dokonywania rozkładów QR macierzy. Rozpoczniemy od sformułowania i udowodnienia twierdzenia o istnieniu takiego rozkładu. Wiele analizowanych pozycji literaturowych sygnalizowało posiadanie dowodu poniższego twierdzenia. W naszej ocenie prezentowane tam dowody bliższe są jednak jedynie ich szkicowi. Dla powyższego powoduje prezentujemy własne opracowanie dowodu twierdzenia o istnieniu rozkładu QR, stworzonego na podstawie szkiców omówionych w literaturze oraz pracy własnej. 
+W tym rozdziale zaprezentujemy elementy teorii dokonywania rozkładów QR macierzy. Rozpoczniemy od sformułowania i udowodnienia twierdzenia o istnieniu takiego rozkładu. Wiele analizowanych pozycji literaturowych sygnalizowało posiadanie dowodu poniższego twierdzenia. W naszej ocenie prezentowane tam dowody bliższe są jednak jedynie ich szkicowi. Wobec powyższego prezentujemy własne opracowanie dowodu twierdzenia o istnieniu rozkładu QR, stworzonego na podstawie szkiców omówionych w literaturze oraz pracy własnej. 
 
 \begin{theorem}[O rozkładzie QR]\label{theorem-qr-docomposition}
-Niech $\mx{A} \in \setR^{m \times n}$, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład 
+Niech $\mx{A} \in \setR^{m \times n}$, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład $\mx{QR}$, tzn. że istnieją takie macierze $\mx{Q}$ i $\mx{R}$, że
 $$
 \mx{A} = \mx{Q} \mx{R}
 $$ 
-na dwa czynniki
+i
 \begin{itemize}
-\item macierz $\mx{Q} \in \setR^{m \times n} $ taką, że 
+\item macierz $\mx{Q} \in \setR^{m \times n} $ jest taka, że 
 $$
 Q^{T}\cdot Q=D,
 $$
 gdzie $D= diag (d_{1}, d_{2}, ..., d_{n})$, oraz $d_{k}>0$ dla $k = 1, 2, \ldots, n$, oraz
-\item macierz trójkątną górną $\mx{R} \in \setR^{n \times n}$ spełniającą dodatkowo warunek 
+\item macierz $\mx{R} \in \setR^{n \times n}$ jest trójkątną górną spełniającą dodatkowo warunek 
 $$
 r_{kk}= 1 
 $$ 
-dla $k = 1, 2, \ldots, n$.
+dla wszystkich $k = 1, 2, \ldots, n$.
 \end{itemize} 
 \end{theorem}
 
-%TODO twierdzenie Grama Schmidta z poredy + dowód
+Aby udowodnić powyższe, zaprezentujemy potrzebną teorię (twierdzenia oraz lematy) wraz z dowodami, na której to będziemy bazować przy dowodzeniu głównego twierdzenia o rozkładzie $QR$. 
+
+\begin{theorem}[ {\citep[Twierdzenie 14.12]{poreda11}}]
+Wektor $\vr{x}$ jest ortogonalny do podprzestrzeni $W$ wtedy i tylko wtedy, gdy jest ortogonalny do każdego wektora jakiejkolwiek bazy tej podprzestrzeni.
+\end{theorem}
+
+\begin{theorem}[Nierówność Bessela {\citep[Twierdzenie 14.22]{poreda11}}] \label{Nierówność-Bessela}
+Jeśli $(\vr{b}_{1}, \ldots, \vr{b}_{n})$ jest układem ortonormalnym w przestrzeni euklidesowej $V$, to dla każdego wektora $\vr{x}$ z przestrzeni $V$ spełniona jest nierówność 
+$$
+\sum_{i=1}^{n}\alpha_{i}^{2}\leq \Vert\vr{x}\Vert^{2},
+$$
+gdzie $\alpha_{i} = (\vr{x}|\vr{b}_{i})$. Ponadto, wektor $\vr{x} - \sum_{i=1}^{n} \alpha_{i} \cdot \vr{b}_{i}$ jest ortogonalny do podprzestrzeni $span(\vr{b}_{1}, \ldots, \vr{b}_{n})$.
+
+\begin{proof}
+Niech $\vr{x}^{'} = \vr{x} -\sum_{i=1}^{n} \alpha_{i} \cdot \vr{b}_{i}$. Oczywiście $\Vert \vr{x}^{'} \Vert^{2} \geq 0$. Zatem
+$$
+0\leq (\vr{x}^{'}|\vr{x}^{'}) = (\vr{x} - \sum_{i=1}^{n} \alpha_{i} \cdot \vr{b}_{i} | \vr{x} - \sum_{i=1}^{n} \alpha_{i} \cdot \vr{b}_{i}) = (\vr{x}|\vr{x}) - 2\cdot \sum_{i=1}^{n} \alpha_{i}\cdot(\vr{x}|\vr{b}_{i}) + \sum_{i=1}^{n}\sum_{j=1}^{n} \alpha_{i}\cdot\alpha_{j}\cdot(\vr{b}_{i}|\vr{b}_{j}) =
+$$
+
+$$
+\Vert\vr{x}\Vert^{2} - 2\cdot\sum_{i=1}^{n}\alpha_{i}^{2} + \sum_{i=1}^{n}\alpha_{i}^{2} = \Vert \vr{x} \Vert^{2} - \sum_{i=1}^{n}\alpha_{i}^{2}.
+$$
+Przekształcając ostatnią nierówność, otrzymujemy
+$$
+\Vert\vr{x}\Vert^{2} \leq \sum_{i=1}^{n}\alpha_{i}^{2},
+$$
+czyli nierówność Bessela.
+Niech $j$ będzie dowolną liczbą ze zbioru ${1, \ldots, n}$. Obliczamy $(\vr{x}^{'}|\vr{b}_{j})$.
+$$
+(\vr{x}^{'}|\vr{b}_{j}) = (\vr{x}|\vr{b}_{j}) - \sum_{i=1}^{n}\alpha_{i}\cdot(\vr{b}_{i}|\vr{b}_{j}) = (\vr{x}|\vr{b}_{j}) - \alpha_{j} = 0.
+$$
+Wynika stąd, że wektor $\vr{x}^{'}$ jest ortogonalny do każdego wektora $\vr{b}_{j}$, jest więc, na mocy poprzedniego twierdzenia ortogonalny do podprzestrzeni $span(\vr{b}_{1}, \ldots, \vr{b}_{n})$.
+\end{proof}
+
+\end{theorem}
+
+\begin{theorem}[Twierdzenie(Grama-Schmidta)\citep{poreda11}] \label{theorem-gram-schmidt}
+Dla każdego układu liniowo niezależnego wektorów $(\vr{x}_{1},\ldots,\vr{x}_{n})$ w przestrzeni euklidesowej istnieje układ ortonormalny $(\vr{b}_{1},\ldots, \vr{b}_{n})$ taki, że 
+$$
+span(\vr{b}_{1},\ldots, \vr{b}_{k}) = span(\vr{x}_{1},\ldots, \vr{x}_{k})
+$$
+dla każdej liczby $k$ ze zbioru $(1,\ldots,n)$.
+\end{theorem}
+
+\begin{proof}
+Oczywiście wektory $\vr{x}_{i}$ są niezerowe, zatem mają długość dodatnią. Niech więc
+$$
+\vr{b}_{1}=\frac{1}{\Vert\vr(x_{1})\Vert}\cdot\vr{x}_{1}.
+$$
+Wektor $\vr{b}_{1}$ ma długość $1$ oraz oczywiście $span(\vr{b}_{1}) = span (\vr{x}_{1})$. Załóżmy teraz, że zdefiniowaliśmy już wektory $\vr{b}_{1}, \ldots, \vr{b}_{k}$ tworzące układ ortonormalny taki, że
+$$
+span(\vr{b}_{1}, \ldots, \vr{b}_{k}) = span(\vr{x}_{1}, \ldots, \vr{x}_{k}),
+$$
+gdzie $k < n$.
+Niech teraz 
+$$
+\vr{b}_{k+1}^{'} = \vr{x}_{k+1} - \sum_{i=1}^{k}(\vr{x}_{k+1}|\vr{b}_{i})\cdot \vr{b}_{i}
+$$
+oraz
+$$
+\vr{b}_{k_1} = \frac{1}{\Vert \vr{b}_{k+1}^{'} \Vert} \cdot \vr{b}_{k+1}^{'}.
+$$
+Na mocy twierdzenia \ref{Nierówność-Bessela} poprzedniego wnioskujemy, że wektor $\vr{b}_{k+1}$ jest ortogonalny do wszystkich wektorów $\vr{b}_{i}$, gdzie $i\in \set{1, \ldots, k}$ oraz ma długość równą $1$. Ponieważ $\vr{b}_{k+1}\in span(\vr{x}_{1}, \ldots, \vr{x}_{k+1})$, więc
+\begin{equation} \label{equation-span}
+span(\vr{b}_{1}, \ldots, \vr{b}_{k+1}) \subset span(\vr{x}_{1}, \ldots, \vr{x}_{k+1}).
+\end{equation}
+
+Zauważmy, że skoro $\vr{x}_{k+1} \notin span(\vr{x}_{1}, \ldots, \vr{x}_{n}),$ to $\vr{b}_{k+1} \notin span (\vr{b}_{1}, \ldots, \vr{b}_{n}).$ Zatem przestrzenie $span(\vr{b}_{1}, \ldots, \vr{b}_{n})$ i $span(\vr{x}_{1}, \ldots, \vr{x}_{n})$ mają ten sam wymiar.
+Przestrzenie $span(\vr{b}_{1}, \ldots, \vr{b}_{k+1})$ i $span(\vr{x}_{1}, \ldots, \vr{x}_{k+1})$ spełniające \eqref{equation-span} i mające ten sam wymiar, muszą być równe.
+W ten sposób określiliśmy iteracyjnie wektory $\vr{b}_{1}, \ldots, \vr{b}_{n},$ spełniające żądane warunki.
+\end{proof}
 
 
 \begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta] \label{lemma-matrix-formulation-of-gs}
-Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $\vr{v_1}, \ldots, \vr{v_n}$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $\vr{u_1}, \ldots, \vr{u_n}$ , które są transformacją wektorów $\vr{v_1}, \ldots, \vr{v_n}$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierza utworzoną kolumnowo z tych wektorów $\vr{u_1}, \ldots, \vr{u_n}$. Wtedy
+Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $\vr{v_1}, \ldots, \vr{v_n}$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $\vr{u_1}, \ldots, \vr{u_n}$ , które są transformacją wektorów $\vr{v_1}, \ldots, \vr{v_n}$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z tych wektorów $\vr{u_1}, \ldots, \vr{u_n}$. Wtedy
 {\small
 $$
 U = A \cdot 
@@ -214,33 +446,17 @@ U = A \cdot
 $$ 
 }
 \end{lemma}
-\begin{proof}
-Dówód powyższego faktu jest niemal automatyczny. Wykonujemy operacje kolejnych iteracji algorytmu Grama-Schmidta. Pierwsza z operacji odpowiada utworzeniu wektora $u_2$ i ławo zauważyć, że powyższe mnożenie macierzowe dostarcza dokładnie tę operację. Macierz jest prawie jednostkową, jedynie 2 kolumna się wyróżnia. W efekcie oznacza to, że wszystkie zmiany przez nią wykonane zostaną składowane w drugiej kolumnie macierzy wynikowej. Dokładnie jak w algorytmie. Kolejne iteracje algorytmu modyfikują wyniki działania poprzednich iteracji - stąd należy w mnożeniu macierzowym zastosować mnożenie wyniku poprzedniej iteracji z prawej strony. 
-\end{proof}
 
-\begin{lemma}[O iloczynie macierzy trójkątnych górnych] \label{lemma-upper-triangle-multiplication}
-Niech $\mx{A}, \mx{B} \in \setR^{n \times n}$ bedą dwiema nieosobliwymi macierzami trójkątnymi górnymi. Wtedy
-$$
-\mx{C} = \mx{A} \cdot \mx{B},
-$$
-jest też nieosobliwą macierzą trójkątną górną.
-\end{lemma}
+Dowód powyższego faktu jest oczywisty. 
 
-\begin{proof}
-Niech $\mx{A}, \mx{B}$ jak w założeniach, oraz $\mx{C} = \mx{A} \cdot \mx{B}$. 
-Korzystająć z twierdzenia Cauchy'ego o iloczynie macierzy otrzymujemy natychmiast, że macierz $\mx{C} \in \setR^{n \times n}$ jest również nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną górną. Rozważmy dowolny $i,j \in \set{1, \ldots, n}$ parę indeksów z poniżej przekątnej, tj. takich dla których $i > j$. Wtedy
-\begin{equation}\label{eq-proof-upper-triangle-mutliplication}
-c_{ij} = a_{i1} b_{1j} + \ldots +a_{in} b_{nj}.
-\end{equation}
-Zauważmy, że elementy $a_{i1}, \ldots , a_{i(i-1)}$ są równe $0$ gdyż pochodzą z macierzy trójkątnej górnej. Ponadto elementy $b_{j(j+1)}, \ldots, b_{jn}$ są z analogicznego powodu również równe $0$. Skoro $i > j$ to każdy składnik sumy \eqref{eq-proof-upper-triangle-mutliplication} posiada czynnik równy $0$. Zatem $c_{ij}$ dla rozważanego indeksu jest równe $0$. W dowolności wyboru $i,j$ macierz $\mx{C}$ jest macierzą trójkątną górną.
-\end{proof}
+
 
 \begin{lemma}[Macierz transformująca algorytmu Grama-Schmidta]\label{lemma-gram-schmidt-matrix}
 Niech $\mx{A} \in \setR^{m \times n}$ będzie macierzą, której kolumny są liniowo niezależne. Niech $\mx{U} \in \setR^{m \times n}$ będzie macierzą uzyskaną poprzez połączenie jako kolumn wektorów uzyskanych z algorytmu Grama-Schmidta. Wtedy istnieje trójkąta górna macierz $\mx{T} \in \setR^{n \times n}$ taka, że
 $$
 \mx{U} = \mx{A} \cdot \mx{T},
 $$
-i $T_{kk} = 1$ dla dowolnego $k \in \set{1,\ldots,n}$.
+gdzie $\mx{T} = [t_{ij}]_{i = 1, \ldots , n}^{j = 1, \ldots, n}$ i $t_{kk} = 1$, dla dowolnego $k \in \set{1,\ldots,n}$.
 \end{lemma}
 
 \begin{proof}
@@ -250,7 +466,7 @@ U = A \cdot
 \begin{bmatrix}
 1 & -\proj{u_1}{v_2} & \cdots & 0 \\
 0 & 1 & \cdots & 0 \\
-\vdots & \vdots & & \vdots \\
+\vdots & \vdots &  & \vdots \\
 0 & 0 & \cdots & 1
 \end{bmatrix} \cdot
 \begin{bmatrix}
@@ -270,153 +486,430 @@ U = A \cdot
 0 & 0 & 0 & \cdots & 0 & 1
 \end{bmatrix}.
 $$ 
-Zauważmy, że mnożenie macierzowe jest łączne. Możemy je mnożyć wykonując kolejne mnożenia patrząc od prawej strony. Stosując $n-2$ krotnie lemat \ref{lemma-upper-triangle-multiplication} otrzymujemy macierz $\mx{T}$ która jest nieosobliwą macierzą trójkątną górną. Łatwo zauważyć, że na przekątnej tej macierzy wszystkie elementy to właśnie $1$. 
+Zauważmy, że mnożenie macierzowe jest łączne. Możemy je mnożyć wykonując kolejne mnożenia patrząc od prawej strony. Stosując $n-2$ krotnie lemat \ref{lemma-upper-triangle-multiplication} otrzymujemy macierz $\mx{T}$ która jest nieosobliwą macierzą trójkątną górną. Ponadto zauważmy, że te wszystkie macierze mają wyłączenie $1$ na przekątnej, zatem macierz $\mx{T}$ również. 
 \end{proof}
 
 Istotną obserwacją jaką można poczynić jest taka, że macierzy tej nie można sobie w łatwy sposób od tak wyznaczyć. Aby ją uzyskać trzeba przeprowadzić cały algorytm Grama-Schmidta i dopiero po jego przeprowadzeniu macierz tę daje się jawnie wyznaczyć.
 
-\begin{lemma}[O odwracaniu macierzy trójkątnej górnej]\label{lemma-upper-triangle-invertion}
-Niech $\mx{A} \in \setR^{n \times n}$ będzie nieosobliwą macierzą trójkątną górną. Wtedy istnieje macierz $\inverse{\mx{A}}$ i jest ona nieosobliwą macierzą trójkątną górną.
-\end{lemma}
-
-\begin{proof}
-Niech $\mx{A}$ będzie macierzą jak w założeniach twierdzenia.
-Na mocy wniosku z twierdzenia Cauchy'ego o iloczynie macierzy wiemy, że macierz $\inverse{\mx{A}} $ istnieje i jest nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną. Pokazać ten fakt można na kilka różnych sposobów, zaprezentujemy tutaj najprostszy pod względem wiedzy teoretycznej dowód.
-Wykorzystamy drugi krok z algorytmu elimininacji Gaussa. Przypomnijmy, że algorytm ten służy rozwiązaniu układu równań postaci 
-$$
-\mx{A} \vr{x} = \vr{b},
-$$
-i składa się z dwóch kroków. Pierwszym jest redukcja macierzy metodą eliminacji do macierzy trójkątnej górnej. Drugim etapem jest iteracyjne policzenie rozwiązania. Przyjmijmy, że mamy
-$$
-\begin{bmatrix}
-a_{11} & a_{12} & \ldots & a_{1n} \\
-0 & a_{22} & \ldots & a_{2n} \\
-\vdots & \vdots & & \vdots\\
-0 & 0 & \ldots & a_{nn}
-\end{bmatrix}
-\begin{bmatrix}
-x_1 \\ x_2 \\ \vdots \\ x_n
-\end{bmatrix}
-=
-\begin{bmatrix}
-b_1 \\ b_2 \\ \vdots \\ b_n
-\end{bmatrix}.
-$$
-Skoro macierz $\mx{A}$ jest nieosobliwa to wiemy, że elementy na przekątnej są różne od $0$, tzn.
-$$
-\forall k \in \set{1, \ldots, n} \quad a_{kk} \neq 0.
-$$
-Wtedy prawdziwy jest wzór pozwalający na iteracyjne policzenie 
-\begin{equation}
-x_k = \frac{1}{a_{kk}} \bracket{b_k - \sum_{i=k+1}^{n} a_{ki} x_{i}}.
-\end{equation}
-{\color{red} Poniższa część dowodu, jest trochę dziurawa - może należałoby ją jeszcze rozszerzyć. Ogólnie chodzi o to, że $x_k$ zależy jedynie od $b_k, \ldots, b_n$ co sprawia, że ta transformacja odwrotna jest reprezentowana przez macierz trójkątną górną.}
-W powyższej formule zauważmy, że istnieje takie $\alpha_n \in \setR^{n}$, że $x_n = \alpha_n \cdot
-\transpose{\begin{bmatrix}
-0, 0 , \ldots, 0, b_n
-\end{bmatrix}}$. W efekcie istnieje takie $\alpha_{n-1} \in \setR^{n}$, że $x_{n-1}= \alpha_{n-1} \cdot
-\transpose{\begin{bmatrix}
-0, 0 , \ldots, b_{n-1}, b_n
-\end{bmatrix}} $, a ostatecznie
-\begin{equation} \label{eq-proof-lemma-upper-triangle-invertion}
-\exists_{\alpha_1,\ldots,\alpha_n \in \setR^{n}}
-\forall_{b \in \setR^{n} } 
-\forall_{k \in \set{1,\ldots, n}} \quad x_{k} = \alpha_{k} \cdot
-\transpose{\begin{bmatrix}
-0, \ldots, 0 , b_{k} , \ldots, b_n
-\end{bmatrix}}. 
-\end{equation}
-Przypuśćmy, że macierz $\inverse{\mx{A}}$ nie jest trójkątna górna. Wtedy istnieje pewien element ${\inverse{a}}_{ij} \neq 0$, gdzie $i > j$. To z kolei oznaczałoby, że \eqref{eq-proof-lemma-upper-triangle-invertion} nie jest spełnione. Zatem macierz ta istotnie musi być trójkątną górną.
-\end{proof}
 
 Teraz możemy przystąpić do dowodu głównego twierdzenia.
 
 \begin{proof}[Dowód twierdzenia \ref{theorem-qr-docomposition}]
 Niech $\mx{A} \in \setR^{m \times n}$ będzie macierzą jak w założeniach. Wtedy z lematu \ref{lemma-gram-schmidt-matrix} przy zastosowaniu algorytmu Grama-Schmidta otrzymujemy równość
 $$
-\mx{U} = \mx{A} \cdot \mx{T}.
-$$
+\mx{U} = \mx{A} \cdot \mx{T},
+$$  
+gdzie $\mx{U} \in \setR^{m \times n}$, $\mx{T} \in \setR^{n \times n}$ i $\mx{U}$ składa się z wektórów ortogonalnych, a $\mx{T}$ jest macierzą trójkątną górną i ma na przekątnej same $1$.  
 Na mocy lematu \ref{lemma-upper-triangle-invertion} wiemy, że macierz $\mx{T}$ jest odwracalna i macierz do niej odwrotna jest trójkątną górną. Wykonując mnożenie prawostronne przez tę macierz otrzymujemy:
 \begin{align*}
 \mx{U} \cdot \inverse{\mx{T}} & = \mx{A}\cdot\mx{T}\cdot \inverse{\mx{T}}, \\
 \mx{U} \cdot \inverse{\mx{T}} & = \mx{A}.
 \end{align*}  
-Postać którą mamy powyżej jest już bliska faktycznemu rozkładowi QR. Macierze te jednak różnią się własnościami. Macierz $\mx{U}$ nie jest macierzą ortogonalną. Jest utworzona z kolumn które są wzajemnie ortogonalne, ale macierz ortogonalna musi posiadać znomalizowane ortonormalne kolumny. Trzeba wprowadzić w nich zatem pewną korektę. Rozważmy macierz $\mx{D}$ następującej postaci
-$$
-\mx{D} = \begin{bmatrix}
-\sqrt{\scalar{u_1}{u_1}} & 0 & 0 & \ldots & 0 \\
-0 & \sqrt{\scalar{u_2}{u_2}} & 0 & \ldots & 0 \\
-0 & 0 & \sqrt{\scalar{u_3}{u_3}} & \ldots & 0 \\
-\vdots & \vdots & \vdots & & \vdots \\
-0 & 0 & 0 & \ldots & \sqrt{\scalar{u_n}{u_n}}
-\end{bmatrix}.
-$$
-Zauważmy natychmiast, że 
-$$
-\inverse{\mx{D}} = 
-\begin{bmatrix}
-\frac{1}{\sqrt{\scalar{u_1}{u_1}}} & 0 & 0 & \ldots & 0 \\
-0 & \frac{1}{\sqrt{\scalar{u_2}{u_2}}} & 0 & \ldots & 0 \\
-0 & 0 & \frac{1}{\sqrt{\scalar{u_3}{u_3}}} & \ldots & 0 \\
-\vdots & \vdots & \vdots & & \vdots \\
-0 & 0 & 0 & \ldots & \frac{1}{\sqrt{\scalar{u_n}{u_n}}}
-\end{bmatrix}.
-$$
-Wtedy możemy wykonać następujące mnożenia
-\begin{align*}
-\mx{U} \cdot \mx{I_n} \cdot \inverse{\mx{T}} & = \mx{A} ,\\
-\mx{U} \cdot \inverse{\mx{D}} \cdot \mx{D} \cdot \inverse{\mx{T}} & = \mx{A}.
-\end{align*}
-Wtedy oznaczmy $\mx{Q}= \mx{U} \cdot \inverse{\mx{D}}$ oraz $ \mx{R} = \mx{D}\cdot \inverse{\mx{T}}$. Zauważmy, że tak otrzymana macierz $\mx{Q}$ jest ortonormalna. Natomiast $\mx{R}$ jako iloczyn dwóch macierzy górnie trójkątnych jest macierzą górnie trójkątną. Dokładne rachunki pokazały by ponadto, że elementy macierzy $\inverse{\mx{T}} $ na przekątnej były $1$ co sprawia, że na przekątnej znajdują się dokładnie elementy macierzy $\mx{D}$.
+Postać, którą mamy powyżej jest rozkładem QR, gdzie $\mx{U} = \mx{Q}$ i $\inverse{\mx{T}} = \mx{R}$. Pozostaje uzasadnić, że $\mx{U}^{T} \cdot \mx{U} = \mx{D}$, gdzie $D= diag (d_{1}, d_{2}, ..., d_{n})$, oraz $d_{k}>0$ dla $k = 1, 2, \ldots, n$. Istotnie rozważmy element $d_{ij}$ macierzy $\mx{D}$. Z tego, że $\mx{U}^{T} \cdot \mx{U} = \mx{D}$ mamy, że $d_{ij} = (u_{i}|u_{j})$. Jeśli $i \neq j$, to $d_{ij}=0$. Zatem macierz $\mx{D}$ jest przekątniowa. Jeśli $i=j$, to $d_{ii}=(u_{i}|u_{i}) = \Vert u_{i} \Vert ^{2} >0$.
 
 \end{proof}
 
-\noindent \textbf{Dowód twierdzenia 3.1}\\
-Podane wyżej twierdzenie jest przekształceniem
-procesu ortogonalizacji Grama-Schmidta. Jeśli zastosujemy Grama-Schmidta do kolumn $a_{i}$ macierzy
- $A = [a_{1}, a_{2}, ..., a_{n}]$ od lewej do prawej, otrzymamy
-sekwencje ortonormalnych wektorów od $q_{1}$ do $q_{n}$ obejmujących tę samą przestrzeń:
-te ortogonalne wektory są kolumnami Q. Gram-Schmidt również wylicza
-współczynniki wyrażające każdą kolumnę $a_{i}$
- jako liniową kombinację $q_{1}$ przez 
- $$q_{i}: a_{i}= \sum_{j=1}^i r_{ji}\cdot q_{i}, $$ 
- gdzie $r_{ji}$ to współczynniki macierzy R.
+
+
+Ortogonalizacja Gram-Schmidta może nie obliczyć macierzy ortogonalnej Q, gdy wektory, które są ortogonalizowane, są prawie liniowo zależne, więc nie możemy jej użyć do stabilnego obliczenia rozkładu QR. Zamiast tego opieramy nasze algorytmy na pewnych łatwo obliczalnych ortogonalnych macierzach zwanych odbiciami Householdera lub rotacjami Givensa. Możemy je wybrać, tak aby wprowadzić zera do macierzy za pomocą mnożenia.
+
+
+\section{Algorytm QR metodą odbić Householdera}
+
+Metoda Householdera pozwala znaleźć rozkład QR dowolnej macierzy prostokątnej m na n ($m\ge n$).
+
+\begin{definition}[Macierz Householdera]
+Macierzą Householdera $H$ zwaną również refleksją nazywamy macierz postaci $\mx{H}=\mx{I}-2\cdot \vr{v}\cdot \vr{v}^{T}$, gdzie $\Vert v \Vert_{2} = 1$.
+\end{definition}
+
+\begin{theorem} [Transformacja Householdera]
+Niech  $\vr{v}\in R^{m}, $ i $\vr{v}\neq 0. $ Wówczas transformacją Householdera nazywamy macierz postaci:
+$$
+\mx{H}=\mx{I}-W\vr{v}\vr{v}^{T},
+$$
+gdzie
+$$
+W={\frac {2}{\vr{v}^{T}\vr{v}}}.
+$$ 
+Macierz H jest macierzą symetryczną i ortogonalną. 
+Jej interpretacja jest następująca: dowolny wektor $x$ wymiaru $m$ jest odbiciem lustrzanym wektora $\vr{Hx}$ względem hiperpłaszczyzny (wymiaru $m-1$) prostopadłej do wektora $\vr{v}$.
+\end{theorem} 
+
+\begin{proof}
+Łatwo sprawdzić, że tak jest ponieważ: 
+$$
+\mx{H}^{T}=\left(\mx{I}-{\frac {2\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}}}\right)^{T}
+= \mx{I}-\left({\frac {2\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}}}\right)^{T}
+= \mx{I}-\frac {2}{\vr{v}^{T}\vr{v}} (\vr{v}\vr{v}^{T})^{T}
+= \mx{I}-\frac {2}{\vr{v}^{T}\vr{v}} (\vr{v}^{T})^{T} \vr{v}^{T}
+= \mx{I} - \frac{2}{\vr{v}^{T}\vr{v}} \vr{v}\vr{v}^{T} 
+= \mx{H}
+$$
+
+oraz
+\begin{align*}
+\mx{H}^{2}  &=\left(\mx{I}-{\frac {2\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}}}\right)^{2}  
+= \mx{I}-{\frac {4\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}}}+4\left({\frac {\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}}}\right)^{2}  
+=\mx{I} - \frac{4\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}} + 4 \frac{\vr{v}\vr{v}^{T}\vr{v}\vr{v}^{T}}{(\vr{v}^{T}\vr{v})^{2}} \\
+&=  \mx{I} - \frac{4\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}} +  \frac{4}{(\vr{v}^{T}\vr{v})^{2}} \vr{v}^{T}\vr{v}(\vr{v}\vr{v}^{T})  
+= \mx{I} - \frac{4\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}} +  \frac{4\vr{v}\vr{v}^{T}}{\vr{v}^{T}\vr{v}}  = \mx{I}.
+\end{align*}
+
+
+
+Z pierwszej równości wynika symetria, z drugiej ortogonalność, ponieważ 
+$$
+\mx{H}^{T}\mx{H}=\mx{H}\mx{H}=\mx{I}.
+$$ 
+\end{proof} 
+
+
+
+\begin{example} Pokażemy, jak obliczyć rozkład $QR$ macierzy $A$ o wymiarach $5$ na $4$ przy użyciu transformacji Householdera. Ten przykład uwidoczni wzór dla ogólnych macierzy $m$ na $n$. W poniższych macierzach $P_{i}$ jest macierzą ortogonalną $5$ na $5$, $x$ oznacza ogólny niezerowy wpis, a $o$ oznacza zero.
+
+1. Wyznaczamy $P_{1}$ tak, że:
+$$
+\mx{A_{1} \equiv {P_{1}\cdot A}}= \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x 
+\end{bmatrix}.
+$$
+2. Wyznaczamy 
+$$
+P_{2} = \left[ 
+\begin{array}{c|c}
+1 & 0 \\\hline
+0 & P_2'
+\end{array}
+\right]
+$$ 
+tak, że
+$$
+\mx{A_{2} \equiv {P_{2}\cdot A_{1}}}= \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & 0 & x & x \\
+0 & 0 & x & x  \\
+0 & 0 & x & x 
+\end{bmatrix}.
+$$
+3. Wyznaczamy 
+$$
+P_{3} = \left[ 
+\begin{array}{cc|c}
+1 & 0 & 0 \\
+0 & 1 & 0 \\\hline
+0 & 0 & P_{3}^{'}
+\end{array}
+\right]
+$$
+tak, że
+$$
+\mx{A_{3} \equiv {P_{3}\cdot A_{2}}}= \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & 0 & x & x \\
+0 & 0 & 0 & x  \\
+0 & 0 & 0 & x 
+\end{bmatrix}.
+$$
+4. Wyznaczamy 
+$$
+P_{4} = \left[ 
+\begin{array}{ccc|c}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\\hline
+0 & 0 & 0 & P_{4}^{'}
+\end{array}
+\right]
+$$ 
+tak, że
+$$
+\mx{A_{3} \equiv {P_{3}\cdot A_{2}}}= \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & 0 & x & x \\
+0 & 0 & 0 & x  \\
+0 & 0 & 0 & 0 
+\end{bmatrix}.
+$$
+
+Tutaj wybraliśmy macierz Householdera $P_{i}^{'}$ aby wyzerować subdiagonale wyrazy w kolumnie i. Jednocześnie nie zakłóca to zer wprowadzonych już w poprzednich kolumnach. Istotnie macierz $\mx{A}_{k}$ ma postać
+$$
+\begin{bmatrix}
+T & A_{1k} \\
+0 & A_{2k}
+\end{bmatrix}.
+$$
+Wtedy w mnożeniu dostajemy:
+$$
+\mx{P}_{k}^{'}= \begin{bmatrix}
+I & 0 \\
+0 & P_{k}^{'}
+\end{bmatrix} \cdot \begin{bmatrix}
+T & A_{1k} \\
+0 & A_{2k}
+\end{bmatrix} = \begin{bmatrix}
+T & A_{1k} \\
+0 & P_{k}^{'}\cdot A_{2k}
+\end{bmatrix}.
+$$
+Stąd widać, że zera pod przekątną są faktycznie zachowane.
+Nazwijmy ostatnią trójkątną górną macierz $5$ na $4$ $\mx{\tilde{R}}=A_{4}$. Następnie 
+$$
+ \mx{A} = \mx{P}_{1}^{T}\cdot \mx{P}_{2}^{T}\cdot \mx{P}_{3}^{T}\cdot \mx{P}_{4}^{T}\cdot \mx{R} = \mx{QR},
+$$
+gdzie $\mx{Q}$ to pierwsze cztery kolumny 
+$$
+\mx{P}_{1}^{T}\cdot \mx{P}_{2}^{T}\cdot \mx{P}_{3}^{T}\cdot \mx{P}_{4}^{T} = \mx{P}_{1}\cdot \mx{P}_{2}\cdot \mx{P}_{3}\cdot \mx{P}_{4}
+$$
+(ponieważ wszystkie $\mx{P}_{i}$ są symetryczne), a $\mx{R}$ to pierwsze cztery rzędy $\mx{\tilde{R}}$.
+\end{example}
+Oto ogólny algorytm dekompozycji $\mx{QR}$ z wykorzystaniem transformacji Householdera.
+
+\begin{algorithm}
+\caption{Algorytm QR metodą transformacji Householdera}
+\begin{algorithmic}
+\For{$i$ from $1$  to $\min (m-1,n)$}
+	\State $u_{i} = House(A(i:m,i))$
+	\State $\mx{P_{i}^{'}} = \mx{I} - 2\cdot u_{i}\cdot u_{i}^{T}$
+	\State $\mx{A}(i:m, i:n) = \mx{P}_{i}^{'}\cdot \mx{A}(i:m, i:n)$	
+\EndFor
+\end{algorithmic}
+\end{algorithm}
  
+\section{Algorytm QR metodą rotacji Givensa}
+\begin{remark}
+Rotacja Givensa postaci: 
+$$
+R(\theta) = \begin{bmatrix}
+\cos\theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{bmatrix}
+$$
+obraca dowolny wektor $\vec{x}\in \setR^{2}$ zgodnie z ruchem wskazówek zegara o $\theta$. Obrót ten prezentuje grafika \ref{rys:logo:jeden}.
+\end{remark}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{rys/givens_rot.png}
+\caption{Rotacja Givensa}\label{rys:logo:jeden}
+\end{figure}
+
+\begin{definition}[Macierz Givensa]
+Niech $ i,j \in {1, \ldots, n}$ i $\theta \in \setR$. Macierz $\mx{R}(i,j,\theta) \in \setR^{n\times n}$ zdefiniowana następująco:
+$$
+\mx{R}(i,j,\theta) = \begin{bmatrix}
+1       & 0     & \cdots &    0       & \cdots &    0       & \cdots & 0 & 0& \\
+0       & 1     & \cdots &     0      & \cdots &     0      &  \cdots& 0 & 0 &   \\
+0       & 0     & \ddots &     0      &  \cdots&     0      &  \cdots& 0 & 0 &  \\
+\vdots  &\vdots &  \cdots& \cos\theta & \cdots & -\sin\theta&  \cdots& 0 & 0& \\
+0       &  0    & \cdots & \vdots     &  \ddots&  \vdots    & \cdots & 0 & 0& \\
+\vdots  & \vdots& \cdots & \sin\theta & \cdots & \cos\theta &  \cdots& 0 & 0& \\
+0       & 0     & \cdots &    0       &  \cdots&  0         & \ddots &  0& 0& \\
+\vdots  & \vdots&\cdots  &  \cdots    &  \cdots&  \cdots    & \cdots & 1 & 0&\\
+0       & 0     & \cdots &     0      &  \cdots&    0       &  \cdots& 0 & 1 & \\       
+\end{bmatrix}
+$$
+nazywamy macierzą rotacji Givensa.
+\end{definition}
+
+\begin{lemma}[O macierzy Givensa]
+Każda macierz Givensa jest macierzą ortogonalną.
+\end{lemma}
+
+\begin{proof}
+Niech $n\in \setN$, rozważmy macierze Givensa rozmiaru $n$ na $n$. Niech $i,j \in {1,\ldots, n}$ i $\theta \in \setR$. Pokażemy, że macierz $\mx{R}(i,j,\theta) \in \setR^{n\times n}$ jest ortogonalna.
+Wystarczy pokazać, że układ kolumn $(r_s)$, $s=1,\ldots, n$ tej macierzy jest układem ortonormalnym. Weźmy dwie kolumny $k$-tą i $l$-tą. Rozważmy przypadki:
+\begin{enumerate}
+\item Gdy $k\notin (i,j)$, $l\notin (i,j)$, $k \neq l$, wtedy
+$$
+(\vr{r}_{k}|\vr{r}_{l}) = ([0,\ldots, 0,1,0,\ldots,0]|[0,\ldots,0,0,1,0,\ldots,0]) = 0
+$$
+$$
+(\vr{r}_{k}|\vr{r}_{k}) = ([0,\ldots, 0,1,0,\ldots,0]|[0,\ldots,0,1,0,\ldots,0]) = 1
+$$
+\end{enumerate}
+
+2.$k \in (i,j)$, $l \in (i,j)$, $k \neq l$
+{\scriptsize
+$$
+(\vr{r}_{i}|\vr{r}_{j}) = ([0,\ldots, 0,\cos\theta,0,\ldots,0,\sin\theta,0,\ldots,0]|[0,\ldots, 0,-(\sin\theta),0,\ldots,0,\cos\theta,0,\ldots,0]) = \cos\theta\cdot(-\sin\theta) + \sin\theta\cdot\cos\theta = 0
+$$
+$$
+(\vr{r}_{i}|\vr{r}_{i}) = ([0,\ldots, 0,\cos\theta,0,\ldots,0,\sin\theta,0,\ldots,0]|[0,\ldots, 0,\cos\theta,0,\ldots,0,\sin\theta,0,\ldots,0]) = \cos^{2}\theta + \sin^{2}\theta = 1
+$$
+$$
+(\vr{r}_{j}|\vr{r}_{j}) = ([0,\ldots, 0,-(\sin\theta),0,\ldots,0,\cos\theta,0,\ldots,0]|[0,\ldots, 0,-(\sin\theta),0,\ldots,0,\cos\theta,0,\ldots,0]) = -\sin^{2}\theta + \cos^{2}\theta = 1
+$$
+}
+3. $k=j$, $l\notin (i,j)$
+$$
+(\vr{r}_{j}|\vr{r}_{l}) = (\vr{r}_{l}|\vr{r}_{j})= ([0,\ldots, 0,1,0,\ldots,0]|[0,\ldots, 0,-(\sin\theta),0,\ldots,0,\cos\theta,0,\ldots,0]) = 0
+$$
+4. $k=i$, $l\notin(i,j)$
+$$
+(\vr{r}_{i}|\vr{r}_{l}) = (\vr{r}_{l}|\vr{r}_{i})= ([0,\ldots, 0,1,0,\ldots,0]|[0,\ldots, 0,\cos\theta,0,\ldots,0,\sin\theta,0,\ldots,0] = 0
+$$
+
+Z uwagi na symetrię oznaczeń, również przypadek gdy $k\notin{i,j}$, $l=i \lor l=j$, to ich iloczyn skalarny jest równy $0$. Podsumowując powyższe przypadki z dowolności wyboru kolumn $k$-tej i $l$-tej układ kolumn $r(s)$ jest ortonormalny. Zatem macierz Givensa jest ortogonalna.
+\end{proof}
+
+\begin{lemma}
+Niech $\mx{A} \in \setR^{n \times n}$. Wtedy macierz Givensa $\mx{R}(i,j, \theta)$, gdzie $\theta$ spełnia warunki:
+$$
+\cos\theta = \frac{a_{ii}}{\sqrt{a_{ii}^{2} + a_{ji}^{2}}}
+$$
+$$
+\sin\theta = \frac{-(a_{ji})}{\sqrt{a_{ii}^{2} + a_{ji}^{2}}}
+$$
+powoduje, że jeśli $[b_{ij}]_{i=1,\ldots,n}^{j=1,\ldots,n} = \mx{B} = \mx{R}(i,j,\theta)\cdot \mx{A}$, to 
+$b_{ji}=0$.
+\end{lemma}
+
+\begin{proof}
+Niech $\mx{A} \in \setR^{n \times n}$, $ij \in{1,\ldots,n}$ i $\theta$ spełniająca warunki. Niech $\mx{B} = \mx{R}(i,j,\theta)\cdot \mx{A}$. Wtedy 
+$$
+b_{ji}= \sin\theta\cdot a_{ii} + \cos\theta\cdot a_{ji} = \frac{-(a_{ji})}{\sqrt{a_{ii}^{2} + a_{ji}^{2}}} \cdot a_{ii} + \frac{a_{ii}}{\sqrt{a_{ii}^{2} + a_{ji}^{2}}} \cdot a_{ji} = 0.
+$$
+\end{proof}
+Zatem macierz $R$ można użyć do "generowania zer w macierzy".
+\begin{algorithm}
+\caption{Algorytm QR metodą rotacji Givensa}
+\begin{algorithmic}
+\For{$i$ from $1$  to $\min (m-1,n)$}
+	\For{$j$ from $i+1$ to $m$}
+		\State $\mx{G} = Givens(i,j, \mx{A}[i,i], \mx{A}[j,i])$
+		\State $\mx{A} = \mx{G}\cdot \mx{A}$
+	\EndFor	
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{proposition} \label{Proposition-zachowanie-zer}
+Zauważmy jak zachowuje się macierz przy mnożeniu przez macierz Givensa.
+{
+\begin{equation*}
+\begin{array}{c}
+\begin{bmatrix}
+I & 0 & 0 & 0 & 0 \\
+0 & \cos\theta & 0 & -\sin\theta & 0 \\
+0 & 0 & I & 0 & 0 \\
+0 & \sin\theta & 0 & \cos\theta & 0 \\
+0 & 0 & 0 & 0 & I
+\end{bmatrix} \cdot \begin{bmatrix}
+A_{11} & A_{12} & A_{13} & A_{14} & A_{15} \\
+A_{21} & A_{22} & A_{23} & A_{24} & A_{25} \\
+A_{31} & A_{32} & A_{33} & A_{34} & A_{35} \\
+A_{41} & A_{42} & A_{43} & A_{44} & A_{45} \\
+A_{51} & A_{52} & A_{53} & A_{54} & A_{55}
+\end{bmatrix} = \\ \\
+{\scriptsize
+\begin{bmatrix}
+A_{11} & A_{12} & A_{13} & A_{14} & A_{15} \\
+\cos\theta \cdot A_{21} - \sin\theta\cdot A_{41} & \cos\theta \cdot A_{22}- \sin\theta\cdot A_{42} & \cos\theta \cdot A_{23}- \sin\theta\cdot A_{43} & \cos\theta \cdot A_{24}- \sin\theta\cdot A_{44} & \cos\theta \cdot A_{25}- \sin\theta\cdot A_{45} \\
+A_{31} & A_{32} & A_{33} & A_{34} & A_{35} \\
+\sin\theta\cdot A_{21} + \cos\theta\cdot A_{41} & \sin\theta\cdot A_{22} + \cos\theta\cdot A_{42} & \sin\theta\cdot A_{23} + \cos\theta\cdot A_{43} & \sin\theta\cdot A_{24} + \cos\theta\cdot A_{44} & \sin\theta\cdot A_{25} + \cos\theta\cdot A_{45} \\
+A_{51} & A_{52} & A_{53} & A_{54} & A_{55} 
+\end{bmatrix}
+}
+\end{array}
+\end{equation*}
+}
+\end{proposition}
+
+\begin{proposition}\label{Proposition-zera-w-kolumnie}
+Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnie $j$.
+\end{proposition}
+
+\begin{proof}[Szkic dowodu]
+Istotnie z obserwacji \ref{Proposition-zachowanie-zer} po wykonaniu obrotu Givensa względem $i$ i $j$ inne zera będą reprezentowane przez pola $\mx{A}_{12}, \mx{A}_{32}, \mx{A}_{52}, \ldots$ i nie ulegają zmianie.
+\end{proof}
 
 
 
-Algorytm QR został wynaleziony w 1961 roku przez Francisa i Kubłanowską. Jest jedną z efektywniejszych znanych metod rozwiązywania pełnego zadania własnego dla macierzy symetrycznych lub niesymetrycznych.
-W podstawowym algorytmie QR tworzy się ciąg macierzy $A= A_{0}, A_{1}, A_{2}, ...$ taki, że 
-$$ A_{s}=Q_{s}R_{s},$$
-$$R_{s}Q_{s}=A_{s+1},$$
-$$(s=0, 1, ...),$$ 
-gdzie $Q_{s}$ jest macierzą ortogonalną, a $R_{s}$ - trójkątną górną. Łatwo widać, że z twierdzenia o rozkładzie QR wynika, że ciąg $A_{s}$ $(s=0, 1, ...)$ jest w zasadzie określony jednoznacznie. Ponieważ 
-$$ A_{s+1}=R_{s}Q_{s}=Q_{s}^{T}A_{s}Q_{s},$$ 
-więc każdy krok w algorytmie QR jest przekształceniem przez podobieństwo. 
+\begin{proposition}\label{Proposition-zera-w-wierszach}
+Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w wierszach $i$, $j$ na miejscach $\mx{A}[i,1:i]$, $\mx{A}[j, 1:i]$. 
+\end{proposition}
+\begin{proof}[Szkic dowodu]
 
-\subsection*{Metoda Householdera}
+Istotnie załóżmy, że $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ są wypełnione zerami. Odpowiada to polom $\mx{A}_{21}$, $\mx{A}_{41}$. Wtedy po rotacji mamy 
+$$
+\mx{A}_{21} = \cos\theta\mx{A}_{21} - \sin\theta\mx{A}_{41} = 0,
+$$  
+$$
+\mx{A}_{41} = \sin\theta\mx{A}_{21} - \cos\theta\mx{A}_{41} = 0.
+$$
+\end{proof}
 
-Metoda Householdera pozwala znaleźć rozkład QR dowolnej macierzy prostokątnej m x n ($m\ge n$).
 
-{Macierz Householdera}
-Macierzą Householdera H zwaną również refleksją nazywamy symetryczną i ortogonalną macierz przekształcenia wektora, które odbija go względem pewnej płaszczyzny. 
-\newpage
-{Transformacja Householdera}
-Niech  $v\in R^{m}, $ i $v\neq 0. $ Wówczas transformacją Householdera nazywamy macierz postaci:
+\begin{example} Poniżej zilustrujemy etapy obliczania rozkładu $\mx{QR}$ macierzy $4$ na $4$ przy użyciu rotacji Givensa.
+Dla $i=1$
+$$
+\begin{bmatrix}
+x & x & x & x \\
+x & x & x & x \\
+x & x & x & x \\
+x & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(1,2)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+x & x & x & x \\
+x & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(1,3)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & x & x & x \\
+x & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(1,4)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & x & x & x \\
+0 & x & x & x   
+\end{bmatrix}  
+$$
+Dla $i=2$
+$$
+\begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x 
+\end{bmatrix}  \underrightarrow{\mx{G}(2,3)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(2,4)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & 0 & x & x   
+\end{bmatrix} 
+$$   
+Dla $i=3$
+$$
+\begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & 0 & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(3,4)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & 0 & 0 & x   
+\end{bmatrix} 
+$$
+\end{example}
+Na mocy obserwacji \ref{Proposition-zera-w-kolumnie} i \ref{Proposition-zera-w-wierszach} widzimy, że wykonanie obrotu Givensa zgodnie z zaprezentowanym wyżej przykładem zachowuje odpowiednie zera w macierzy.
+Z książki "Applied Numerical Linear Algebra" autorstwa Jamesa W. Demmela możemy uzyskać informację, że koszt  rozkładu $\mx{QR}$ za pomocą rotacji Givensa jest dwa razy większy niż koszt rozkładu za pomocą metody Householdera.
 
-$${\displaystyle H=I-Wvv^{T}, } {\displaystyle H=I-Wvv^{T}, }       {\displaystyle W={\frac {2}{v^{T}v}}} {\displaystyle W={\frac {2}{v^{T}v}}}$$ 
-Macierz H jest macierzą symetryczną i ortogonalną oraz ma taką własność, że dowolny wektor x wymiaru m jest odbiciem lustrzanym wektora Hx względem hiperpłaszczyzny (wymiaru m-1) prostopadłej do wektora v[3]. Łatwo sprawdzić, że tak jest ponieważ: 
-
-$${\displaystyle H^{2}=\left(I-{\frac {2vv^{T}}{v^{T}v}}\right)^{2}=I-{\frac {4vv^{T}}{v^{T}v}}+4\left({\frac {vv^{T}}{v^{T}v}}\right)^{2}=I} {\displaystyle H^{2}=\left(I-{\frac {2vv^{T}}{v^{T}v}}\right)^{2}}$$ \newline  $$= {I-{\frac {4vv^{T}}{v^{T}v}}+4\left({\frac {vv^{T}}{v^{T}v}}\right)^{2}=I}       {\displaystyle ((vv^{T})(v^{T}v)=(vv^{T})^{2})} {\displaystyle ((vv^{T})(v^{T}v)=(vv^{T})^{2})}$$\\
-oraz\\
-
-$${\displaystyle H^{T}=\left(I-{\frac {2vv^{T}}{v^{T}v}}\right)^{T}=I-\left({\frac {2vv^{T}}{v^{T}v}}\right)^{T}=I-{\frac {2vv^{T}}{v^{T}v}}=H} {\displaystyle H^{T}=\left(I-{\frac {2vv^{T}}{v^{T}v}}\right)^{T}}$$ \newline $$={I-\left({\frac {2vv^{T}}{v^{T}v}}\right)^{T}=I-{\frac {2vv^{T}}{v^{T}v}}=H}       {\displaystyle ((vv^{T})^{T}=(vv^{T}))} {\displaystyle ((vv^{T})^{T}=(vv^{T}))}$$\\
-Z drugiej równości wynika symetria, z pierwszej ortogonalność, ponieważ $${\displaystyle H^{T}H=HH=I}. $$ Zatem:\\
-
-$${\displaystyle |Hx|={\sqrt {(Hx)^{T}(Hx)}}={\sqrt {x^{T}(H^{T}H)x}}={\sqrt {x^{T}Ix}}=|x|} {\displaystyle |Hx|={\sqrt {(Hx)^{T}(Hx)}}={\sqrt {x^{T}(H^{T}H)x}}={\sqrt {x^{T}Ix}}=|x|}. $$\\
-Mnożąc dowolny wektor ${\displaystyle x\in R^{m}}$ otrzymujemy:\\
-
-$${\displaystyle Hx=x-{\frac {2vv^{T}x}{v^{T}v}}=x+(-2{\frac {vv^{T}x}{v^{T}v}})=x-2r} {\displaystyle Hx=x-{\frac {2vv^{T}x}{v^{T}v}}=x+(-2{\frac {vv^{T}x}{v^{T}v}})=x-2r}$$
 
 
 
