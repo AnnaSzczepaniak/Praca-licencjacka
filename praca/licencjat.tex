@@ -24,8 +24,9 @@
 \newcommand{\proj}[2]{\frac{\scalar{#2}{#1}}{\scalar{#1}{#1}}}
 
 
+\usepackage{Sweave}
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+\input{licencjat-concordance}
 
 
 \begin{titlepage}
@@ -922,259 +923,40 @@ Z książki "Applied Numerical Linear Algebra" autorstwa Jamesa W. Demmela może
 
 Szukamy przekształcenia pierwszego wektora, tj. pierwszej kolumny.
 
-<<>>=
-house = function(x) {
-  norm_x = sqrt(t(x) %*% x)
-  if (x[1] > 0) {
-    x[1] = x[1] + norm_x;
-  } else {
-    x[1] = x[1] - norm_x;
-  }
-  return(x)
-}
-@
+\begin{Schunk}
+\begin{Sinput}
+> house = function(x) {
++   norm_x = sqrt(t(x) %*% x)
++   if (x[1] > 0) {
++     x[1] = x[1] + norm_x;
++   } else {
++     x[1] = x[1] - norm_x;
++   }
++   return(x)
++ }
+\end{Sinput}
+\end{Schunk}
 
 Tworzymy rozkład QR korzystając z transformacji Householdera 
 
-<<>>=
-qr_householer = function(A)
-{
- R = A
- dimm = dim(A)
- n = dimm[2]
-  m = dimm[1]
-  Q = diag(n)
-  for (i in 1:min(m-1,n)){
-    u = house(R[i:m,i])
-    den =  (t(u) %*% u)[1,1]
-    P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
-    R[i:m,i:n] = P %*% R[i:m,i:n]
-    if (i>1)
-      Q[i:n,1:(i-1)] = P %*% Q[i:n,1:(i-1)]
-    Q[i:n,i:n] = P %*% Q[i:n,i:n]
-  }
-  return(list(R=R, Q=t(Q)))
-}
-qr_householer(A)
-
-@
-
-Jest to gotowy algorytm, który zwraca nam macierz $\mx{Q}$ i macierz $\mx{R}$. 
-
-\section{Algorytm dekompozycji QR metodą rotacji Givensa}
-
-Tworzymy macierz rotacji Givensa
-
-<<>>=
-givens = function(i,j,A){
-  dimm = dim(A)
-  n = dimm[1]
-  G = diag(n)
-  p = sqrt((A[i,i])^2 + (A[j,i])^2)
-  G[i,i] = A[i,i]/ p
-  G[i,j] = (A[j,i])/p
-  G[j,i] = -(A[j,i])/p
-  G[j,j] = A[i,i]/ p
-  
-return(G)  
-  
-}
-@
-
-Tworzymy algorytm dekompozycji macierzy QR metodą rotacji Givensa.
-
-<<>>=
-qr_givens = function(A){
-  R = A
-  
-  n = dim(A)[2]
-  m = dim(A)[1]
-  Q = diag(n)
-  for (i in 1:(n-1)) {
-    for (j in (i+1):m) {
-      G = givens(i,j,R)
-      R = G %*% R
-      Q = Q %*% t(G)
-    }
-  }
-  return(list(R=R, Q=Q))
-}
-
-qr_givens(A)
-@
-
-
-\section{Eksperymenty numeryczne - porównanie jakości dwóch algorytmów}
-
-Teraz czas na eksperymenty, które pokażą, jak bardzo różni się błąd naszych algorytmów  od tego z gotowej funkcji R Studio, służącej do rozkładu QR. 
-Do wyżej wymienionych eksperymentów wykorzystamy losowo wybrane trzy macierze. 
-1. Wymiarów 5 na 5.
-2. Wymiarów 25 na 25.
-3. Wymiarów 125 na 125. 
-
-Na początek zajmijmy się macierzą wymiarów 5 na 5. Zostanie ona wygenerowana z losowych liczb.
-
-<<>>=
-M_1<-matrix(c(replicate(5, rnorm(5)) ), 5, 5, byrow=TRUE) 
-M_1
-@
-
-Najpierw przeprowadźmy rozkład wbudowaną funkcją w R Studio.
-
-<<>>=
-QR = qr(M_1)
-qr.Q(QR)
-qr.R(QR)
-@
-
-Następnie przeprowadzimy rozkład naszym algorytmem qr_givens.
-
-<<>>=
-wynik1_givens = qr_givens(M_1)
-wynik1_givens$Q
-wynik1_givens$R
-@
-
-Pozostało przeprowadzić rozkład algorytmem qr_householder.
-
-<<>>=
-wynik1_householder = qr_householer(M_1)
-wynik1_householder$Q
-wynik1_householder$R
-@
-
-Należy teraz sprawdzić, który rozkład jest najbliższy naszej wyjściowej macierzy A.
-
-Policzymy kolejno błądy bezwgldęne z: 
-1. Rozkładu QR metodą rotacji Givensa.
-2. Rozkładu QR funkcją wbudowaną w język R.
-3. Rozkładu QR metodą odbić Householdera.
-
-1.
-
-<<>>=
-M_1_givens = wynik1_givens$Q  %*% wynik1_givens$R
-M_11 = M_1_givens - M_1
-blad_givens_M_1 = norm(M_11)
-blad_givens_M_1
-@
-
-2.
-
-<<>>=
-M_1_qr = qr.Q(QR) %*% qr.R(QR)
-M_12 = M_1_qr - M_1
-blad_qr_M_1 = norm(M_12)
-blad_qr_M_1
-@
-
-3.
-
-<<>>=
-M_1_householder = wynik1_householder$Q %*% wynik1_householder$R
-M_13 = M_1_householder - M_1
-blad_householder_M_1 = norm(M_13)
-blad_householder_M_1
-@
-
-Sprawdźmy, który z błędów jest najmniejszy, a który największy. Będziemy wtedy w stanie ocenić, który z rozkładów jest na najdokładniejszy.
-
-<<>>=
-min(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
-max(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
-@
-
-Widzimy, że gotowy algorytm, wbudowany w RStudio jest jednak dokładniejszy od naszych, samodzielnie napisanych. Widać również, że algorytm dekompozycji QR metodą Givensa jest jednak dokładniejszy od algorytmu metodą odbić Householdera.
-
-Sprawdzimy czy ta zaleźność znajduje zastosowania dla macierzy wyższych rzędów.
-
-Kolej na macierzy wymiarów 25 na 25.
-
-<<>>=
-M_2<-matrix(c(replicate(25, rnorm(25)) ), 25, 25, byrow=TRUE)
-@
-
-Rozkład wbudowaną funkcją w R Studio.
-
-<<>>=
-QR = qr(M_2)
-qr.Q(QR)
-qr.R(QR)
-@
-
-Rozkład algorytmem qr_givens.
-
-<<>>=
-wynik2_givens = qr_givens(M_2)
-wynik2_givens$Q
-wynik2_givens$R
-@
-
-Rozkład algorytmem qr_householder.
-
-<<>>=
-wynik2_householder = qr_householer(M_2)
-wynik2_householder$Q
-wynik2_householder$R
-@
-
-Teraz wykonujemy dokładnie taką samą procedurę jak dla macierzy wymiarów $5$ na $5$.
-Liczy kolejno błędy bezwzględne.
-
-1.
-<<>>=
-M_2_givens = wynik2_givens$Q  %*% wynik2_givens$R
-M_21 = M_2_givens - M_2
-blad_givens_M_2 = norm(M_21)
-blad_givens_M_2
-@
-
-2.
-<<>>=
-M_2_qr = qr.Q(QR) %*% qr.R(QR)
-M_22 = M_2_qr - M_2
-blad_qr_M_2 = norm(M_22)
-blad_qr_M_2
-@
-
-3.
-<<>>=
-M_2_householder = wynik2_householder$Q %*% wynik2_householder$R
-M_23 = M_2_householder - M_2
-blad_householder_M_2 = norm(M_23)
-blad_householder_M_2
-@
-
-Tak jak w poprzednim przykładzie porównajmy uzyskane błędy.
-
-<<>>=
-min(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
-max(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
-@
-
-Widzimy, że zwiększenie wymiarów macierzy nie wpływa na jakości prezentowanych algorytmów.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\chapter{Podsumowanie}
-
-
-\bibliographystyle{plain}
-\bibliography{bibliografia}
-
-\end{document}
+\begin{Schunk}
+\begin{Sinput}
+> qr_householer = function(A)
++ {
++   R = A
++   dimm = dim(A)
++   n = dimm[2]
++   m = dimm[1]
++   Q = diag(n)
++   for (i in 1:min(m-1,n)){
++     u = house(R[i:m,i])
++     den =  (t(u) %*% u)[1,1]
++     P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
++     R[i:m,i:n] = P %*% R[i:m,i:n]
++     if (i>1)
++       Q[i:n,1:(i-1)] = P %*% Q[i:n,1:(i-1)]
++     Q[i:n,i:n] = P %*% Q[i:n,i:n]
++   }
++   return(list(R=R, Q=t(Q)))
++ }
+> qr_householer(A)

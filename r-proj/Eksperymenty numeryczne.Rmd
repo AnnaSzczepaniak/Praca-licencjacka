@@ -9,12 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Rozwa¿my sobie nastêpuj¹c¹ macierz
 
-```{r}
-A <- matrix(c(2,-2,18,2,1,0,1,2,0), 3, 3, byrow=TRUE)
-A
-```
 
 Szukamy przekszta³cenia pierwszego wektora, tj. pierwszej kolumny.
 
