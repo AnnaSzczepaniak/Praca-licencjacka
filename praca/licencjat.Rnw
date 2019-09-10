@@ -920,7 +920,7 @@ Z książki "Applied Numerical Linear Algebra" autorstwa Jamesa W. Demmela może
 
 \section{Algorytm dekompozycji QR metodą odbić Householdera}
 
-Algorytm dekompozycji QR metodą odbić Householera posiada dwie główne składowe. Pierwszych z nich jest funkcja odnajdująca odpowiednie odbicie.  Odbicie reprezentowane jest przez wektor normalny do płaszczyzny odbicia. Zadaniem jest skonstruowanie odbicia, które umożliwia ''wyzerowanie'' elementów położonych poniżej przekątnej w macierzy. Kod odpowiadający poszukiwaniu takiego wektora prezentujemy poniżej:
+Algorytm dekompozycji QR metodą odbić Householera posiada dwie główne składowe. Pierwszym z nich jest funkcja odnajdująca odpowiednie odbicie.  Odbicie reprezentowane jest przez wektor normalny do płaszczyzny odbicia. Zadaniem jest skonstruowanie odbicia, które umożliwia ''wyzerowanie'' elementów położonych poniżej przekątnej w macierzy. Kod odpowiadający poszukiwaniu takiego wektora prezentujemy poniżej:
 
 <<>>=
 house = function(x) {
@@ -934,7 +934,7 @@ house = function(x) {
 }
 @
 
-Wtedy algorytm rozkładu QR może być łatwo zapisany za pomocą poniższego kodu
+Wtedy algorytm rozkładu QR może być łatwo zapisany za pomocą poniższego kodu:
 
 <<>>=
 qr_householer = function(A)
@@ -961,7 +961,7 @@ Jest to gotowy algorytm, który zwraca nam macierz $\mx{Q}$ i macierz $\mx{R}$.
 
 \section{Algorytm dekompozycji QR metodą rotacji Givensa}
 
-Tworzymy macierz rotacji Givensa
+Algorytm dekompozycji QR metodą rotacji Givensa podobnie jak w metodzie odbić Householdera również posiada dwie główne składowe. Pierwszą z nich jest funkcja odnajdująca odpowiednią rotację, która reprezentowana jest przez macierz Givensa. Zadaniem jest skonstruowanie takiej macierzy rotującej, która umożliwia ''wyzerowanie'' w kolejnych kolumnach elementów położonych poniżej przekątnej w macierzy. Kod odpowiadający poszukiwaniu takiej macierzy prezentujemy poniżej:
 
 <<>>=
 givens = function(i,j,A){
@@ -979,7 +979,7 @@ return(G)
 }
 @
 
-Tworzymy algorytm dekompozycji macierzy QR metodą rotacji Givensa.
+Teraz łatwo tworzymy algorytm dekompozycji macierzy QR metodą rotacji Givensa:
 
 <<>>=
 qr_givens = function(A){
@@ -999,6 +999,8 @@ qr_givens = function(A){
 }
 @
 
+Podobnie jak algorytm QR metodą odbić Householdera ten algorytm również zwraca nam dwie macierze $\mx{Q}$ i $\mx{R}$
+
 
 \section{Eksperymenty numeryczne - porównanie jakości dwóch algorytmów}
 
@@ -1016,39 +1018,34 @@ Na początek zajmijmy się macierzą wymiarów 5 na 5. Zostanie ona wygenerowana
 
 <<>>=
 M_1<-matrix(c(replicate(5, rnorm(5)) ), 5, 5, byrow=TRUE)
-M_1
 @
 
-Najpierw przeprowadźmy rozkład wbudowaną funkcją w pakiet R.
+Najpierw przeprowadzimy rozkład wbudowaną funkcją w pakiet R.
 
 <<>>=
 QR = qr(M_1)
-qr.Q(QR)
-qr.R(QR)
 @
 
-Następnie przeprowadzimy rozkład naszym algorytmem qr givens.
+Następnie przeprowadzimy rozkład opracowanym samodzielnie algorytmem qr givens.
 
 <<>>=
 wynik1_givens = qr_givens(M_1)
-wynik1_givens$Q
-wynik1_givens$R
 @
 
-Pozostało przeprowadzić rozkład algorytmem qr householder.
+Pozostało przeprowadzić rozkład również opracowanym samodzielnie algorytmem qr householder.
 
 <<>>=
 wynik1_householder = qr_householer(M_1)
-wynik1_householder$Q
-wynik1_householder$R
 @
 
-Należy teraz sprawdzić, który rozkład jest najbliższy naszej wyjściowej macierzy A.
+Należy sprawdzić, który rozkład jest najbliższy naszej wyjściowej macierzy A.
 
 Policzymy kolejno błądy bezwgldęne z:
-1. Rozkładu QR metodą rotacji Givensa.
-2. Rozkładu QR funkcją wbudowaną w język R.
-3. Rozkładu QR metodą odbić Householdera.
+\begin{enumerate}
+\item Rozkładu QR metodą rotacji Givensa.
+\item Rozkładu QR funkcją wbudowaną w język R.
+\item Rozkładu QR metodą odbić Householdera.
+\end{enumerate}
 
 1.
 
@@ -1077,20 +1074,20 @@ blad_householder_M_1 = norm(M_13)
 blad_householder_M_1
 @
 
-Sprawdźmy, który z błędów jest najmniejszy, a który największy. Będziemy wtedy w stanie ocenić, który z rozkładów jest na najdokładniejszy.
+Sprawdźmy, który z błędów jest najmniejszy, a który największy. Będziemy wtedy w stanie ocenić, który z rozkładów jest najdokładniejszy.
 
 <<>>=
 min(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
 max(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
 @
 
-Widzimy, że gotowy algorytm, wbudowany w RStudio jest jednak dokładniejszy od naszych, samodzielnie napisanych. Widać również, że algorytm dekompozycji QR metodą Givensa jest jednak dokładniejszy od algorytmu metodą odbić Householdera.
+Widzimy, że gotowy algorytm, wbudowany w RStudio jest jednak dokładniejszy od naszych, samodzielnie napisanych. Widać również, że algorytm dekompozycji QR metodą Givensa jest lepszy od algorytmu metodą odbić Householdera.
 
 Sprawdzimy czy ta zaleźność znajduje zastosowania dla macierzy większych rozmiarów.
 
 \subsection{Test dla macierzy średniego rozmiaru}
 
-Kolej na macierzy wymiarów 25 na 25.
+Kolej na macierz wymiarów 25 na 25.
 
 <<>>=
 M_2<-matrix(c(replicate(25, rnorm(25)) ), 25, 25, byrow=TRUE)
@@ -1100,28 +1097,22 @@ Rozkład wbudowaną funkcją w Pakiet R.
 
 <<>>=
 QR = qr(M_2)
-qr.Q(QR)
-qr.R(QR)
 @
 
 Rozkład algorytmem qr givens.
 
 <<>>=
 wynik2_givens = qr_givens(M_2)
-wynik2_givens$Q
-wynik2_givens$R
 @
 
 Rozkład algorytmem qr householder.
 
 <<>>=
 wynik2_householder = qr_householer(M_2)
-wynik2_householder$Q
-wynik2_householder$R
 @
 
 Teraz wykonujemy dokładnie taką samą procedurę jak dla macierzy wymiarów $5$ na $5$.
-Liczy kolejno błędy bezwzględne.
+Liczymy kolejno błędy bezwzględne.
 
 1.
 <<>>=
@@ -1155,6 +1146,109 @@ max(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
 @
 
 Widzimy, że zwiększenie wymiarów macierzy nie wpływa na jakości prezentowanych algorytmów.
+
+\subsection{Test dla macierzy dużych rozmiarów}
+
+Sprawdzimy dokładność algorytmów dla macierzy rozmiarów $125$ na $125$. Zbadamy również czy przy wzroście wymiarów macierzy wzrastają również poszczególne błędy. 
+
+Wygenerujmy więc macierz:
+
+<<>>=
+M_3<-matrix(c(replicate(125, rnorm(125)) ), 125, 125, byrow=TRUE) 
+@
+
+Zgodnie z procedurą jaką stosowaliśmy dla macierzy mniejszych rozmiarów, przeprowadźmy kolejno:
+
+Rozkład funkcją qr:
+
+<<>>=
+QR = qr(M_3)
+@
+
+Rozkład algorytmem qr givens:
+
+<<>>=
+wynik3_givens = qr_givens(M_3)
+@
+
+Rozkład algorytmem qr householder:
+
+<<>>=
+wynik3_householder = qr_householer(M_3)
+@
+
+Dalej policzymy błędy bezwględne.
+
+1.
+<<>>=
+M_3_givens = wynik3_givens$Q  %*% wynik3_givens$R
+M_31 = M_3_givens - M_3
+blad_givens_M_3 = norm(M_31)
+blad_givens_M_3
+@
+
+
+2.
+<<>>=
+M_3_qr = qr.Q(QR) %*% qr.R(QR)
+M_32 = M_3_qr - M_3
+blad_qr_M_3 = norm(M_32)
+blad_qr_M_3
+@
+
+3.
+<<>>=
+M_3_householder = wynik3_householder$Q %*% wynik3_householder$R
+M_33 = M_3_householder - M_3
+blad_householder_M_3 = norm(M_33)
+blad_householder_M_3
+@
+
+Zgodnie z procedurą badamy, który z błędów jest najmniejszy, a który największy.
+
+<<>>=
+min(blad_givens_M_3,blad_householder_M_3,blad_qr_M_3)
+max(blad_givens_M_3,blad_householder_M_3,blad_qr_M_3)
+@
+
+W tym momencie możemy wysnuć wniosek, że rozmiar macierzy nie ma znaczenia jeżeli chodzi o jakość naszych samodzielnie opisanych funkcji. Są one mniej dokładne niż wbudowany, gotowy algorytm dekompozycji QR w R Studio. Ponadto algorytm metodą rotacji Givensa jest jakościowo lepszy od algorytmu metodą odbić Householdera.
+Zbadamy teraz jak zachowują się błędy w poszczególnych algorytmach przy zwiększaniu wymiaru. Interesuje nas czy te błędy rosną wraz ze wzrostem wymiaru, czy też wręcz przeciwnie. 
+
+Porównajmy kolejno błędy bezwzględne z:
+\begin{enumerate}
+\item rozkładu qr givens
+\item rozkładu qr householder
+\item rozkładu funkcją wbudowaną w język R.
+\end{enumerate}
+
+1.
+<<>>=
+blad_givens_M_1
+blad_givens_M_2
+blad_givens_M_3
+min(blad_givens_M_1,blad_givens_M_2)
+min(blad_givens_M_2,blad_givens_M_3)
+@
+
+2.
+<<>>=
+blad_householder_M_1
+blad_householder_M_2
+blad_householder_M_3
+min(blad_householder_M_1,blad_householder_M_2)
+min(blad_householder_M_2,blad_householder_M_3)
+@
+
+3.
+<<>>=
+blad_qr_M_1
+blad_qr_M_2
+blad_qr_M_3
+min(blad_qr_M_1,blad_qr_M_2)
+min(blad_qr_M_2,blad_qr_M_3)
+@
+
+Wyniki nie są zaskakujące. Wraz ze wzrostem wymiaru rosną również błędy bezwględne wszystkich przedstawionych przez nas algorytmów.
 
 
 
