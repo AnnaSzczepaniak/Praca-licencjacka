@@ -20,7 +20,6 @@ Szukamy przekszta³cenia pierwszego wektora, tj. pierwszej kolumny.
 
 ```{r}
 house = function(x) {
-  print(t(x) %*% x)
   norm_x = sqrt(t(x) %*% x)
   if (x[1] > 0) {
     x[1] = x[1] + norm_x;
@@ -37,9 +36,7 @@ Tworzymy rozk³ad QR korzystaj¹c z transformacji Householdera
 ```{r}
 qr_householer = function(A)
 {
-  
   R = A
-  print(A)
   dimm = dim(A)
   n = dimm[2]
   m = dimm[1]
@@ -56,10 +53,11 @@ qr_householer = function(A)
   return(list(R=R, Q=t(Q)))
 }
 qr_householer(A)
+qr.Q(qr(A))
 ```
 
 
-
+Tworzymy macierz rotacji Givensa
 
 ```{r}
 
@@ -90,6 +88,9 @@ A3
 ```{r}
 givens(3,1,A) %*% A
 ```
+
+
+Tworzymy algorytm dekompozycji macierzy QR metod¹ rotacji Givensa.
 
 ```{r}
 qr_givens = function(A){
@@ -131,25 +132,68 @@ qr.Q(QR)
 qr.R(QR)
 ```
 
+
 Nastêpnie przeprowadzimy rozk³ad naszym algorytmem qr_givens
-
 ```{r}
-qr_givens(M_1)
+wynik1_givens = qr_givens(M_1)
+wynik1_givens$Q
+wynik1_givens$R
 ```
-SprawdŸmy, który rozk³ad jest bli¿szy naszej wyjœciowej macierzy A.
+
+Rozk³ad algorytmem qr_householder:
 
 ```{r}
-M_1_givens = R %*% Q
-S = M_1_givens^2 - M_1^2
-blad_givens = sqrt(S^2)
+wynik1_householder = qr_householer(M_1)
+wynik1_householder$Q
+wynik1_householder$R
+```
+
+
+
+
+SprawdŸmy, który rozk³ad jest najbli¿szy naszej wyjœciowej macierzy A.
+
+Policzymy b³¹d bezwgldêny z rozk³adu QR metod¹ rotacji Givensa:
+
+```{r}
+M_1_givens = wynik1_givens$Q  %*% wynik1_givens$R
+M_11 = M_1_givens - M_1
+blad_givens_M_1 = norm(M_11)
+blad_givens_M_1
+```
+
+B³¹d bezwzglêdny z rozk³adu QR funkcj¹ wbudowan¹ w jêzyk R:
+
+```{r}
 M_1_qr = qr.Q(QR) %*% qr.R(QR)
-S_1 = M_1_qr - M_1
-blad_qr = sqrt(S_1^2)
+M_12 = M_1_qr - M_1
+blad_qr_M_1 = norm(M_12)
+blad_qr_M_1
 ```
 
+B³¹d bezwzglêdy z rozk³adu QR metod¹ odbiæ Householdera:
 
+```{r}
+M_1_householder = wynik1_householder$Q %*% wynik1_householder$R
+M_13 = M_1_householder - M_1
+blad_householder_M_1 = norm(M_13)
+blad_householder_M_1
 
-Teraz kolej na macierzy wymiarów 25 na 25.
+```
+
+SprawdŸmy, który z b³êdów jest najmniejszy, a który najwiêkszy. Bêdziemy wtedy w stanie oceniæ, który z rozk³adów jest na najdok³adniejszy.
+
+```{r}
+min(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
+max(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
+
+```
+
+Widzimy, ¿e gotowy algorytm, wbudowany w RStudio jest jednak dok³adniejszy od naszych, samodzielnie napisanych. Widaæ równie¿, ¿e algorytm dekompozycji QR metod¹ Givensa jest jednak dok³adniejszy od algorytmu metod¹ odbiæ Householdera.
+
+Sprawdzimy czy ta zaleŸnoœæ znajduje zastosowania dla macierzy wy¿szych rzêdów.
+
+Kolej na macierzy wymiarów 25 na 25.
 
 ```{r}
 M_2<-matrix(c(replicate(25, rnorm(25)) ), 25, 25, byrow=TRUE) 
@@ -163,14 +207,61 @@ qr.Q(QR)
 qr.R(QR)
 ```
 
-Rozk³ad naszym algorytmem:
+Rozk³ad algorytmem qr_givens:
 
 ```{r}
-qr_givens(M_2)
+wynik2_givens = qr_givens(M_2)
+wynik2_givens$Q
+wynik2_givens$R
+```
+
+Rozk³ad algorytmem qr_householder:
+
+```{r}
+wynik2_householder = qr_householer(M_2)
+wynik2_householder$Q
+wynik2_householder$R
 ```
 
 
-W koñcu sprawdŸmy jak wygl¹daj¹ rozk³ady macierzy wymiarów 125 na 125.
+B³¹d bezwgldêny z rozk³adu QR metod¹ rotacji Givensa:
+
+
+```{r}
+M_2_givens = wynik2_givens$Q  %*% wynik2_givens$R
+M_21 = M_2_givens - M_2
+blad_givens_M_2 = norm(M_21)
+blad_givens_M_2
+```
+
+B³¹d bezwzglêdny z rozk³adu QR funkcj¹ wbudowan¹ w jêzyk R:
+
+```{r}
+M_2_qr = qr.Q(QR) %*% qr.R(QR)
+M_22 = M_2_qr - M_2
+blad_qr_M_2 = norm(M_22)
+blad_qr_M_2
+```
+
+B³¹d bezwzglêdy z rozk³adu QR metod¹ odbiæ Householdera:
+
+```{r}
+M_2_householder = wynik2_householder$Q %*% wynik2_householder$R
+M_23 = M_2_householder - M_2
+blad_householder_M_2 = norm(M_23)
+blad_householder_M_2
+
+```
+
+Porównajmy uzyskane b³êdy:
+
+```{r}
+min(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
+max(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
+```
+
+
+W koñcu sprawdŸmy jak wygl¹daj¹ rozk³ady QR macierzy wymiarów 125 na 125.
 
 ```{r}
 M_3<-matrix(c(replicate(125, rnorm(125)) ), 125, 125, byrow=TRUE) 
@@ -184,9 +275,52 @@ qr.Q(QR)
 qr.R(QR)
 ```
 
+Rozk³ad algorytmem qr_givens:
+
+```{r}
+wynik3_givens = qr_givens(M_3)
+wynik3_givens$Q
+wynik3_givens$R
+```
+
 Rozk³ad algorytmem qr_householder:
 
 ```{r}
-qr_givens(M_3)
+wynik3_householder = qr_householer(M_3)
+wynik3_householder$Q
+wynik3_householder$R
 ```
 
+B³¹d bezwgldêny z rozk³adu QR metod¹ rotacji Givensa:
+
+```{r}
+M_3_givens = wynik3_givens$Q  %*% wynik3_givens$R
+M_31 = M_3_givens - M_3
+blad_givens_M_3 = norm(M_31)
+blad_givens_M_3
+```
+
+B³¹d bezwzglêdny z rozk³adu QR funkcj¹ wbudowan¹ w jêzyk R:
+
+```{r}
+M_3_qr = qr.Q(QR) %*% qr.R(QR)
+M_32 = M_3_qr - M_3
+blad_qr_M_3 = norm(M_32)
+blad_qr_M_3
+```
+
+B³¹d bezwzglêdy z rozk³adu QR metod¹ odbiæ Householdera:
+
+```{r}
+M_3_householder = wynik3_householder$Q %*% wynik3_householder$R
+M_33 = M_3_householder - M_3
+blad_householder_M_3 = norm(M_33)
+blad_householder_M_3
+
+```
+
+```{r}
+min(blad_givens_M_3,blad_householder_M_3,blad_qr_M_3)
+max(blad_givens_M_3,blad_householder_M_3,blad_qr_M_3)
+
+```
