@@ -1,0 +1,71 @@
+\documentclass[10pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{polski}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+
+
+
+\begin{document}
+
+
+
+
+
+Klasyczne algorytmy Gram-Schmidt (CGS) i zmodyfikowany GramSchmidt (MGS) dla dekompozycji A = QR:
+for i = 1 do n 
+$ q_{i} = a_{i}$ 
+ for j = 1 to i - 1 
+  $$\left\{ \begin{array}{ll}
+   r_{ji} = q_{j}^{T}*a_{i} (CGS)  \\   
+   r_{ji} = q_{j}^{T}*q_{i}  (MGS)   \\  
+\end{array} \right.
+$$
+end for
+$$
+r_{ii} = \Arrowvert q_{i}\Arrowvert_{2}
+$$
+ 
+if 
+$$r_{ii} = 0 $$
+quit 
+end if
+ $$q_{i} = q_{i}/ r_{ii}$$
+  end for
+  
+Niestety, CGS jest numerycznie niestabilny w arytmetyce zmiennoprzecinkowej, gdy kolumny A są prawie liniowo zależne. MGS jest bardziej stabilny, ale wciąż może powodować, że Q będzie daleko od ortogonalnego 
+$$\Arrowvert Q^{T}Q - I\Arrowvert $$
+. Algorytm 3.2 w sekcji 3.4.1 jest stabilnym alternatywnym algorytmem dla dekompozycji $A = QR$.  
+
+
+
+
+
+
+
+
+
+
+
+Wyprowadzimy wzór na x, który minimalizuje 
+$$\Arrowvert Ax - b\Arrowvert_{2}
+$$
+ używając dekompozycji 
+ $$A = QR $$
+ na trzy nieco inne sposoby. Po pierwsze, zawsze możemy wybrać m - n więcej ortonormalnych wektorów Q, tak że [Q, \~Q] jest kwadratową ortogonalną macierzą (na przykład możemy wybrać dowolne m - n więcej niezależnych wektorów X, które chcemy, a następnie zastosować Algorytm 3.1 do macierz nieosobliwej nxn [Q, X]).
+ Wtedy
+ $$ \Arrowvert Ax - b \Arrowvert_{2}^{2} =  \Arrowvert [Q,\~Q]^{T}(Ax - b)\Arrowvert_{2}^{2} 
+ =
+ \Arrowvert
+(\mathbf{X} =
+\begin{bmatrix}
+Q^{T}\\
+\~Q^{T}\\
+\end{bmatrix})\cdot(Q RX - b) \Arrowvert_{2}^{2}
+$$
+  
+\end{document}
