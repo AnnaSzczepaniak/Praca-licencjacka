@@ -1017,6 +1017,7 @@ Do wyżej wymienionych eksperymentów wykorzystamy losowo wybrane trzy macierze.
 Na początek zajmijmy się macierzą wymiarów 5 na 5. Zostanie ona wygenerowana z losowych liczb.
 
 <<>>=
+set.seed(2019)
 M_1<-matrix(c(replicate(5, rnorm(5)) ), 5, 5, byrow=TRUE)
 @
 
