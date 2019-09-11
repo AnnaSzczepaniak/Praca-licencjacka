@@ -54,7 +54,7 @@ Specjalność: Matematyczne Metody Analizy Danych Biznesowych %TU WPISZ SPECJALN
 \bigskip
 \noindent\hrulefill
 \begin{center}
-\textsc{\textbf{{\Large Algorytmy Dekompozycji QR %TU WPISZ TYTUŁ PRACY%
+\textsc{\textbf{{\Large Algorytmy dekompozycji QR %TU WPISZ TYTUŁ PRACY%
 \\}}}
 \end{center}
 \bigskip
@@ -97,7 +97,7 @@ Promotor: dr inż. Piotr Kowalski %TU WPISZ TYTUŁ ORAZ IMIĘ I NAZWISKO PROMOTO
 \tableofcontents
 
 \chapter{Wstęp}
-Tematem niniejszej pracy jest algorytm QR dekompozycji macierzy, który to został wynaleziony w 1961 roku przez Francisa i Kubłanowską. Jest on jedną z efektywniejszych znanych metod rozwiązywania pełnego zadania własnego dla macierzy symetrycznych lub niesymetrycznych. Należy on do najważniejszych algorytmów opracowanych w XX wieku. Pomimo tego, iż w czasie studiów podobne operacje wykonywane są za pomocą procesu ortogonalizacji Grama-Schmidta sam algorytm dekompozycji QR rozwiązywany jest na inne sposoby, które dalej zostaną dokładnie omówione. W pracy tej chcieliśmy zgromadzić informacje o samym algorytmie, matematycznych podstawach na których jest oparty oraz matematycznie opisać operacje, które są wykonywane przez rzeczywiste implementacje.
+Tematem niniejszej pracy jest algorytm QR dekompozycji macierzy, który to został wynaleziony w 1961 roku przez Francisa i Kubłanowską. Jest on jedną z efektywniejszych znanych metod rozwiązywania pełnego zadania własnego dla macierzy symetrycznych lub niesymetrycznych. Należy on do najważniejszych algorytmów opracowanych w XX wieku. Pomimo tego, iż w czasie studiów podobne operacje wykonywane są za pomocą procesu ortogonalizacji Grama-Schmidta, sam algorytm dekompozycji QR rozwiązywany jest na inne sposoby, które dalej zostaną dokładnie omówione. W pracy tej chcieliśmy zgromadzić informacje o samym algorytmie, matematycznych podstawach na których jest oparty oraz matematycznie opisać operacje, które są wykonywane przez rzeczywiste implementacje.
 
 Praca uporządkowana jest w następujący sposób. W rozdziale 2 znajdują się preliminaria, w których umieszczone zostały wybrane elementy algebry liniowej wraz z kilkoma znanymi lematami, które zostały udowodnione samodzielnie na potrzeby tej pracy. W rozdziale 3 znajduje się twierdzenie o rozkładzie QR wraz z dowodem. Dowód ten został samodzielnie opracowany na podstawie szkiców z książek \citep{bjorck14,demmel12,poreda11,wilkinson13}. W tym samym rozdziale omówimy również podstawy działania algorytmów służących do dekompozycji, tj. algorytmu QR metodą odbić Householdera oraz algorytmu QR metodą rotacji Givensa. W rozdziale 4 przedstawiamy opracowane własne implementacje z wykorzystaniem dokumentacji języka R \citep{dokumentacjaR} wraz z eksperymentami numerycznymi oraz obserwacjami jakie poczyniliśmy przy tychże eksperymentach. W rozdziale 5 zaprezentowane są wnioski z wyników naszej pracy w rozdziale 4. 
 
@@ -116,20 +116,24 @@ W niniejszym rozdziale przypomniane zostaną wybrane elementy z zakresu algebry 
  
 \section{Oznaczenia użyte w pracy}
 
-Poniżej prezentuję oznaczenia jakich będziemy używać w pracy: \\
-$\bullet\setR^{m \times n}$ - przestrzeń wszystkim macierzy o $m$ wierszach i $n$ kolumnach \\
-$\bullet span$ - przestrzeń rozpięta na wektorach \\ 
-$\bullet(\cdot |\cdot )$ - iloczyn skalarny \\
-$\bullet ||\cdot || $ - norma \\
-$\bullet \mx{A}, \mx{B}$ - macierze \\
-$\bullet x$ - szukana \\
-$\bullet \mx{I}$ - macierz identycznościowa
+Poniżej prezentuję oznaczenia jakich będziemy używać w pracy: 
+\begin{itemize}
+\item$\setR^{m \times n}$ - przestrzeń wszystkim macierzy o $m$ wierszach i $n$ kolumnach
+\item$span$ - przestrzeń rozpięta na wektorach
+\item$(\cdot |\cdot )$ - iloczyn skalarny
+\item$||\cdot || $ - norma
+\item$\mx{A}, \mx{B}$ - macierze
+\item$x$ - szukany wektor
+\item$\vr{b}$ - wektor prawej strony równania
+\item$\mx{I}$ - macierz identycznościowa
+
+\end{itemize}
 
 \section{Elementy algebry liniowej} 
 
 Niniejszą część rozpocznijmy od zdefiniowania pojęcia macierzy. Warto nadmienić, że w znaczącej części literatury - pojęcie te nie jest definiowane w sposób matematycznie precyzyjny.
 
-\begin{definition}[Macierz \cite{poreda11}]
+\begin{definition}[Macierz {\cite[Def. 8.1]{poreda11}}]
 Niech $n,m \in \setN$. Macierzą o $m$ wierszach oraz $n$ kolumnach (nazywaną również macierzą o wymiarach $m$ na $n$) i wyrazach w ciele $\setR$ nazywamy funkcję 
 $$
 \mx{A}: \set{1,2, \ldots ,m}\times \set{1,2, \ldots ,n} \to \setR.
@@ -143,26 +147,33 @@ $$
          a_{m1} & a_{m2} & \cdots & a_{mn} \\
 \end{bmatrix}.
 $$
-
 Przez $\setR^{m \times n}$ oznaczmy zbiór wszystkich macierzy o wymiarach $m$ na $n$ i elementach z $\setR$ .
 \end{definition}
 
 Macierze posiadają wiele istotnych dla nas podklas, posiadających określone cechy. Wymieńmy kilka typów macierzy, szczególnie interesujących z perspektywy omawianego przez nas tematu.
 
 
-\begin{definition}[Rodzaje macierzy\citep{poreda11}] \label{definicja-macierzy}
-$\bullet$ Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej. \\
-$\bullet$ Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poza główną przekątną są równe zeru, to taką macierz nazywamy macierzą diagonalną, oznaczamy ją jako $diag(a_{11}, a_{22},\ldots,a_{nn})$. \\
-$\bullet$ Macierz jednostkową stopnia $n$ nazywamy taką macierz diagonalną, w której wszystkie elementy na głównej przekątnej są równe 1. \\
-$\bullet$ Macierzą symetryczną nazywamy macierz kwadratową $\mx{A}=[a_{ij}]$, której wyrazy spełniają warunek 
+\begin{definition}[Rodzaje macierzy {\citep[Sekcja 8.1]{poreda11}}] \label{definicja-macierzy}
+Możemy rozróżnić następujące rodzaje macierzy:
+\begin{itemize}
+\item Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej.
+\item Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poza główną przekątną są równe zeru, to taką macierz nazywamy macierzą diagonalną, oznaczamy ją jako $diag(a_{11}, a_{22},\ldots,a_{nn})$.
+\item Macierz jednostkową stopnia $n$ nazywamy taką macierz diagonalną, w której wszystkie elementy na głównej przekątnej są równe 1.
+\item Macierzą symetryczną nazywamy macierz kwadratową $\mx{A}=[a_{ij}]$, której wyrazy spełniają warunek 
 $$
 \forall_{i,j \in \set{1,\ldots,n}} \quad a_{ij}=a_{ji}.
-$$ \\
-$\bullet$ Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poniżej głównej przekątnej są równe $0$, to taką macierz nazywamy macierzą trójkątną górną.
+$$ 
+\item Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poniżej głównej przekątnej są równe $0$, to taką macierz nazywamy macierzą trójkątną górną.
 Analogicznie jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy powyżej głównej przekątnej są równe $0$ to taką macierz nazywamy trójkątną dolną.
+\item Niech $\mx{A}=[a_{ij}] \in \setR^{m \times n}$. Macierz $D \in \setR^{n \times m}$ nazywamy macierzą transponowaną do $A$, jeśli
+$$
+d_{ij} = a_{ji},
+$$
+dla dowolnych $i \in \set{1,\ldots, n}$ oraz $j \in \set{1,\ldots,m}$ . Macierz $D$ oznaczamy symbolem $\transpose{A}$.
+\end{itemize}
 
 \end{definition}
-Następujące lematy zostały opracowane na potrzeby dowodu w rozdziale 3.
+Następujące lematy zostały opracowane na potrzeby dowodu z rozdziału 3.
 \begin{lemma}[O iloczynie macierzy trójkątnych górnych] \label{lemma-upper-triangle-multiplication}
 Niech $\mx{A}, \mx{B} \in \setR^{n \times n}$ będą dwiema nieosobliwymi macierzami trójkątnymi górnymi. Wtedy
 $$
@@ -196,7 +207,7 @@ Wykorzystamy drugi krok z algorytmu elimininacji Gaussa. Przypomnijmy, że algor
 $$
 \mx{A} \vr{x} = \vr{b},
 $$
-i składa się z dwóch kroków. Pierwszym jest redukcja macierzy metodą eliminacji do macierzy trójkątnej górnej. Drugim etapem jest iteracyjne policzenie rozwiązania. Przyjmijmy, że mamy
+i składa się z dwóch kroków. Pierwszym jest redukcja macierzy metodą eliminacji do macierzy trójkątnej górnej. Drugim etapem jest iteracyjne policzenie rozwiązania. Przyjmijmy, że mamy poniższy układ równań z macierzą $\mx{A}$:
 $$
 \begin{bmatrix}
 a_{11} & a_{12} & \ldots & a_{1n} \\
@@ -212,7 +223,7 @@ x_1 \\ x_2 \\ \vdots \\ x_n
 b_1 \\ b_2 \\ \vdots \\ b_n
 \end{bmatrix}.
 $$
-Skoro macierz $\mx{A}$ jest nieosobliwa to wiemy, że elementy na przekątnej są różne od $0$, tzn.
+Wtedy również $\vr{x} = \inverse{\mx{A}}\vr{b}$. Skoro macierz $\mx{A}$ jest nieosobliwa to wiemy, że elementy na przekątnej są różne od $0$, tzn.
 $$
 \forall k \in \set{1, \ldots, n} \quad a_{kk} \neq 0.
 $$
@@ -234,16 +245,7 @@ Sprzeczność jest efektem przypuszczenia, że macierz $\inverse{\mx{A}}$ nie ma
 \end{proof}
 
 
-\begin{definition}
-Niech $\mx{A}=[a_{ij}] \in \setR^{m \times n}$. Wtedy macierz $D \in \setR^{n \times m}$ spełniająca warunek taki, że
-$$
-d_{ij} = a_{ji},
-$$
-dla dowolnych $i \in \set{1,\ldots, n}$ oraz $j \in \set{1,\ldots,m}$ nazywamy macierzą transponowaną do $A$. Z reguły tę macierz $D$ oznaczamy symbolem $\transpose{A}$.
-\end{definition}
-
-
-\begin{definition}[Iloczyn macierzy\citep{poreda11}]
+\begin{definition}[Iloczyn macierzy {\citep[Def. 9.13]{poreda11}}]
 Niech $\mx{A}\in \setR^{m \times n }$ i $\mx{B}\in \setR^{m \times n }$. Jeśli
 $$
 \mx{A} = \begin{bmatrix}
@@ -265,7 +267,7 @@ $$
 \end{definition}
 
 
-\begin{definition}[Macierz odwrotna\citep{poreda11}] 
+\begin{definition}[Macierz odwrotna {\citep[Def. 9.21]{poreda11}}] 
 Macierz $\mx{A}$ jest odwracalna, jeśli istnieje taka macierz $\mx{B}$, że zachodzi
 $$
 \mx{A}\cdot \mx{B}=\mx{B}\cdot \mx{A}=\mx{I},
@@ -276,8 +278,8 @@ Macierz $\mx{A}$ nazywamy nieosobliwą, jeśli istnieje macierz $\mx{B},$ która
 \end{definition}
 
 
-\begin{definition}
-Macierzą ortogonalną nazywamy macierz kwadratową $\mx{A}\in \setR^{n\times n}$ o elementach będących liczbami rzeczywistymi spełniająca równość:
+\begin{definition}[Macierz ortogonalna {\citep[Def. 14.26]{poreda11}}]
+Macierz kwadratową $\mx{A}\in \setR^{n\times n}$ nazywamy macierzą ortogonalną, jeśli spełniony jest następujący warunek:
 $$
 \mx{A}^{T}\cdot \mx{A}=\mx{A}\cdot \mx{A}^{T}=\mx{I}_{n}.
 $$
@@ -306,13 +308,13 @@ $$
 Zatem $\mx{C}$ jest ortogonalna.
 \end{proof}
 
-\begin{definition}
+\begin{definition}[Wektor {\citep[Sekcja 8.1]{poreda11}}]
 Wektorem kolumnowym nazywamy macierz z przestrzeni $\setR^{n\times 1}.$
 \end{definition}
 
 Tak zdefiniowane wektory można utożsamiać z elementami przestrzeni $\setR^{n}.$
 
-\begin{definition}
+\begin{definition}[Liniowa niezależność wektorów {\citep[Def. 7.21 oraz Def. 7.22]{poreda11}}]
 Niech $\vr{v_{1}},..., \vr{v_{n}}$ będą różnymi elementami przestrzeni liniowej $\setR^{k}$. Zbiór wektorów ${\vr{v_{1}},...,\vr{v_{n}}}$ nazywamy liniowo niezależnymi jeżeli 
 $$
 \forall_{a_{1},...,a_{n}\in \mathbb{R}} (a_{1}\cdot \vr{v}_{1} + ... + a_{n}\cdot \vr{v}_{n} = 0 \implies a_{1}=...=a_{n}=0)
@@ -324,7 +326,7 @@ $$
 
 W tym rozdziale zaprezentujemy elementy teorii dokonywania rozkładów QR macierzy. Rozpoczniemy od sformułowania i udowodnienia twierdzenia o istnieniu takiego rozkładu. Wiele analizowanych pozycji literaturowych sygnalizowało posiadanie dowodu poniższego twierdzenia. W naszej ocenie prezentowane tam dowody bliższe są jednak jedynie ich szkicowi. Wobec powyższego prezentujemy własne opracowanie dowodu twierdzenia o istnieniu rozkładu QR, stworzonego na podstawie szkiców omówionych w literaturze oraz pracy własnej. 
 
-\begin{theorem}[O rozkładzie QR]\label{theorem-qr-docomposition}
+\begin{theorem}[O rozkładzie QR]\label{theorem-qr-decomposition}
 Niech $\mx{A} \in \setR^{m \times n}$, gdzie $m\ge n$, której kolumny są liniowo niezależne. Istnieje wtedy jedyny rozkład $\mx{QR}$, tzn. że istnieją takie macierze $\mx{Q}$ i $\mx{R}$, że
 $$
 \mx{A} = \mx{Q} \mx{R}
@@ -343,6 +345,14 @@ $$
 dla wszystkich $k = 1, 2, \ldots, n$.
 \end{itemize} 
 \end{theorem}
+
+\begin{remark}
+Rozkładem $\mx{QR}$ nazwiemy również sytuacje, gdy 
+$$
+\mx{A}=\mx{Q}\mx{R}
+$$
+oraz $\transpose{\mx{Q}}\mx{Q}=\mx{I}$ i $\mx{R}$ jest macierzą trójkątną górną, niekoniecznie z $1$ na przekątnej. Powodem tego jest, że pomiędzy omawianym tu rozkładem, a rozkładem z \ref{theorem-qr-decomposition} istnieje równoważność.  
+\end{remark}
 
 Aby udowodnić powyższe, zaprezentujemy potrzebną teorię (twierdzenia oraz lematy) wraz z dowodami, na której to będziemy bazować przy dowodzeniu głównego twierdzenia o rozkładzie $QR$. 
 
@@ -406,7 +416,7 @@ oraz
 $$
 \vr{b}_{k_1} = \frac{1}{\Vert \vr{b}_{k+1}^{'} \Vert} \cdot \vr{b}_{k+1}^{'}.
 $$
-Na mocy twierdzenia \ref{Nierówność-Bessela} poprzedniego wnioskujemy, że wektor $\vr{b}_{k+1}$ jest ortogonalny do wszystkich wektorów $\vr{b}_{i}$, gdzie $i\in \set{1, \ldots, k}$ oraz ma długość równą $1$. Ponieważ $\vr{b}_{k+1}\in span(\vr{x}_{1}, \ldots, \vr{x}_{k+1})$, więc
+Na mocy twierdzenia \ref{Nierówność-Bessela} wnioskujemy, że wektor $\vr{b}_{k+1}$ jest ortogonalny do wszystkich wektorów $\vr{b}_{i}$, gdzie $i\in \set{1, \ldots, k}$ oraz ma długość równą $1$. Ponieważ $\vr{b}_{k+1}\in span(\vr{x}_{1}, \ldots, \vr{x}_{k+1})$, więc
 \begin{equation} \label{equation-span}
 span(\vr{b}_{1}, \ldots, \vr{b}_{k+1}) \subset span(\vr{x}_{1}, \ldots, \vr{x}_{k+1}).
 \end{equation}
@@ -418,7 +428,7 @@ W ten sposób określiliśmy iteracyjnie wektory $\vr{b}_{1}, \ldots, \vr{b}_{n}
 
 
 \begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta] \label{lemma-matrix-formulation-of-gs}
-Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $\vr{v_1}, \ldots, \vr{v_n}$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $\vr{u_1}, \ldots, \vr{u_n}$ , które są transformacją wektorów $\vr{v_1}, \ldots, \vr{v_n}$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z tych wektorów $\vr{u_1}, \ldots, \vr{u_n}$. Wtedy
+Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $v_{1}, \ldots, v_n$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $u_1, \ldots, u_n$ , które są transformacją wektorów $v_1, \ldots, v_n$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z tych wektorów $u_1, \ldots, u_n$. Wtedy
 {\small
 $$
 U = A \cdot 
@@ -495,12 +505,12 @@ Istotną obserwacją jaką można poczynić jest taka, że macierzy tej nie moż
 
 Teraz możemy przystąpić do dowodu głównego twierdzenia.
 
-\begin{proof}[Dowód twierdzenia \ref{theorem-qr-docomposition}]
+\begin{proof}[Dowód twierdzenia \ref{theorem-qr-decomposition}]
 Niech $\mx{A} \in \setR^{m \times n}$ będzie macierzą jak w założeniach. Wtedy z lematu \ref{lemma-gram-schmidt-matrix} przy zastosowaniu algorytmu Grama-Schmidta otrzymujemy równość
 $$
 \mx{U} = \mx{A} \cdot \mx{T},
 $$  
-gdzie $\mx{U} \in \setR^{m \times n}$, $\mx{T} \in \setR^{n \times n}$ i $\mx{U}$ składa się z wektórów ortogonalnych, a $\mx{T}$ jest macierzą trójkątną górną i ma na przekątnej same $1$.  
+gdzie $\mx{U} \in \setR^{m \times n}$, $\mx{T} \in \setR^{n \times n}$ i $\mx{U}$ składa się z wektorów ortogonalnych, a $\mx{T}$ jest macierzą trójkątną górną i ma na przekątnej same $1$.  
 Na mocy lematu \ref{lemma-upper-triangle-invertion} wiemy, że macierz $\mx{T}$ jest odwracalna i macierz do niej odwrotna jest trójkątną górną. Wykonując mnożenie prawostronne przez tę macierz otrzymujemy:
 \begin{align*}
 \mx{U} \cdot \inverse{\mx{T}} & = \mx{A}\cdot\mx{T}\cdot \inverse{\mx{T}}, \\
@@ -512,7 +522,8 @@ Postać, którą mamy powyżej jest rozkładem QR, gdzie $\mx{U} = \mx{Q}$ i $\i
 
 
 
-Ortogonalizacja Gram-Schmidta może nie obliczyć macierzy ortogonalnej Q, gdy wektory, które są ortogonalizowane, są prawie liniowo zależne, więc nie możemy jej użyć do stabilnego obliczenia rozkładu QR. Zamiast tego opieramy nasze algorytmy na pewnych łatwo obliczalnych ortogonalnych macierzach zwanych odbiciami Householdera lub rotacjami Givensa. Możemy je wybrać, tak aby wprowadzić zera do macierzy za pomocą mnożenia.
+Ortogonalizacja Grama-Schmidta może nie obliczyć macierzy ortogonalnej Q, gdy wektory, które są ortogonalizowane, są prawie liniowo zależne, więc nie możemy jej użyć do stabilnego obliczenia rozkładu QR. Zamiast tego opieramy nasze algorytmy na pewnych łatwo obliczalnych ortogonalnych macierzach zwanych odbiciami Householdera lub rotacjami Givensa. Możemy je wybrać, tak aby wprowadzić zera do macierzy za pomocą mnożenia.
+
 
 
 \section{Algorytm QR metodą odbić Householdera}
@@ -520,7 +531,11 @@ Ortogonalizacja Gram-Schmidta może nie obliczyć macierzy ortogonalnej Q, gdy w
 Metoda Householdera pozwala znaleźć rozkład QR dowolnej macierzy prostokątnej m na n ($m\ge n$).
 
 \begin{definition}[Macierz Householdera]
-Macierzą Householdera $H$ zwaną również refleksją nazywamy macierz postaci $\mx{H}=\mx{I}-2\cdot \vr{v}\cdot \vr{v}^{T}$, gdzie $\Vert v \Vert_{2} = 1$.
+Macierzą Householdera $H$, zwaną również refleksją, nazywamy macierz postaci 
+$$
+\mx{H}=\mx{I}-2\cdot \vr{v}\cdot \vr{v}^{T},
+$$
+gdzie $\Vert v \Vert_{2} = 1$.
 \end{definition}
 
 \begin{theorem} [Transformacja Householdera]
@@ -566,9 +581,9 @@ $$
 
 
 
-\begin{example} Pokażemy, jak obliczyć rozkład $QR$ macierzy $A$ o wymiarach $5$ na $4$ przy użyciu transformacji Householdera. Ten przykład uwidoczni wzór dla ogólnych macierzy $m$ na $n$. W poniższych macierzach $P_{i}$ jest macierzą ortogonalną $5$ na $5$, $x$ oznacza ogólny niezerowy wpis, a $o$ oznacza zero.
-
-1. Wyznaczamy $P_{1}$ tak, że:
+\begin{example} Pokażemy, jak obliczyć rozkład $QR$ macierzy $A$ o wymiarach $5$ na $4$ przy użyciu transformacji Householdera. Ten przykład uwidoczni wzór dla ogólnych macierzy $m$ na $n$. W poniższych macierzach $P_{i}$ jest macierzą ortogonalną $5$ na $5$, $x$ oznacza ogólny niezerowy wpis, a $0$ oznacza zero.
+\begin{enumerate}
+\item Wyznaczamy $P_{1}$ tak, że:
 $$
 \mx{A_{1} \equiv {P_{1}\cdot A}}= \begin{bmatrix}
 x & x & x & x \\
@@ -578,7 +593,7 @@ x & x & x & x \\
 0 & x & x & x 
 \end{bmatrix}.
 $$
-2. Wyznaczamy 
+\item Wyznaczamy 
 $$
 P_{2} = \left[ 
 \begin{array}{c|c}
@@ -597,7 +612,7 @@ x & x & x & x \\
 0 & 0 & x & x 
 \end{bmatrix}.
 $$
-3. Wyznaczamy 
+\item Wyznaczamy 
 $$
 P_{3} = \left[ 
 \begin{array}{cc|c}
@@ -617,7 +632,7 @@ x & x & x & x \\
 0 & 0 & 0 & x 
 \end{bmatrix}.
 $$
-4. Wyznaczamy 
+\item Wyznaczamy 
 $$
 P_{4} = \left[ 
 \begin{array}{ccc|c}
@@ -638,17 +653,17 @@ x & x & x & x \\
 0 & 0 & 0 & 0 
 \end{bmatrix}.
 $$
-
-Tutaj wybraliśmy macierz Householdera $P_{i}^{'}$ aby wyzerować subdiagonale wyrazy w kolumnie i. Jednocześnie nie zakłóca to zer wprowadzonych już w poprzednich kolumnach. Istotnie macierz $\mx{A}_{k}$ ma postać
+\end{enumerate}
+Tutaj wybraliśmy macierz Householdera $P_{i}^{'}$ aby wyzerować subdiagonale wyrazy w kolumnie i. Jednocześnie nie zakłóca to zer wprowadzonych już w poprzednich kolumnach. Istotnie, jeśli macierz $\mx{A}_{k}$ ma postać
 $$
 \begin{bmatrix}
 T & A_{1k} \\
 0 & A_{2k}
 \end{bmatrix}.
 $$
-Wtedy w mnożeniu dostajemy:
+to wtedy w mnożeniu dostajemy:
 $$
-\mx{P}_{k}^{'}= \begin{bmatrix}
+\mx{A}_{k+1}^{'}= \begin{bmatrix}
 I & 0 \\
 0 & P_{k}^{'}
 \end{bmatrix} \cdot \begin{bmatrix}
@@ -660,17 +675,8 @@ T & A_{1k} \\
 \end{bmatrix}.
 $$
 Stąd widać, że zera pod przekątną są faktycznie zachowane.
-Nazwijmy ostatnią trójkątną górną macierz $5$ na $4$ $\mx{\tilde{R}}=A_{4}$. Następnie 
-$$
- \mx{A} = \mx{P}_{1}^{T}\cdot \mx{P}_{2}^{T}\cdot \mx{P}_{3}^{T}\cdot \mx{P}_{4}^{T}\cdot \mx{R} = \mx{QR},
-$$
-gdzie $\mx{Q}$ to pierwsze cztery kolumny 
-$$
-\mx{P}_{1}^{T}\cdot \mx{P}_{2}^{T}\cdot \mx{P}_{3}^{T}\cdot \mx{P}_{4}^{T} = \mx{P}_{1}\cdot \mx{P}_{2}\cdot \mx{P}_{3}\cdot \mx{P}_{4}
-$$
-(ponieważ wszystkie $\mx{P}_{i}$ są symetryczne), a $\mx{R}$ to pierwsze cztery rzędy $\mx{\tilde{R}}$.
 \end{example}
-Oto ogólny algorytm dekompozycji $\mx{QR}$ z wykorzystaniem transformacji Householdera.
+Poniżej prezentujemy ogólny algorytm dekompozycji $\mx{QR}$ z wykorzystaniem transformacji Householdera.
 
 \begin{algorithm}
 \caption{Algorytm QR metodą transformacji Householdera}
@@ -682,10 +688,12 @@ Oto ogólny algorytm dekompozycji $\mx{QR}$ z wykorzystaniem transformacji House
 \EndFor
 \end{algorithmic}
 \end{algorithm}
+
+Implementację oraz opracowane przykłady prezentujemy w kolejnym rozdziale.
  
 \section{Algorytm QR metodą rotacji Givensa}
 \begin{remark}
-Rotacja Givensa postaci: 
+Macierz postaci: 
 $$
 R(\theta) = \begin{bmatrix}
 \cos\theta & -\sin\theta \\
@@ -695,6 +703,7 @@ $$
 obraca dowolny wektor $\vec{x}\in \setR^{2}$ zgodnie z ruchem wskazówek zegara o $\theta$. Obrót ten prezentuje grafika \ref{rys:logo:jeden}.
 \end{remark}
 
+Powyższa uwaga pozwala na zdefiniowanie całych grup macierzy obrotów.
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{rys/givens_rot.png}
@@ -724,7 +733,7 @@ Każda macierz Givensa jest macierzą ortogonalną.
 \end{lemma}
 
 \begin{proof}
-Niech $n\in \setN$, rozważmy macierze Givensa rozmiaru $n$ na $n$. Niech $i,j \in {1,\ldots, n}$ i $\theta \in \setR$. Pokażemy, że macierz $\mx{R}(i,j,\theta) \in \setR^{n\times n}$ jest ortogonalna.
+Niech $n\in \setN$, rozważmy macierze Givensa rozmiaru $n$ na $n$. Niech $i,j \in \{1,\ldots, n\}$ i $\theta \in \setR$. Pokażemy, że macierz $\mx{R}(i,j,\theta) \in \setR^{n\times n}$ jest ortogonalna.
 Wystarczy pokazać, że układ kolumn $(r_s)$, $s=1,\ldots, n$ tej macierzy jest układem ortonormalnym. Weźmy dwie kolumny $k$-tą i $l$-tą. Rozważmy przypadki:
 \begin{enumerate}
 \item Gdy $k\notin (i,j)$, $l\notin (i,j)$, $k \neq l$, wtedy
@@ -824,11 +833,19 @@ A_{51} & A_{52} & A_{53} & A_{54} & A_{55}
 \end{proposition}
 
 \begin{proposition}\label{Proposition-zera-w-kolumnie}
-Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnie $j$.
+Na podstawie obserwacji \ref{Proposition-zachowanie-zer} możemy wywynioskować następujące:
+\begin{enumerate}
+\item Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnie $j$.
+\item Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnach $[1:i-1]$ w wierszach różnych od $i$ i $j$.
+\end{enumerate}
 \end{proposition}
 
 \begin{proof}[Szkic dowodu]
-Istotnie z obserwacji \ref{Proposition-zachowanie-zer} po wykonaniu obrotu Givensa względem $i$ i $j$ inne zera będą reprezentowane przez pola $\mx{A}_{12}, \mx{A}_{32}, \mx{A}_{52}, \ldots$ i nie ulegają zmianie.
+Krótko uzasadnimy \ref{Proposition-zera-w-kolumnie}.
+\begin{enumerate}
+\item Istotnie z obserwacji \ref{Proposition-zachowanie-zer} po wykonaniu obrotu Givensa względem $i$ i $j$ inne zera będą reprezentowane przez pola $\mx{A}_{12}, \mx{A}_{32}, \mx{A}_{52}$ i w efekcie nie ulegają zmianie.
+\item Istotnie z obserwacji \ref{Proposition-zachowanie-zer} po wykonaniu obrotu Givensa względem $i$ i $j$ w kolumnach $[1:i-1]$ w wierszach różnych od $i$ i $j$ są reprezentowane przez pola $\mx{A}_11,\mx{A}_31,\mx{A}_51$.
+\end{enumerate}
 \end{proof}
 
 
@@ -840,10 +857,10 @@ Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje ze
 
 Istotnie załóżmy, że $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ są wypełnione zerami. Odpowiada to polom $\mx{A}_{21}$, $\mx{A}_{41}$. Wtedy po rotacji mamy 
 $$
-\mx{A}_{21} = \cos\theta\mx{A}_{21} - \sin\theta\mx{A}_{41} = 0,
+\overline{\mx{A}}_{21} = \cos\theta\mx{A}_{21} - \sin\theta\mx{A}_{41} = 0,
 $$  
 $$
-\mx{A}_{41} = \sin\theta\mx{A}_{21} - \cos\theta\mx{A}_{41} = 0.
+\overline{\mx{A}}_{41} = \sin\theta\mx{A}_{21} - \cos\theta\mx{A}_{41} = 0.
 $$
 \end{proof}
 
@@ -909,7 +926,7 @@ x & x & x & x \\
 $$
 \end{example}
 Na mocy obserwacji \ref{Proposition-zera-w-kolumnie} i \ref{Proposition-zera-w-wierszach} widzimy, że wykonanie obrotu Givensa zgodnie z zaprezentowanym wyżej przykładem zachowuje odpowiednie zera w macierzy.
-Z książki "Applied Numerical Linear Algebra" autorstwa Jamesa W. Demmela możemy uzyskać informację, że koszt  rozkładu $\mx{QR}$ za pomocą rotacji Givensa jest dwa razy większy niż koszt rozkładu za pomocą metody Householdera.
+Z książki Demmela \citep{demmel12} możemy uzyskać informację, że koszt  rozkładu $\mx{QR}$ za pomocą rotacji Givensa jest dwa razy większy niż koszt rozkładu za pomocą metody Householdera.
 
 
 
@@ -934,7 +951,7 @@ house = function(x) {
 }
 @
 
-Wtedy algorytm rozkładu QR może być łatwo zapisany za pomocą poniższego kodu:
+Wtedy algorytm rozkładu QR może być zapisany za pomocą poniższego kodu:
 
 <<>>=
 qr_householer = function(A)
@@ -957,7 +974,7 @@ qr_householer = function(A)
 }
 @
 
-Jest to gotowy algorytm, który zwraca nam macierz $\mx{Q}$ i macierz $\mx{R}$. 
+Algorytm rozpoczynamy od zadeklarowania wymiarów rozkładanej macierzy. Następnie iteracyjnie wyznaczamy odbicia reprezentowane przez wektory normalne, które są wykorzystywane do obliczenia macierzy $\mx{P}$, dzięki której obliczamy macierz trójkątną górną $\mx{R}$ oraz macierz $\mx{Q}$. Warto nadmienić również, że w jednej iteracji dokonujemy wyzerowania wszystkich elementów danej kolumny pod przekątną. Cały algorytm zwraca nam macierz $\mx{R}$ oraz co ważne zwraca nam transpozycję macierzy $\mx{Q}$.
 
 \section{Algorytm dekompozycji QR metodą rotacji Givensa}
 
@@ -979,7 +996,7 @@ return(G)
 }
 @
 
-Teraz łatwo tworzymy algorytm dekompozycji macierzy QR metodą rotacji Givensa:
+Teraz tworzymy algorytm dekompozycji macierzy QR metodą rotacji Givensa:
 
 <<>>=
 qr_givens = function(A){
@@ -999,12 +1016,12 @@ qr_givens = function(A){
 }
 @
 
-Podobnie jak algorytm QR metodą odbić Householdera ten algorytm również zwraca nam dwie macierze $\mx{Q}$ i $\mx{R}$
+Algorytm rozpoczynamy od zadeklarowania wymiarów rozkładanej macierzy. Następnie iteracyjnie wyznaczamy macierz rotacji Givensa, dzięki której obliczamy macierz trójkątną górną $\mx{R}$ oraz macierz $\mx{Q}$. Warto nadmienić również, że w jednej iteracji tego algorytmu dokonujemy wyzerowania dokładnie jednego elementu danej kolumny pod przekątną. Stąd liczba iteracji jest znacznie większa niż w algorytmie qr householder. Cały algorytm zwraca nam macierz $\mx{R}$ oraz w przeciwieństwie do algorytmu qr householder zwraca nam macierz $\mx{Q}$.
 
 
 \section{Eksperymenty numeryczne - porównanie jakości dwóch algorytmów}
 
-Teraz czas na eksperymenty, które pokażą, jak bardzo różni się błąd naszych algorytmów  od tego z gotowej funkcji R Studio, służącej do rozkładu QR.
+Teraz czas na eksperymenty, które sprawdzą, jak bardzo dokładność naszych algorytmów różni się od gotowej funkcji R, służącej do rozkładu QR.
 Do wyżej wymienionych eksperymentów wykorzystamy losowo wybrane trzy macierze.
 \begin{enumerate}
 \item Wymiarów $5$ na $5$,
@@ -1021,31 +1038,31 @@ set.seed(2019)
 M_1<-matrix(c(replicate(5, rnorm(5)) ), 5, 5, byrow=TRUE)
 @
 
-Najpierw przeprowadzimy rozkład wbudowaną funkcją w pakiet R.
-
-<<>>=
-QR = qr(M_1)
-@
-
-Następnie przeprowadzimy rozkład opracowanym samodzielnie algorytmem qr givens.
+Najpierw przeprowadzimy rozkład opracowanym samodzielnie algorytmem qr givens.
 
 <<>>=
 wynik1_givens = qr_givens(M_1)
 @
 
-Pozostało przeprowadzić rozkład również opracowanym samodzielnie algorytmem qr householder.
+Następnie przeprowadzimy rozkład również opracowanym samodzielnie algorytmem qr householder.
 
 <<>>=
 wynik1_householder = qr_householer(M_1)
 @
 
+Pozostało przeprowadzić rozkład wbudowaną funkcją w pakiet R.
+
+<<>>=
+QR = qr(M_1)
+@
+
 Należy sprawdzić, który rozkład jest najbliższy naszej wyjściowej macierzy A.
 
-Policzymy kolejno błądy bezwgldęne z:
+Policzymy kolejno błędy bezwględne z:
 \begin{enumerate}
 \item Rozkładu QR metodą rotacji Givensa.
-\item Rozkładu QR funkcją wbudowaną w język R.
 \item Rozkładu QR metodą odbić Householdera.
+\item Rozkładu QR funkcją wbudowaną w język R.
 \end{enumerate}
 
 1.
@@ -1060,31 +1077,25 @@ blad_givens_M_1
 2.
 
 <<>>=
-M_1_qr = qr.Q(QR) %*% qr.R(QR)
-M_12 = M_1_qr - M_1
-blad_qr_M_1 = norm(M_12)
-blad_qr_M_1
-@
-
-3.
-
-<<>>=
 M_1_householder = wynik1_householder$Q %*% wynik1_householder$R
 M_13 = M_1_householder - M_1
 blad_householder_M_1 = norm(M_13)
 blad_householder_M_1
 @
 
-Sprawdźmy, który z błędów jest najmniejszy, a który największy. Będziemy wtedy w stanie ocenić, który z rozkładów jest najdokładniejszy.
+3.
 
 <<>>=
-min(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
-max(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
+M_1_qr = qr.Q(QR) %*% qr.R(QR)
+M_12 = M_1_qr - M_1
+blad_qr_M_1 = norm(M_12)
+blad_qr_M_1
 @
 
-Widzimy, że gotowy algorytm, wbudowany w RStudio jest jednak dokładniejszy od naszych, samodzielnie napisanych. Widać również, że algorytm dekompozycji QR metodą Givensa jest lepszy od algorytmu metodą odbić Householdera.
 
-Sprawdzimy czy ta zaleźność znajduje zastosowania dla macierzy większych rozmiarów.
+Widzimy, że gotowy algorytm, wbudowany w R jest jednak dokładniejszy od naszych, samodzielnie napisanych. Widać również, że algorytm dekompozycji QR metodą Givensa jest lepszy od algorytmu metodą odbić Householdera. Zauważmy jednak, że nasze implementacje, nie odstają znacznie od wbudowanego w język R.
+
+Sprawdzimy czy ta zależność znajduje zastosowania dla macierzy większych rozmiarów.
 
 \subsection{Test dla macierzy średniego rozmiaru}
 
@@ -1092,12 +1103,6 @@ Kolej na macierz wymiarów 25 na 25.
 
 <<>>=
 M_2<-matrix(c(replicate(25, rnorm(25)) ), 25, 25, byrow=TRUE)
-@
-
-Rozkład wbudowaną funkcją w Pakiet R.
-
-<<>>=
-QR = qr(M_2)
 @
 
 Rozkład algorytmem qr givens.
@@ -1110,6 +1115,12 @@ Rozkład algorytmem qr householder.
 
 <<>>=
 wynik2_householder = qr_householer(M_2)
+@
+
+Rozkład wbudowaną funkcją w Pakiet R.
+
+<<>>=
+QR = qr(M_2)
 @
 
 Teraz wykonujemy dokładnie taką samą procedurę jak dla macierzy wymiarów $5$ na $5$.
@@ -1125,28 +1136,22 @@ blad_givens_M_2
 
 2.
 <<>>=
-M_2_qr = qr.Q(QR) %*% qr.R(QR)
-M_22 = M_2_qr - M_2
-blad_qr_M_2 = norm(M_22)
-blad_qr_M_2
-@
-
-3.
-<<>>=
 M_2_householder = wynik2_householder$Q %*% wynik2_householder$R
 M_23 = M_2_householder - M_2
 blad_householder_M_2 = norm(M_23)
 blad_householder_M_2
 @
 
-Tak jak w poprzednim przykładzie porównajmy uzyskane błędy.
-
+3.
 <<>>=
-min(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
-max(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
+M_2_qr = qr.Q(QR) %*% qr.R(QR)
+M_22 = M_2_qr - M_2
+blad_qr_M_2 = norm(M_22)
+blad_qr_M_2
 @
 
-Widzimy, że zwiększenie wymiarów macierzy nie wpływa na jakości prezentowanych algorytmów.
+
+Tutaj obserwujemy, że błąd bezwzględny rozkładu wbudowaną funkcją w R jest wciąż najmniejszy, natomiast w tym przypadku rozkład algorytmem qr householder jest dokładniejszy od algorytmu qr givens, czyli zależność z testu dla macierzy małych rozmiarów jest odwrócona.
 
 \subsection{Test dla macierzy dużych rozmiarów}
 
@@ -1160,11 +1165,6 @@ M_3<-matrix(c(replicate(125, rnorm(125)) ), 125, 125, byrow=TRUE)
 
 Zgodnie z procedurą jaką stosowaliśmy dla macierzy mniejszych rozmiarów, przeprowadźmy kolejno:
 
-Rozkład funkcją qr:
-
-<<>>=
-QR = qr(M_3)
-@
 
 Rozkład algorytmem qr givens:
 
@@ -1176,6 +1176,12 @@ Rozkład algorytmem qr householder:
 
 <<>>=
 wynik3_householder = qr_householer(M_3)
+@
+
+Rozkład funkcją qr:
+
+<<>>=
+QR = qr(M_3)
 @
 
 Dalej policzymy błędy bezwględne.
@@ -1191,69 +1197,63 @@ blad_givens_M_3
 
 2.
 <<>>=
-M_3_qr = qr.Q(QR) %*% qr.R(QR)
-M_32 = M_3_qr - M_3
-blad_qr_M_3 = norm(M_32)
-blad_qr_M_3
-@
-
-3.
-<<>>=
 M_3_householder = wynik3_householder$Q %*% wynik3_householder$R
 M_33 = M_3_householder - M_3
 blad_householder_M_3 = norm(M_33)
 blad_householder_M_3
 @
 
-Zgodnie z procedurą badamy, który z błędów jest najmniejszy, a który największy.
-
-<<>>=
-min(blad_givens_M_3,blad_householder_M_3,blad_qr_M_3)
-max(blad_givens_M_3,blad_householder_M_3,blad_qr_M_3)
-@
-
-W tym momencie możemy wysnuć wniosek, że rozmiar macierzy nie ma znaczenia jeżeli chodzi o jakość naszych samodzielnie opisanych funkcji. Są one mniej dokładne niż wbudowany, gotowy algorytm dekompozycji QR w R Studio. Ponadto algorytm metodą rotacji Givensa jest jakościowo lepszy od algorytmu metodą odbić Householdera.
-Zbadamy teraz jak zachowują się błędy w poszczególnych algorytmach przy zwiększaniu wymiaru. Interesuje nas czy te błędy rosną wraz ze wzrostem wymiaru, czy też wręcz przeciwnie. 
-
-Porównajmy kolejno błędy bezwzględne z:
-\begin{enumerate}
-\item rozkładu qr givens
-\item rozkładu qr householder
-\item rozkładu funkcją wbudowaną w język R.
-\end{enumerate}
-
-1.
-<<>>=
-blad_givens_M_1
-blad_givens_M_2
-blad_givens_M_3
-min(blad_givens_M_1,blad_givens_M_2)
-min(blad_givens_M_2,blad_givens_M_3)
-@
-
-2.
-<<>>=
-blad_householder_M_1
-blad_householder_M_2
-blad_householder_M_3
-min(blad_householder_M_1,blad_householder_M_2)
-min(blad_householder_M_2,blad_householder_M_3)
-@
-
 3.
 <<>>=
-blad_qr_M_1
-blad_qr_M_2
+M_3_qr = qr.Q(QR) %*% qr.R(QR)
+M_32 = M_3_qr - M_3
+blad_qr_M_3 = norm(M_32)
 blad_qr_M_3
-min(blad_qr_M_1,blad_qr_M_2)
-min(blad_qr_M_2,blad_qr_M_3)
 @
 
-Wyniki nie są zaskakujące. Wraz ze wzrostem wymiaru rosną również błędy bezwględne wszystkich przedstawionych przez nas algorytmów.
+\subsection{Podsumowanie}
+
+W tym momencie możemy wysnuć wniosek, że rozmiar macierzy nie wpływa istotnie na jakość naszych samodzielnie opisanych funkcji w stosunku do gotowej funkcji w R. Są one mniej dokładne niż wbudowany, gotowy algorytm dekompozycji QR w R. Ponadto algorytm metodą rotacji Givensa nie zawsze jest jakościowo lepszy od algorytmu metodą odbić Householdera. Zależy to od wymiarów oraz od losowości rozkładanej macierzy.
+
+Zbadamy teraz jak zachowują się błędy w poszczególnych algorytmach przy zwiększaniu wymiaru. Interesuje nas czy te błędy rosną wraz ze wzrostem wymiaru, czy też wręcz przeciwnie. 
+
+W tym celu stworzymy wykres prezentujący jak zachowują się błędy bezwzględne trzech przedstawionych przez nas algorytmów dla macierzy wymiarów omówionych przez nas.
+
+<<>>=
+wymiary<-c(5,25,125)
+bledy1<-c(blad_qr_M_1,blad_qr_M_2,blad_qr_M_3)
+bledy2<-c(blad_givens_M_1,blad_givens_M_2,blad_givens_M_3)
+bledy3<-c(blad_householder_M_1,blad_householder_M_2,blad_householder_M_3)
+@
+
+<<fig=TRUE>>=
+
+plot(wymiary, bledy1, type = 'l', col = 'blue', ylim=c(0,5e-13), ylab = "Bledy")
+lines(wymiary, bledy2, col='green')
+lines(wymiary, bledy3, col='red')
+legend(10,4e-13, c("qr in R", "qr givens", "qr householder"), 
+       fill=c("blue", "green", "red"))
+@
+
+Wyniki nie są zaskakujące. Wraz ze wzrostem wymiaru rosną również błędy bezwględne wszystkich przedstawionych przez nas algorytmów. Z wykresu można również zaobserwować, iż ten wzrost jest więcej niż liniowy. Warto również nadmienić, że błąd algorytmu $\mx{QR}$ metodą odbić Householdera rośnie najszybciej, zaś tempo wzrostu błędu wbudowanej funkcji jest najniższe. 
 
 
 
 \chapter{Podsumowanie}
+
+W pracy tej zajmowaliśmy się tematyką dotyczącą algorytmu $\mx{QR}$. W rozdziale 3 udało się zaprezentować uzupełniony dowód istnienia rozkładu $\mx{QR}$ dowolnej macierzy. Zaprezentowany dowód opiera się w głównej mierze o twierdzenie o ortogonalizacji Grama-Schmidta, przy wykorzystaniu kilku podstawowych faktów, dotyczących macierzy trójkątnych górnych i ortogonanych. Dalej w sekcjach 3.1 oraz 3.2 prezentujemy i omawiamy stabilnie numerycznie algorytmy znajdowania dekompozycji $\mx{QR}$. W seksji 3.1 algorytm $\mx{QR}$ metodą odbić Householdera, dla którego pokazujemy kilka faktów dotyczących własności macierzy odbić oraz uzasadniamy dlaczego w metodzie tej zachowane są  zera w macierzy w czasie procesu iterowania. W sekcji 3.2 prezentujemy algorytm $\mx{QR}$ metodą rotacji Givensa, wykorzystujący macierze rotacji. Również w tym wypadku dowodzimy prostych faktów dla tychże macierzy, a za pomocą obserwacji \ref{Proposition-zachowanie-zer}, \ref{Proposition-zera-w-kolumnie}, \ref{Proposition-zera-w-wierszach}  przedstawiamy czytelnikowi szkic argumentacji o zachowaniu zer w macierzy w procesie iterowania. W rozdziale 4 pracy zaprezentowaliśmy własne implementacje algorytmów, omówionych w rozdziale 3. W sekcji 4.1 znajduje się implementacja algorytmu $\mx{QR}$ metodą odbić z wykorzystaniem składni języka R. Czytenilnik znajdzie natomiast w sekcji 4.2 implementacje drugiego z algorytmów, algorytmu $\mx{QR}$ metodą rotacji. Wreszcie w sekcji 4.3 przeprowadzamy kilka prostych eksperymentów z wykorzystaniem naszych implementacji. Przeprowadzamy testy dla macierzy o rozmiarach:
+\begin{enumerate}
+\item 5 na 5
+\item 25 na 25
+\item 125 na 125
+\end{enumerate}
+
+porównując je ze sobą oraz z wbudowaną implementacją w języku R.
+
+
+W efekcie przeprowadzonych eksperymentów stwierdzamy, że nasze własne implementacje niestety ustępują wbudowanej funkcji. Godnym odnotowaniem jest jednak fakt, iż uzyskane przez nie wyniki są jakościowo bliskie narzędziu wbudowanemu. Stosowanie naszych algorytmów nie powoduje bowiem wprowadzenia niedokładności większych niż $10^{-13}$ dla macierzy o rozmiarach nawet 125 na 125.
+
+
 
 
 \bibliographystyle{plain}
