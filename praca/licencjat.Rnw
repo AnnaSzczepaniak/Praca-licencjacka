@@ -272,8 +272,7 @@ Macierz $\mx{A}$ jest odwracalna, jeśli istnieje taka macierz $\mx{B}$, że zac
 $$
 \mx{A}\cdot \mx{B}=\mx{B}\cdot \mx{A}=\mx{I},
 $$ 
-gdzie $\mx{I}$ jest macierzą jednostkową. Macierz $\mx{B}$ nazywa się wówczas macierzą odwrotną do macierzy $\mx{A}$ i oznacza się przez  $\inverse{\mx{A}}$. \\
-Macierz $\mx{A}$ nazywamy nieosobliwą, jeśli istnieje macierz $\mx{B},$ która jest do niej odwrotna.
+gdzie $\mx{I}$ jest macierzą jednostkową. Macierz $\mx{B}$ nazywa się wówczas macierzą odwrotną do macierzy $\mx{A}$ i oznacza się przez  $\inverse{\mx{A}}$. Macierz $\mx{A}$ nazywamy nieosobliwą, jeśli istnieje macierz $\mx{B},$ która jest do niej odwrotna.
 
 \end{definition}
 
@@ -288,7 +287,7 @@ $$
 \begin{lemma}[O iloczynie macierzy ortogonalnych]
 Niech $\mx{A},\mx{B} \in \setR^{n \times n }$ będą dwiema ortogonalnymi macierzami. Wówczas 
 $$
-\mx{C}=\mx{A}\mx{B}
+\mx{C}=\mx{A}\cdot \mx{B}
 $$
 jest też macierzą ortogonalną. 
 \end{lemma}
@@ -351,17 +350,17 @@ Rozkładem $\mx{QR}$ nazwiemy również sytuacje, gdy
 $$
 \mx{A}=\mx{Q}\mx{R}
 $$
-oraz $\transpose{\mx{Q}}\mx{Q}=\mx{I}$ i $\mx{R}$ jest macierzą trójkątną górną, niekoniecznie z $1$ na przekątnej. Powodem tego jest, że pomiędzy omawianym tu rozkładem, a rozkładem z \ref{theorem-qr-decomposition} istnieje równoważność.  
+oraz $\transpose{\mx{Q}}\mx{Q}=\mx{I}$ i $\mx{R}$ jest macierzą trójkątną górną, niekoniecznie z $1$ na przekątnej. Powodem tego jest, że prezentowana tu postać oraz postać z twierdzenia \ref{theorem-qr-decomposition} są sobie równoważne.  
 \end{remark}
 
-Aby udowodnić powyższe, zaprezentujemy potrzebną teorię (twierdzenia oraz lematy) wraz z dowodami, na której to będziemy bazować przy dowodzeniu głównego twierdzenia o rozkładzie $QR$. 
+Aby udowodnić twierdzenie \ref{theorem-qr-decomposition}, zaprezentujemy potrzebną teorię (twierdzenia oraz lematy) wraz z dowodami, na której to będziemy bazować przy dowodzeniu głównego twierdzenia o rozkładzie $QR$. 
 
 \begin{theorem}[ {\citep[Twierdzenie 14.12]{poreda11}}]
 Wektor $\vr{x}$ jest ortogonalny do podprzestrzeni $W$ wtedy i tylko wtedy, gdy jest ortogonalny do każdego wektora jakiejkolwiek bazy tej podprzestrzeni.
 \end{theorem}
 
 \begin{theorem}[Nierówność Bessela {\citep[Twierdzenie 14.22]{poreda11}}] \label{Nierówność-Bessela}
-Jeśli $(\vr{b}_{1}, \ldots, \vr{b}_{n})$ jest układem ortonormalnym w przestrzeni euklidesowej $V$, to dla każdego wektora $\vr{x}$ z przestrzeni $V$ spełniona jest nierówność 
+Jeśli $(\vr{b}_{1}, \ldots, \vr{b}_{n})$ jest układem ortonormalnym w przestrzeni euklidesowej $\setR^k$, to dla każdego wektora $\vr{x}$ z przestrzeni $\setR^k$ spełniona jest nierówność 
 $$
 \sum_{i=1}^{n}\alpha_{i}^{2}\leq \Vert\vr{x}\Vert^{2},
 $$
@@ -420,7 +419,6 @@ Na mocy twierdzenia \ref{Nierówność-Bessela} wnioskujemy, że wektor $\vr{b}_
 \begin{equation} \label{equation-span}
 span(\vr{b}_{1}, \ldots, \vr{b}_{k+1}) \subset span(\vr{x}_{1}, \ldots, \vr{x}_{k+1}).
 \end{equation}
-
 Zauważmy, że skoro $\vr{x}_{k+1} \notin span(\vr{x}_{1}, \ldots, \vr{x}_{n}),$ to $\vr{b}_{k+1} \notin span (\vr{b}_{1}, \ldots, \vr{b}_{n}).$ Zatem przestrzenie $span(\vr{b}_{1}, \ldots, \vr{b}_{n})$ i $span(\vr{x}_{1}, \ldots, \vr{x}_{n})$ mają ten sam wymiar.
 Przestrzenie $span(\vr{b}_{1}, \ldots, \vr{b}_{k+1})$ i $span(\vr{x}_{1}, \ldots, \vr{x}_{k+1})$ spełniające \eqref{equation-span} i mające ten sam wymiar, muszą być równe.
 W ten sposób określiliśmy iteracyjnie wektory $\vr{b}_{1}, \ldots, \vr{b}_{n},$ spełniające żądane warunki.
@@ -497,7 +495,7 @@ U = A \cdot
 0 & 0 & 0 & \cdots & 0 & 1
 \end{bmatrix}.
 $$ 
-Zauważmy, że mnożenie macierzowe jest łączne. Możemy je mnożyć wykonując kolejne mnożenia patrząc od prawej strony. Stosując $n-2$ krotnie lemat \ref{lemma-upper-triangle-multiplication} otrzymujemy macierz $\mx{T}$ która jest nieosobliwą macierzą trójkątną górną. Ponadto zauważmy, że te wszystkie macierze mają wyłączenie $1$ na przekątnej, zatem macierz $\mx{T}$ również. 
+Zauważmy, że mnożenie macierzowe jest łączne. Możemy je mnożyć wykonując kolejne mnożenia patrząc od prawej strony. Stosując $n-2$ krotnie lemat \ref{lemma-upper-triangle-multiplication} otrzymujemy macierz $\mx{T}$, która jest nieosobliwą macierzą trójkątną górną. Ponadto zauważmy, że te wszystkie macierze mają wyłączenie $1$ na przekątnej, zatem macierz $\mx{T}$ również. 
 \end{proof}
 
 Istotną obserwacją jaką można poczynić jest taka, że macierzy tej nie można sobie w łatwy sposób od tak wyznaczyć. Aby ją uzyskać trzeba przeprowadzić cały algorytm Grama-Schmidta i dopiero po jego przeprowadzeniu macierz tę daje się jawnie wyznaczyć.
@@ -510,7 +508,7 @@ Niech $\mx{A} \in \setR^{m \times n}$ będzie macierzą jak w założeniach. Wte
 $$
 \mx{U} = \mx{A} \cdot \mx{T},
 $$  
-gdzie $\mx{U} \in \setR^{m \times n}$, $\mx{T} \in \setR^{n \times n}$ i $\mx{U}$ składa się z wektorów ortogonalnych, a $\mx{T}$ jest macierzą trójkątną górną i ma na przekątnej same $1$.  
+gdzie $\mx{U} \in \setR^{m \times n}$, $\mx{T} \in \setR^{n \times n}$ i $\mx{U}$ składa się z kolumn będących wektorami ortogonalnymi, a $\mx{T}$ jest macierzą trójkątną górną i ma na przekątnej same $1$.  
 Na mocy lematu \ref{lemma-upper-triangle-invertion} wiemy, że macierz $\mx{T}$ jest odwracalna i macierz do niej odwrotna jest trójkątną górną. Wykonując mnożenie prawostronne przez tę macierz otrzymujemy:
 \begin{align*}
 \mx{U} \cdot \inverse{\mx{T}} & = \mx{A}\cdot\mx{T}\cdot \inverse{\mx{T}}, \\
@@ -522,7 +520,7 @@ Postać, którą mamy powyżej jest rozkładem QR, gdzie $\mx{U} = \mx{Q}$ i $\i
 
 
 
-Ortogonalizacja Grama-Schmidta może nie obliczyć macierzy ortogonalnej Q, gdy wektory, które są ortogonalizowane, są prawie liniowo zależne, więc nie możemy jej użyć do stabilnego obliczenia rozkładu QR. Zamiast tego opieramy nasze algorytmy na pewnych łatwo obliczalnych ortogonalnych macierzach zwanych odbiciami Householdera lub rotacjami Givensa. Możemy je wybrać, tak aby wprowadzić zera do macierzy za pomocą mnożenia.
+Ortogonalizacja Grama-Schmidta może nie obliczyć macierzy ortogonalnej Q, gdy wektory które są ortogonalizowane, są prawie liniowo zależne, więc nie możemy jej użyć do stabilnego obliczenia rozkładu QR. Zamiast tego opieramy nasze algorytmy na pewnych łatwo obliczalnych ortogonalnych macierzach zwanych odbiciami Householdera lub rotacjami Givensa. Możemy je wybrać, tak aby "wprowadzić" zera do macierzy za pomocą mnożenia.
 
 
 
@@ -581,7 +579,7 @@ $$
 
 
 
-\begin{example} Pokażemy, jak obliczyć rozkład $QR$ macierzy $A$ o wymiarach $5$ na $4$ przy użyciu transformacji Householdera. Ten przykład uwidoczni wzór dla ogólnych macierzy $m$ na $n$. W poniższych macierzach $P_{i}$ jest macierzą ortogonalną $5$ na $5$, $x$ oznacza ogólny niezerowy wpis, a $0$ oznacza zero.
+\begin{example} Pokażemy schemat, jak obliczyć rozkład $QR$ macierzy $A$ o wymiarach $5$ na $4$ przy użyciu transformacji Householdera. Ten przykład uwidoczni wzór dla ogólnych macierzy $m$ na $n$. W poniższych macierzach $P_{i}$ jest macierzą ortogonalną $5$ na $5$, $x$ oznacza ogólny niezerowy wpis, a $0$ oznacza zero.
 \begin{enumerate}
 \item Wyznaczamy $P_{1}$ tak, że:
 $$
@@ -654,14 +652,14 @@ x & x & x & x \\
 \end{bmatrix}.
 $$
 \end{enumerate}
-Tutaj wybraliśmy macierz Householdera $P_{i}^{'}$ aby wyzerować subdiagonale wyrazy w kolumnie i. Jednocześnie nie zakłóca to zer wprowadzonych już w poprzednich kolumnach. Istotnie, jeśli macierz $\mx{A}_{k}$ ma postać
+Tutaj wybraliśmy macierz Householdera $P_{i}^{'}$ aby wyzerować wyrazy w kolumnie i. Jednocześnie nie zakłóca to zer wprowadzonych już w poprzednich kolumnach. Istotnie, jeśli macierz $\mx{A}_{k}$ ma postać
 $$
 \begin{bmatrix}
 T & A_{1k} \\
 0 & A_{2k}
-\end{bmatrix}.
+\end{bmatrix},
 $$
-to wtedy w mnożeniu dostajemy:
+gdzie $\mx{T}$ oznacza macierz trójkątną górną, $\mx{0}$ oznacza macierz złożoną z zer, a $\mx{A}_{1k}$ i $\mx{A}_{2k}$ są macierzami o dowolnych wyrazach, to wtedy w mnożeniu dostajemy:
 $$
 \mx{A}_{k+1}^{'}= \begin{bmatrix}
 I & 0 \\
@@ -707,7 +705,7 @@ Powyższa uwaga pozwala na zdefiniowanie całych grup macierzy obrotów.
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{rys/givens_rot.png}
-\caption{Rotacja Givensa}\label{rys:logo:jeden}
+\caption{Rotacja Givensa \citep{ilustracja}}\label{rys:logo:jeden}
 \end{figure}
 
 \begin{definition}[Macierz Givensa]
@@ -770,7 +768,7 @@ Z uwagi na symetrię oznaczeń, również przypadek gdy $k\notin{i,j}$, $l=i \lo
 \end{proof}
 
 \begin{lemma}
-Niech $\mx{A} \in \setR^{n \times n}$. Wtedy macierz Givensa $\mx{R}(i,j, \theta)$, gdzie $\theta$ spełnia warunki:
+Niech $\mx{A} \in \setR^{n \times n}$, $i,j \in \{1, \ldots, n\}$ oraz $\sqrt{a_{ii}^{2} + a_{ji}^{2}} > 0$. Wtedy macierz Givensa $\mx{R}(i,j, \theta)$, gdzie $\theta$ spełnia warunki:
 $$
 \cos\theta = \frac{a_{ii}}{\sqrt{a_{ii}^{2} + a_{ji}^{2}}}
 $$
@@ -782,12 +780,12 @@ $b_{ji}=0$.
 \end{lemma}
 
 \begin{proof}
-Niech $\mx{A} \in \setR^{n \times n}$, $ij \in{1,\ldots,n}$ i $\theta$ spełniająca warunki. Niech $\mx{B} = \mx{R}(i,j,\theta)\cdot \mx{A}$. Wtedy 
+Niech $\mx{A} \in \setR^{n \times n}$, $i,j \in \{1,\ldots,n\}$, $\sqrt{a_{ii}^{2} + a_{ji}^{2}} > 0$ i $\theta$ spełniająca warunki. Niech $\mx{B} = \mx{R}(i,j,\theta)\cdot \mx{A}$. Wtedy 
 $$
 b_{ji}= \sin\theta\cdot a_{ii} + \cos\theta\cdot a_{ji} = \frac{-(a_{ji})}{\sqrt{a_{ii}^{2} + a_{ji}^{2}}} \cdot a_{ii} + \frac{a_{ii}}{\sqrt{a_{ii}^{2} + a_{ji}^{2}}} \cdot a_{ji} = 0.
 $$
 \end{proof}
-Zatem macierz $R$ można użyć do "generowania zer w macierzy".
+Zatem macierz $\mx{R}(i,j,\theta)$ można użyć do "generowania zer w macierzy".
 \begin{algorithm}
 \caption{Algorytm QR metodą rotacji Givensa}
 \begin{algorithmic}
@@ -835,8 +833,8 @@ A_{51} & A_{52} & A_{53} & A_{54} & A_{55}
 \begin{proposition}\label{Proposition-zera-w-kolumnie}
 Na podstawie obserwacji \ref{Proposition-zachowanie-zer} możemy wywynioskować następujące:
 \begin{enumerate}
-\item Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnie $j$.
-\item Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnach $[1:i-1]$ w wierszach różnych od $i$ i $j$.
+\item Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnie $i$.
+\item Wykonanie rotacji macierzą $\mx{G}(i,j, \mx{A}[i,i], \mx{A}[j,i])$ zachowuje zera w kolumnach $[1:i-1]$ w wierszach różnych od $i$ oraz $j$.
 \end{enumerate}
 \end{proposition}
 
@@ -844,7 +842,7 @@ Na podstawie obserwacji \ref{Proposition-zachowanie-zer} możemy wywynioskować 
 Krótko uzasadnimy \ref{Proposition-zera-w-kolumnie}.
 \begin{enumerate}
 \item Istotnie z obserwacji \ref{Proposition-zachowanie-zer} po wykonaniu obrotu Givensa względem $i$ i $j$ inne zera będą reprezentowane przez pola $\mx{A}_{12}, \mx{A}_{32}, \mx{A}_{52}$ i w efekcie nie ulegają zmianie.
-\item Istotnie z obserwacji \ref{Proposition-zachowanie-zer} po wykonaniu obrotu Givensa względem $i$ i $j$ w kolumnach $[1:i-1]$ w wierszach różnych od $i$ i $j$ są reprezentowane przez pola $\mx{A}_11,\mx{A}_31,\mx{A}_51$.
+\item Istotnie z obserwacji \ref{Proposition-zachowanie-zer} po wykonaniu obrotu Givensa względem $i$ i $j$ w kolumnach $[1:i-1]$ w wierszach różnych od $i$ i $j$ są reprezentowane przez pola $\mx{A}_{11},\mx{A}_{31},\mx{A}_{51}$.
 \end{enumerate}
 \end{proof}
 
