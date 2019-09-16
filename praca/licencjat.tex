@@ -100,7 +100,7 @@ Promotor: dr inż. Piotr Kowalski %TU WPISZ TYTUŁ ORAZ IMIĘ I NAZWISKO PROMOTO
 \chapter{Wstęp}
 Tematem niniejszej pracy jest algorytm QR dekompozycji macierzy, który to został wynaleziony w 1961 roku przez Francisa i Kubłanowską. Jest on jedną z efektywniejszych znanych metod rozwiązywania pełnego zadania własnego dla macierzy symetrycznych lub niesymetrycznych. Należy on do najważniejszych algorytmów opracowanych w XX wieku. Pomimo tego, iż w czasie studiów podobne operacje wykonywane są za pomocą procesu ortogonalizacji Grama-Schmidta, sam algorytm dekompozycji QR rozwiązywany jest na inne sposoby, które dalej zostaną dokładnie omówione. W pracy tej chcieliśmy zgromadzić informacje o samym algorytmie, matematycznych podstawach na których jest oparty oraz matematycznie opisać operacje, które są wykonywane przez rzeczywiste implementacje.
 
-Praca uporządkowana jest w następujący sposób. W rozdziale 2 znajdują się preliminaria, w których umieszczone zostały wybrane elementy algebry liniowej wraz z kilkoma znanymi lematami, które zostały udowodnione samodzielnie na potrzeby tej pracy. W rozdziale 3 znajduje się twierdzenie o rozkładzie QR wraz z dowodem. Dowód ten został samodzielnie opracowany na podstawie szkiców z książek \citep{bjorck14,demmel12,poreda11,wilkinson13}. W tym samym rozdziale omówimy również podstawy działania algorytmów służących do dekompozycji, tj. algorytmu QR metodą odbić Householdera oraz algorytmu QR metodą rotacji Givensa. W rozdziale 4 przedstawiamy opracowane własne implementacje z wykorzystaniem dokumentacji języka R \citep{dokumentacjaR} wraz z eksperymentami numerycznymi oraz obserwacjami jakie poczyniliśmy przy tychże eksperymentach. W rozdziale 5 zaprezentowane są wnioski z wyników naszej pracy w rozdziale 4. 
+Praca uporządkowana jest w następujący sposób. W rozdziale 2 znajdują się preliminaria, w~których umieszczone zostały wybrane elementy algebry liniowej wraz z kilkoma znanymi lematami, które zostały udowodnione samodzielnie na potrzeby tej pracy. W rozdziale 3 znajduje się twierdzenie o rozkładzie QR wraz z dowodem. Dowód ten został samodzielnie opracowany na podstawie szkiców z książek \citep{bjorck14,demmel12,poreda11,wilkinson13}. W tym samym rozdziale omówimy również podstawy działania algorytmów służących do dekompozycji, tj. algorytmu QR metodą odbić Householdera oraz algorytmu QR metodą rotacji Givensa. W rozdziale 4 przedstawiamy opracowane własne implementacje z wykorzystaniem dokumentacji języka R \citep{dokumentacjaR} wraz z eksperymentami numerycznymi oraz obserwacjami jakie poczyniliśmy przy tychże eksperymentach. W rozdziale 5 zaprezentowane są wnioski z wyników naszej pracy w rozdziale 4. 
 
 
 
@@ -135,7 +135,7 @@ Poniżej prezentuję oznaczenia jakich będziemy używać w pracy:
 Niniejszą część rozpocznijmy od zdefiniowania pojęcia macierzy. Warto nadmienić, że w znaczącej części literatury - pojęcie te nie jest definiowane w sposób matematycznie precyzyjny.
 
 \begin{definition}[Macierz {\cite[Def. 8.1]{poreda11}}]
-Niech $n,m \in \setN$. Macierzą o $m$ wierszach oraz $n$ kolumnach (nazywaną również macierzą o wymiarach $m$ na $n$) i wyrazach w ciele $\setR$ nazywamy funkcję 
+Niech $n,m \in \setN$. Macierzą o $m$ wierszach oraz $n$ kolumnach (nazywaną również macierzą o~wymiarach $m$ na $n$) i wyrazach w ciele $\setR$ nazywamy funkcję 
 $$
 \mx{A}: \set{1,2, \ldots ,m}\times \set{1,2, \ldots ,n} \to \setR.
 $$
@@ -157,7 +157,7 @@ Macierze posiadają wiele istotnych dla nas podklas, posiadających określone c
 \begin{definition}[Rodzaje macierzy {\citep[Sekcja 8.1]{poreda11}}] \label{definicja-macierzy}
 Możemy rozróżnić następujące rodzaje macierzy:
 \begin{itemize}
-\item Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej.
+\item Macierzą kwadratową o wymiarze $n$ na $n$ nazywamy macierz o równej liczbie wierszy i~kolumn. Liczbę $n$ nazywamy wtedy stopniem macierzy kwadratowej.
 \item Jeśli w macierzy kwadratowej $[a_{ij}]$ wszystkie elementy poza główną przekątną są równe zeru, to taką macierz nazywamy macierzą diagonalną, oznaczamy ją jako $diag(a_{11}, a_{22},\ldots,a_{nn})$.
 \item Macierz jednostkową stopnia $n$ nazywamy taką macierz diagonalną, w której wszystkie elementy na głównej przekątnej są równe 1.
 \item Macierzą symetryczną nazywamy macierz kwadratową $\mx{A}=[a_{ij}]$, której wyrazy spełniają warunek 
@@ -189,7 +189,7 @@ Korzystając z twierdzenia Cauchy'ego o iloczynie macierzy otrzymujemy natychmia
 \begin{equation}\label{eq-proof-upper-triangle-mutliplication}
 c_{ij} = a_{i1} b_{1j} + \ldots +a_{in} b_{nj}.
 \end{equation}
-Zauważmy, że elementy $a_{i1}, \ldots , a_{i(i-1)}$ są równe $0$ gdyż pochodzą z macierzy trójkątnej górnej. Ponadto elementy $b_{j(j+1)}, \ldots, b_{jn}$ są z analogicznego powodu również równe $0$. Skoro $i > j$ to każdy składnik sumy \eqref{eq-proof-upper-triangle-mutliplication} posiada czynnik równy $0$. Zatem $c_{ij}$ dla rozważanego indeksu jest równe $0$. W dowolności wyboru $i,j$ macierz $\mx{C}$ jest macierzą trójkątną górną. 
+Zauważmy, że elementy $a_{i1}, \ldots , a_{i(i-1)}$ są równe $0$ gdyż pochodzą z macierzy trójkątnej górnej. Ponadto elementy $b_{j(j+1)}, \ldots, b_{jn}$ są z analogicznego powodu również równe $0$. Skoro $i > j$, to~każdy składnik sumy \eqref{eq-proof-upper-triangle-mutliplication} posiada czynnik równy $0$. Zatem $c_{ij}$ dla rozważanego indeksu jest równe $0$. W dowolności wyboru $i,j$ macierz $\mx{C}$ jest macierzą trójkątną górną. 
 Załóżmy dalej, że $\mx{A}$ i $\mx{B}$ mają na przekątnej same $1$. Niech $i \in \set{1, \ldots, n}$. Wtedy 
 $$
 c_{ii} = a_{i1} b_{1i}+ \ldots+ a_{in} b_{ni} = \sum_{k=1}^{n} a_{ik} b_{ki} = a_{ii}b_{ii} = 1.
@@ -198,12 +198,12 @@ Z dowolności wyboru $i$ macierz $\mx{C}$ ma na przekątnej same $1$.
 \end{proof}
 
 \begin{lemma}[O odwracaniu macierzy trójkątnej górnej]\label{lemma-upper-triangle-invertion}
-Niech $\mx{A} \in \setR^{n \times n}$ będzie nieosobliwą macierzą trójkątną górną. Wtedy istnieje macierz $\inverse{\mx{A}} = [\overline{a}_{ij}]_{i = 1, \ldots , n}^{j = 1, \ldots, n}$ i jest ona nieosobliwą macierzą trójkątną górną. Ponadto jeśli macierz $\mx{A}$ ma na przekątnej wyłącznie $1$, to również macierz $\inverse{\mx{A}}$ ma na przekątnej same $1$.
+Niech $\mx{A} \in \setR^{n \times n}$ będzie nieosobliwą macierzą trójkątną górną. Wtedy istnieje macierz $\inverse{\mx{A}}=[\overline{a}_{ij}]_{i = 1, \ldots , n}^{j = 1, \ldots, n}$~i jest ona nieosobliwą macierzą trójkątną górną. Ponadto jeśli macierz $\mx{A}$ ma na przekątnej wyłącznie $1$, to również macierz $\inverse{\mx{A}}$ ma na przekątnej same $1$.
 \end{lemma}
 
 \begin{proof}
 Niech $\mx{A}$ będzie macierzą jak w założeniach twierdzenia.
-Na mocy twierdzenia 9.23 z \citep{poreda11} i twierdzenia 9.22 z \citep{poreda11}, i nieosobliwości macierzy $\mx{A}$, wiemy że macierz $\inverse{\mx{A}} $ istnieje i jest nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną górną. Pokazać ten fakt można na kilka różnych sposobów, zaprezentujemy tutaj najprostszy pod względem wiedzy teoretycznej dowód.
+Na mocy twierdzenia 9.23 z~\citep{poreda11} i twierdzenia 9.22 z \citep{poreda11}, i nieosobliwości macierzy $\mx{A}$, wiemy że macierz $\inverse{\mx{A}} $ istnieje i jest nieosobliwa. Pozostaje pokazać, że jest macierzą trójkątną górną. Pokazać ten fakt można na kilka różnych sposobów, zaprezentujemy tutaj najprostszy pod względem wiedzy teoretycznej dowód.
 Wykorzystamy drugi krok z algorytmu elimininacji Gaussa. Przypomnijmy, że algorytm ten służy rozwiązaniu układu równań postaci 
 $$
 \mx{A} \vr{x} = \vr{b},
@@ -224,15 +224,15 @@ x_1 \\ x_2 \\ \vdots \\ x_n
 b_1 \\ b_2 \\ \vdots \\ b_n
 \end{bmatrix}.
 $$
-Wtedy również $\vr{x} = \inverse{\mx{A}}\vr{b}$, gdzie $\mx{A}^{-1} = [\overline{a}_{ij}]$. Skoro macierz $\mx{A}$ jest nieosobliwa to wiemy, że elementy na przekątnej są różne od $0$, tzn.
+Wtedy również $\vr{x} = \inverse{\mx{A}}\vr{b}$, gdzie $\mx{A}^{-1} = [\overline{a}_{ij}]$. Skoro macierz $\mx{A}$ jest nieosobliwa to wiemy, że~elementy na przekątnej są różne od $0$, tzn.
 $$
 \forall k \in \set{1, \ldots, n} \quad a_{kk} \neq 0.
 $$
-Wtedy prawdziwy jest wzór pozwalający na iteracyjne policzenie wektora $\vr{x}$, tj. dla każdego $k$ począwszy od $n$ do $1$.
+Wtedy prawdziwy jest wzór pozwalający na iteracyjne policzenie wektora $\vr{x}$, tj. dla każdego $k$~począwszy od $n$ do $1$.
 \begin{equation}
 x_k = \frac{1}{a_{kk}} \bracket{b_k - \sum_{i=k+1}^{n} a_{ki} x_{i}}.
 \end{equation}
-Przypuśćmy nie wprost, że macierz $\inverse{\mx{A}}$ nie jest trójkątną górną. Istnieje zatem takie $i,j \in \set{1, \ldots, n}$, $i > j$ i $\overline{a}_{ij} \neq 0 $. Rozważmy $\vr{b}= [0,0, \ldots, 1,0,0, \ldots]^{T}$, gdzie $\vr{b}_{j} = 1$. Wtedy dla każdego $k>i>j$, $k \in \set{1, \ldots, n}$, $x_{k} = 0$ oraz $x_{i} = \frac{1}{a_{ii}} \cdot(0 - 0 ) = 0$. Z drugiej strony $\vr{x} = \inverse{\mx{A}} \vr{b}$. Stąd 
+Przypuśćmy nie wprost, że~macierz $\inverse{\mx{A}}$ nie jest trójkątną górną. Istnieje zatem takie $i,j\in~\set{1, \ldots, n}$, $i > j$ i $\overline{a}_{ij} \neq 0 $. Rozważmy $\vr{b}= [0,0, \ldots, 1,0,0, \ldots]^{T}$, gdzie $\vr{b}_{j} = 1$. Wtedy dla każdego $k>i>j$, $k \in \set{1, \ldots, n}$, $x_{k} = 0$ oraz $x_{i} = \frac{1}{a_{ii}} \cdot(0 - 0 ) = 0$. Z drugiej strony $\vr{x} = \inverse{\mx{A}} \vr{b}$. Stąd 
 $$
 x_{i} = \overline{a}_{i1} \vr{b}_{1} + \overline{a}_{i2} \vr{b}_{2} + \ldots + \overline{a}_{in} \vr{b}_{n} = \overline{a}_{ij} \vr{b}_{j} = \overline{a}_{ij} \neq 0.
 $$ 
@@ -261,7 +261,7 @@ $$
          b_{k1} & b_{k2} & \cdots & b_{km} \\
 \end{bmatrix},
 $$ 
-to iloczynem macierzy $\mx{B}$ i $\mx{A}$ nazywamy taką macierz $\mx{C} = [c_{lj}]_{j=1,\ldots,n}^{l=1,\ldots,k},$ że dla $i=1,\ldots,m, j=1,\ldots,n $
+to iloczynem macierzy $\mx{B}$ i $\mx{A}$ nazywamy taką macierz $\mx{C} = [c_{lj}]_{j=1,\ldots,n}^{l=1,\ldots,k},$ że dla $i=1,\ldots,m$, $j=1,\ldots,n $
 $$
 c_{lj}= \sum_{l=1}^{m} b_{li} \cdot a_{ij}.
 $$
@@ -354,7 +354,7 @@ $$
 oraz $\transpose{\mx{Q}}\mx{Q}=\mx{I}$ i $\mx{R}$ jest macierzą trójkątną górną, niekoniecznie z $1$ na przekątnej. Powodem tego jest, że prezentowana tu postać oraz postać z twierdzenia \ref{theorem-qr-decomposition} są sobie równoważne.  
 \end{remark}
 
-Aby udowodnić twierdzenie \ref{theorem-qr-decomposition}, zaprezentujemy potrzebną teorię (twierdzenia oraz lematy) wraz z dowodami, na której to będziemy bazować przy dowodzeniu głównego twierdzenia o rozkładzie $QR$. 
+Aby udowodnić twierdzenie \ref{theorem-qr-decomposition}, zaprezentujemy potrzebną teorię (twierdzenia oraz lematy) wraz z dowodami, na której to będziemy bazować przy dowodzeniu głównego twierdzenia o~rozkładzie $QR$. 
 
 \begin{theorem}[ {\citep[Twierdzenie 14.12]{poreda11}}]
 Wektor $\vr{x}$ jest ortogonalny do podprzestrzeni $W$ wtedy i tylko wtedy, gdy jest ortogonalny do każdego wektora jakiejkolwiek bazy tej podprzestrzeni.
@@ -421,13 +421,13 @@ Na mocy twierdzenia \ref{Nierówność-Bessela} wnioskujemy, że wektor $\vr{b}_
 span(\vr{b}_{1}, \ldots, \vr{b}_{k+1}) \subset span(\vr{x}_{1}, \ldots, \vr{x}_{k+1}).
 \end{equation}
 Zauważmy, że skoro $\vr{x}_{k+1} \notin span(\vr{x}_{1}, \ldots, \vr{x}_{n}),$ to $\vr{b}_{k+1} \notin span (\vr{b}_{1}, \ldots, \vr{b}_{n}).$ Zatem przestrzenie $span(\vr{b}_{1}, \ldots, \vr{b}_{n})$ i $span(\vr{x}_{1}, \ldots, \vr{x}_{n})$ mają ten sam wymiar.
-Przestrzenie $span(\vr{b}_{1}, \ldots, \vr{b}_{k+1})$ i $span(\vr{x}_{1}, \ldots, \vr{x}_{k+1})$ spełniające \eqref{equation-span} i mające ten sam wymiar, muszą być równe.
+Przestrzenie $span(\vr{b}_{1}, \ldots, \vr{b}_{k+1})$ i~$span(\vr{x}_{1}, \ldots, \vr{x}_{k+1})$ spełniające \eqref{equation-span} i mające ten sam wymiar, muszą być równe.
 W ten sposób określiliśmy iteracyjnie wektory $\vr{b}_{1}, \ldots, \vr{b}_{n},$ spełniające żądane warunki.
 \end{proof}
 
 
 \begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta] \label{lemma-matrix-formulation-of-gs}
-Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $v_{1}, \ldots, v_n$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $u_1, \ldots, u_n$ , które są transformacją wektorów $v_1, \ldots, v_n$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z tych wektorów $u_1, \ldots, u_n$. Wtedy
+Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $v_{1}, \ldots, v_n$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $u_1, \ldots, u_n$ , które są transformacją wektorów $v_1, \ldots, v_n$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z~tych wektorów $u_1, \ldots, u_n$. Wtedy
 {\small
 $$
 U = A \cdot 
@@ -583,7 +583,7 @@ Macierz postaci:
 $$
 \left[ 
 \begin{array}{c|c}
-1 & 0 \\\hline
+I & 0 \\\hline
 0 & P
 \end{array}
 \right],
@@ -696,7 +696,11 @@ Poniżej prezentujemy ogólny algorytm dekompozycji $\mx{QR}$ z wykorzystaniem t
 \For{$i$ from $1$  to $\min (m-1,n)$}
 	\State $u_{i} = House(A(i:m,i))$
 	\State $\mx{P_{i}^{'}} = \mx{I} - 2\cdot u_{i}\cdot u_{i}^{T}$
-	\State $\mx{A}(i:m, i:n) = \mx{P}_{i}^{'}\cdot \mx{A}(i:m, i:n)$	
+	\State $\mx{A}(i:m, i:n) = \mx{P}_{i}^{'}\cdot \mx{A}(i:m, i:n)$
+\If {$i > 1$}
+      \State $\mx{Q}(i:n,1:(i-1)) = \mx{P}\cdot \mx{Q}(i:n,1:(i-1))$
+      \State $\mx{Q}(i:n,i:n) = \mx{P}\cdot \mx{Q}(i:n,i:n)$
+\EndIf
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -745,7 +749,7 @@ Każda macierz Givensa jest macierzą ortogonalną.
 \end{lemma}
 
 \begin{proof}
-Niech $n\in \setN$, rozważmy macierze Givensa rozmiaru $n$ na $n$. Niech $i,j \in \{1,\ldots, n\}$ i $\theta \in \setR$. Pokażemy, że macierz $\mx{R}(i,j,\theta) \in \setR^{n\times n}$ jest ortogonalna.
+Niech $n\in \setN$, rozważmy macierze Givensa rozmiaru $n$ na $n$. Niech $i,j \in \{1,\ldots, n\}$ i~$\theta \in \setR$. Pokażemy, że macierz $\mx{R}(i,j,\theta) \in \setR^{n\times n}$ jest ortogonalna.
 Wystarczy pokazać, że układ kolumn $(r_s)$, $s=1,\ldots, n$ tej macierzy jest układem ortonormalnym. Weźmy dwie kolumny $k$-tą i $l$-tą. Rozważmy przypadki:
 \begin{enumerate}
 \item Gdy $k\notin (i,j)$, $l\notin (i,j)$, $k \neq l$, wtedy
@@ -807,6 +811,8 @@ Zatem macierz $\mx{R}(i,j,\theta)$ można użyć do "generowania zer w macierzy"
 	\For{$j$ from $i+1$ to $m$}
 		\State $\mx{G} = Givens(i,j, \mx{A}[i,i], \mx{A}[j,i])$
 		\State $\mx{A} = \mx{G}\cdot \mx{A}$
+      	\State $\mx{Q} = \mx{Q}\cdot \mx{t(G)}$
+      	
 	\EndFor	
 \EndFor
 \end{algorithmic}
@@ -1334,7 +1340,7 @@ Wyniki nie są zaskakujące. Wraz ze wzrostem wymiaru rosną również błędy b
 
 \chapter{Podsumowanie}
 
-W pracy tej zajmowaliśmy się tematyką dotyczącą algorytmu $\mx{QR}$. W rozdziale 3 udało się zaprezentować uzupełniony dowód istnienia rozkładu $\mx{QR}$ dowolnej macierzy. Zaprezentowany dowód opiera się w głównej mierze o twierdzenie o ortogonalizacji Grama-Schmidta, przy wykorzystaniu kilku podstawowych faktów, dotyczących macierzy trójkątnych górnych i ortogonanych. Dalej w sekcjach 3.1 oraz 3.2 prezentujemy i omawiamy stabilnie numerycznie algorytmy znajdowania dekompozycji $\mx{QR}$. W seksji 3.1 algorytm $\mx{QR}$ metodą odbić Householdera, dla którego pokazujemy kilka faktów dotyczących własności macierzy odbić oraz uzasadniamy dlaczego w metodzie tej zachowane są  zera w macierzy w czasie procesu iterowania. W sekcji 3.2 prezentujemy algorytm $\mx{QR}$ metodą rotacji Givensa, wykorzystujący macierze rotacji. Również w tym wypadku dowodzimy prostych faktów dla tychże macierzy, a za pomocą obserwacji \ref{Proposition-zachowanie-zer}, \ref{Proposition-zera-w-kolumnie}, \ref{Proposition-zera-w-wierszach}  przedstawiamy czytelnikowi szkic argumentacji o zachowaniu zer w macierzy w procesie iterowania. W rozdziale 4 pracy zaprezentowaliśmy własne implementacje algorytmów, omówionych w rozdziale 3. W sekcji 4.1 znajduje się implementacja algorytmu $\mx{QR}$ metodą odbić z wykorzystaniem składni języka R. Czytenilnik znajdzie natomiast w sekcji 4.2 implementacje drugiego z algorytmów, algorytmu $\mx{QR}$ metodą rotacji. Wreszcie w sekcji 4.3 przeprowadzamy kilka prostych eksperymentów z wykorzystaniem naszych implementacji. Przeprowadzamy testy dla macierzy o rozmiarach:
+W pracy tej zajmowaliśmy się tematyką dotyczącą algorytmu $\mx{QR}$. W rozdziale 3 udało się zaprezentować uzupełniony dowód istnienia rozkładu $\mx{QR}$ dowolnej macierzy. Zaprezentowany dowód opiera się w głównej mierze o twierdzenie o ortogonalizacji Grama-Schmidta, przy wykorzystaniu kilku podstawowych faktów, dotyczących macierzy trójkątnych górnych i ortogonanych. Dalej w sekcjach 3.1 oraz 3.2 prezentujemy i omawiamy stabilnie numerycznie algorytmy znajdowania dekompozycji $\mx{QR}$. W seksji 3.1 algorytm $\mx{QR}$ metodą odbić Householdera, dla którego pokazujemy kilka faktów dotyczących własności macierzy odbić oraz uzasadniamy dlaczego w~metodzie tej zachowane są  zera w macierzy w czasie procesu iterowania. W sekcji 3.2 prezentujemy algorytm $\mx{QR}$ metodą rotacji Givensa, wykorzystujący macierze rotacji. Również w tym wypadku dowodzimy prostych faktów dla tychże macierzy, a za pomocą obserwacji \ref{Proposition-zachowanie-zer}, \ref{Proposition-zera-w-kolumnie}, \ref{Proposition-zera-w-wierszach}  przedstawiamy czytelnikowi szkic argumentacji o zachowaniu zer w macierzy w procesie iterowania. W rozdziale 4 pracy zaprezentowaliśmy własne implementacje algorytmów, omówionych w rozdziale 3. W sekcji 4.1 znajduje się implementacja algorytmu $\mx{QR}$ metodą odbić z wykorzystaniem składni języka R. Czytenilnik znajdzie natomiast w sekcji 4.2 implementacje drugiego z algorytmów, algorytmu $\mx{QR}$ metodą rotacji. Wreszcie w sekcji 4.3 przeprowadzamy kilka prostych eksperymentów z wykorzystaniem naszych implementacji. Przeprowadzamy testy dla macierzy o rozmiarach:
 \begin{enumerate}
 \item 5 na 5
 \item 25 na 25
@@ -1343,7 +1349,7 @@ W pracy tej zajmowaliśmy się tematyką dotyczącą algorytmu $\mx{QR}$. W rozd
 porównując je ze sobą oraz z wbudowaną implementacją w języku R.
 
 
-W efekcie przeprowadzonych eksperymentów stwierdzamy, że nasze własne implementacje niestety ustępują wbudowanej funkcji. Godnym odnotowaniem jest jednak fakt, iż uzyskane przez nie wyniki są jakościowo bliskie narzędziu wbudowanemu. Stosowanie naszych algorytmów nie powoduje bowiem wprowadzenia niedokładności większych niż $10^{-13}$ dla macierzy o rozmiarach nawet 125 na 125.
+W efekcie przeprowadzonych eksperymentów stwierdzamy, że nasze własne implementacje niestety ustępują wbudowanej funkcji. Godnym odnotowaniem jest jednak fakt, iż uzyskane przez nie wyniki są jakościowo bliskie narzędziu wbudowanemu. Stosowanie naszych algorytmów nie powoduje bowiem wprowadzenia niedokładności większych niż $10^{-13}$ dla macierzy o~rozmiarach nawet 125 na 125.
 
 
 

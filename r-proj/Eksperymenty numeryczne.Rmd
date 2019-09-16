@@ -1,7 +1,7 @@
 ---
 title: "Dekompozycja QR- Metoda Householdera"
 author: "Ania Szczepaniak"
-date: "3 wrzeœnia 2019"
+date: "3 wrze?nia 2019"
 output: html_document
 ---
 
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-Szukamy przekszta³cenia pierwszego wektora, tj. pierwszej kolumny.
+Szukamy przekszta?cenia pierwszego wektora, tj. pierwszej kolumny.
 
 ```{r}
 house = function(x) {
@@ -25,7 +25,7 @@ house = function(x) {
 }
 ```
 
-Tworzymy rozk³ad QR korzystaj¹c z transformacji Householdera 
+Tworzymy rozk?ad QR korzystaj?c z transformacji Householdera 
 
 
 ```{r}
@@ -41,7 +41,7 @@ qr_householer = function(A)
     den =  (t(u) %*% u)[1,1]
     P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
     R[i:m,i:n] = P %*% R[i:m,i:n]
-    if (i>1)
+    if (i>1) 
       Q[i:n,1:(i-1)] = P %*% Q[i:n,1:(i-1)]
     Q[i:n,i:n] = P %*% Q[i:n,i:n]
   }
@@ -85,7 +85,7 @@ givens(3,1,A) %*% A
 ```
 
 
-Tworzymy algorytm dekompozycji macierzy QR metod¹ rotacji Givensa.
+Tworzymy algorytm dekompozycji macierzy QR metod? rotacji Givensa.
 
 ```{r}
 qr_givens = function(A){
@@ -107,19 +107,19 @@ qr_givens = function(A){
 qr_givens(A)
 ```
 
-Teraz czas na eksperymenty, które poka¿¹, jak bardzo ró¿ni siê b³¹d naszych algorytmów  od tego z gotowej funkcji R Studio, s³u¿¹cej do rozk³adu QR. 
-Do wy¿ej wymienionych eksperymentów wykorzystamy losowo wybrane trzy macierze. 
-1. Wymiarów 5 na 5.
-2. Wymiarów 25 na 25.
-3. Wymiarów 125 na 125. 
+Teraz czas na eksperymenty, kt?re poka??, jak bardzo r??ni si? b??d naszych algorytm?w  od tego z gotowej funkcji R Studio, s?u??cej do rozk?adu QR. 
+Do wy?ej wymienionych eksperyment?w wykorzystamy losowo wybrane trzy macierze. 
+1. Wymiar?w 5 na 5.
+2. Wymiar?w 25 na 25.
+3. Wymiar?w 125 na 125. 
 
-Na pocz¹tek zajmijmy siê macierz¹ wymiarów 5 na 5.
+Na pocz?tek zajmijmy si? macierz? wymiar?w 5 na 5.
 ```{r}
 M_1<-matrix(c(replicate(5, rnorm(5)) ), 5, 5, byrow=TRUE) 
 M_1
 ```
 
-Najpierw przeprowadŸmy rozk³ad wbudowan¹ funkcj¹ w R Studio.
+Najpierw przeprowad?my rozk?ad wbudowan? funkcj? w R Studio.
 
 ```{r}
 QR = qr(M_1)
@@ -128,14 +128,14 @@ qr.R(QR)
 ```
 
 
-Nastêpnie przeprowadzimy rozk³ad naszym algorytmem qr_givens
+Nast?pnie przeprowadzimy rozk?ad naszym algorytmem qr_givens
 ```{r}
 wynik1_givens = qr_givens(M_1)
 wynik1_givens$Q
 wynik1_givens$R
 ```
 
-Rozk³ad algorytmem qr_householder:
+Rozk?ad algorytmem qr_householder:
 
 ```{r}
 wynik1_householder = qr_householer(M_1)
@@ -146,9 +146,9 @@ wynik1_householder$R
 
 
 
-SprawdŸmy, który rozk³ad jest najbli¿szy naszej wyjœciowej macierzy A.
+Sprawd?my, kt?ry rozk?ad jest najbli?szy naszej wyj?ciowej macierzy A.
 
-Policzymy b³¹d bezwgldêny z rozk³adu QR metod¹ rotacji Givensa:
+Policzymy b??d bezwgld?ny z rozk?adu QR metod? rotacji Givensa:
 
 ```{r}
 M_1_givens = wynik1_givens$Q  %*% wynik1_givens$R
@@ -157,7 +157,7 @@ blad_givens_M_1 = norm(M_11)
 blad_givens_M_1
 ```
 
-B³¹d bezwzglêdny z rozk³adu QR funkcj¹ wbudowan¹ w jêzyk R:
+B??d bezwzgl?dny z rozk?adu QR funkcj? wbudowan? w j?zyk R:
 
 ```{r}
 M_1_qr = qr.Q(QR) %*% qr.R(QR)
@@ -166,7 +166,7 @@ blad_qr_M_1 = norm(M_12)
 blad_qr_M_1
 ```
 
-B³¹d bezwzglêdy z rozk³adu QR metod¹ odbiæ Householdera:
+B??d bezwzgl?dy z rozk?adu QR metod? odbi? Householdera:
 
 ```{r}
 M_1_householder = wynik1_householder$Q %*% wynik1_householder$R
@@ -176,7 +176,7 @@ blad_householder_M_1
 
 ```
 
-SprawdŸmy, który z b³êdów jest najmniejszy, a który najwiêkszy. Bêdziemy wtedy w stanie oceniæ, który z rozk³adów jest na najdok³adniejszy.
+Sprawd?my, kt?ry z b??d?w jest najmniejszy, a kt?ry najwi?kszy. B?dziemy wtedy w stanie oceni?, kt?ry z rozk?ad?w jest na najdok?adniejszy.
 
 ```{r}
 min(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
@@ -184,17 +184,17 @@ max(blad_givens_M_1, blad_householder_M_1, blad_qr_M_1)
 
 ```
 
-Widzimy, ¿e gotowy algorytm, wbudowany w RStudio jest jednak dok³adniejszy od naszych, samodzielnie napisanych. Widaæ równie¿, ¿e algorytm dekompozycji QR metod¹ Givensa jest jednak dok³adniejszy od algorytmu metod¹ odbiæ Householdera.
+Widzimy, ?e gotowy algorytm, wbudowany w RStudio jest jednak dok?adniejszy od naszych, samodzielnie napisanych. Wida? r?wnie?, ?e algorytm dekompozycji QR metod? Givensa jest jednak dok?adniejszy od algorytmu metod? odbi? Householdera.
 
-Sprawdzimy czy ta zaleŸnoœæ znajduje zastosowania dla macierzy wy¿szych rzêdów.
+Sprawdzimy czy ta zale?no?? znajduje zastosowania dla macierzy wy?szych rz?d?w.
 
-Kolej na macierzy wymiarów 25 na 25.
+Kolej na macierzy wymiar?w 25 na 25.
 
 ```{r}
 M_2<-matrix(c(replicate(25, rnorm(25)) ), 25, 25, byrow=TRUE) 
 ```
 
-Rozk³ad wbudowan¹ funkcj¹ w R Studio:
+Rozk?ad wbudowan? funkcj? w R Studio:
 
 ```{r}
 QR = qr(M_2)
@@ -202,7 +202,7 @@ qr.Q(QR)
 qr.R(QR)
 ```
 
-Rozk³ad algorytmem qr_givens:
+Rozk?ad algorytmem qr_givens:
 
 ```{r}
 wynik2_givens = qr_givens(M_2)
@@ -210,7 +210,7 @@ wynik2_givens$Q
 wynik2_givens$R
 ```
 
-Rozk³ad algorytmem qr_householder:
+Rozk?ad algorytmem qr_householder:
 
 ```{r}
 wynik2_householder = qr_householer(M_2)
@@ -219,7 +219,7 @@ wynik2_householder$R
 ```
 
 
-B³¹d bezwgldêny z rozk³adu QR metod¹ rotacji Givensa:
+B??d bezwgld?ny z rozk?adu QR metod? rotacji Givensa:
 
 
 ```{r}
@@ -229,7 +229,7 @@ blad_givens_M_2 = norm(M_21)
 blad_givens_M_2
 ```
 
-B³¹d bezwzglêdny z rozk³adu QR funkcj¹ wbudowan¹ w jêzyk R:
+B??d bezwzgl?dny z rozk?adu QR funkcj? wbudowan? w j?zyk R:
 
 ```{r}
 M_2_qr = qr.Q(QR) %*% qr.R(QR)
@@ -238,7 +238,7 @@ blad_qr_M_2 = norm(M_22)
 blad_qr_M_2
 ```
 
-B³¹d bezwzglêdy z rozk³adu QR metod¹ odbiæ Householdera:
+B??d bezwzgl?dy z rozk?adu QR metod? odbi? Householdera:
 
 ```{r}
 M_2_householder = wynik2_householder$Q %*% wynik2_householder$R
@@ -248,7 +248,7 @@ blad_householder_M_2
 
 ```
 
-Porównajmy uzyskane b³êdy:
+Por?wnajmy uzyskane b??dy:
 
 ```{r}
 min(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
@@ -256,13 +256,13 @@ max(blad_givens_M_2,blad_householder_M_2, blad_qr_M_2)
 ```
 
 
-W koñcu sprawdŸmy jak wygl¹daj¹ rozk³ady QR macierzy wymiarów 125 na 125.
+W ko?cu sprawd?my jak wygl?daj? rozk?ady QR macierzy wymiar?w 125 na 125.
 
 ```{r}
 M_3<-matrix(c(replicate(125, rnorm(125)) ), 125, 125, byrow=TRUE) 
 ```
 
-Rozk³ad funkcj¹ qr:
+Rozk?ad funkcj? qr:
 
 ```{r}
 QR = qr(M_3)
@@ -270,7 +270,7 @@ qr.Q(QR)
 qr.R(QR)
 ```
 
-Rozk³ad algorytmem qr_givens:
+Rozk?ad algorytmem qr_givens:
 
 ```{r}
 wynik3_givens = qr_givens(M_3)
@@ -278,7 +278,7 @@ wynik3_givens$Q
 wynik3_givens$R
 ```
 
-Rozk³ad algorytmem qr_householder:
+Rozk?ad algorytmem qr_householder:
 
 ```{r}
 wynik3_householder = qr_householer(M_3)
@@ -286,7 +286,7 @@ wynik3_householder$Q
 wynik3_householder$R
 ```
 
-B³¹d bezwgldêny z rozk³adu QR metod¹ rotacji Givensa:
+B??d bezwgld?ny z rozk?adu QR metod? rotacji Givensa:
 
 ```{r}
 M_3_givens = wynik3_givens$Q  %*% wynik3_givens$R
@@ -295,7 +295,7 @@ blad_givens_M_3 = norm(M_31)
 blad_givens_M_3
 ```
 
-B³¹d bezwzglêdny z rozk³adu QR funkcj¹ wbudowan¹ w jêzyk R:
+B??d bezwzgl?dny z rozk?adu QR funkcj? wbudowan? w j?zyk R:
 
 ```{r}
 M_3_qr = qr.Q(QR) %*% qr.R(QR)
@@ -304,7 +304,7 @@ blad_qr_M_3 = norm(M_32)
 blad_qr_M_3
 ```
 
-B³¹d bezwzglêdy z rozk³adu QR metod¹ odbiæ Householdera:
+B??d bezwzgl?dy z rozk?adu QR metod? odbi? Householdera:
 
 ```{r}
 M_3_householder = wynik3_householder$Q %*% wynik3_householder$R
