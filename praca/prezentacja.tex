@@ -40,7 +40,7 @@
 
 
 \begin{frame}
-\begin{theorem}[Twierdzenie(Grama-Schmidta)\citep{poreda11}] \label{theorem-gram-schmidt}
+\begin{theorem}[Grama-Schmidta\citep{poreda11}] \label{theorem-gram-schmidt}
 Dla każdego układu liniowo niezależnego wektorów $(\vr{x}_{1},\ldots,\vr{x}_{n})$ w przestrzeni euklidesowej istnieje układ ortonormalny $(\vr{b}_{1},\ldots, \vr{b}_{n})$ taki, że 
 $$
 span(\vr{b}_{1},\ldots, \vr{b}_{k}) = span(\vr{x}_{1},\ldots, \vr{x}_{k})
@@ -52,7 +52,7 @@ dla każdej liczby $k$ ze zbioru $(1,\ldots,n)$.
 
 \begin{frame}
 \begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta] \label{lemma-matrix-formulation-of-gs}
-Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $v_{1}, \ldots, v_n$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $u_1, \ldots, u_n$ , które są transformacją wektorów $v_1, \ldots, v_n$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z~tych wektorów $u_1, \ldots, u_n$. Wtedy
+Algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $v_{1}, \ldots, v_n$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia Grama-Schmidta istnieją wektory $u_1, \ldots, u_n$ , które są transformacją wektorów $v_1, \ldots, v_n$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z~tych wektorów $u_1, \ldots, u_n$. Wtedy
 {\fontsize{4}{4}
 $$
 U = A \cdot 
@@ -188,7 +188,46 @@ $$
 \end{example}
 \end{frame}
 
+\begin{frame}[fragile]
+\begin{Schunk}
+\begin{Sinput}
+> house = function(x) {
++   norm_x = sqrt(t(x)\cdot x)
++   if (x[1] > 0) {
++     x[1] = x[1] + norm_x;
++   } else {
++     x[1] = x[1] - norm_x;
++   }
++   return(x)
++ }
+\end{Sinput}
+\end{Schunk}
+\end{frame}
 
+\begin{frame}[fragile]
+\begin{Schunk}
+\begin{Sinput}
+> qr_householer = function(A)
++ {
++  R = A
++  dimm = dim(A)
++  n = dimm[2]
++   m = dimm[1]
++   Q = diag(n)
++   for (i in 1:min(m-1,n)){
++     u = house(R[i:m,i])
++     den =  (t(u) %*% u)[1,1]
++     P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
++     R[i:m,i:n] = P %*% R[i:m,i:n]
++     if (i>1)
++       Q[i:n,1:(i-1)] = P %*% Q[i:n,1:(i-1)]
++     Q[i:n,i:n] = P %*% Q[i:n,i:n]
++   }
++   return(list(R=R, Q=t(Q)))
++ }
+\end{Sinput}
+\end{Schunk}
+\end{frame}
 
 \begin{frame}
 \begin{definition}[Macierz Givensa]
@@ -209,6 +248,7 @@ $$
 nazywamy macierzą rotacji Givensa.
 \end{definition}
 \end{frame}
+
 
 \begin{frame}
 \begin{example}
@@ -273,51 +313,6 @@ $$
 \end{example}
 \end{frame}
 
-
-\begin{frame}[fragile]
-\begin{Schunk}
-\begin{Sinput}
-> house = function(x) {
-+   norm_x = sqrt(t(x)\cdot x)
-+   if (x[1] > 0) {
-+     x[1] = x[1] + norm_x;
-+   } else {
-+     x[1] = x[1] - norm_x;
-+   }
-+   return(x)
-+ }
-\end{Sinput}
-\end{Schunk}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\begin{Schunk}
-\begin{Sinput}
-> qr_householer = function(A)
-+ {
-+  R = A
-+  dimm = dim(A)
-+  n = dimm[2]
-+   m = dimm[1]
-+   Q = diag(n)
-+   for (i in 1:min(m-1,n)){
-+     u = house(R[i:m,i])
-+     den =  (t(u) %*% u)[1,1]
-+     P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
-+     R[i:m,i:n] = P %*% R[i:m,i:n]
-+     if (i>1)
-+       Q[i:n,1:(i-1)] = P %*% Q[i:n,1:(i-1)]
-+     Q[i:n,i:n] = P %*% Q[i:n,i:n]
-+   }
-+   return(list(R=R, Q=t(Q)))
-+ }
-\end{Sinput}
-\end{Schunk}
-\end{frame}
-
-
-
 \begin{frame}[fragile]
 \begin{Schunk}
 \begin{Sinput}
@@ -359,7 +354,6 @@ $$
 \end{Sinput}
 \end{Schunk}
 \end{frame}
-
 
 \begin{frame}[fragile]
 {\scriptsize
