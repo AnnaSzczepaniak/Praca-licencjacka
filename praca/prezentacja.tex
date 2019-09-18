@@ -4,7 +4,6 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{polski}
-\usepackage{babel}
 \usepackage{amsmath}
 \usepackage{centernot}
 \usepackage{amsfonts}
@@ -13,9 +12,7 @@
 \usepackage{enumerate}
 \usepackage{mathtools}
 \usepackage{hyperref}
-\usepackage{algorithm}
-\usepackage{algorithmicx}
-\usepackage{algpseudocode}
+\usepackage{algorithm,algorithmic}
 \usepackage{natbib} %bibtex
 \usepackage[polish]{dyschemist}
 \newtheorem{tw}{Twierdzenie}
@@ -131,7 +128,7 @@ nazywamy macierzą rotacji Givensa.
 \end{definition}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \begin{Schunk}
 \begin{Sinput}
 > givens = function(i,j,A){
@@ -153,22 +150,22 @@ nazywamy macierzą rotacji Givensa.
 
 
 \begin{frame}
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Algorytm QR metodą rotacji Givensa}
 \begin{algorithmic}
-\For{$i$ from $1$  to $\min (m-1,n)$}
-	\For{$j$ from $i+1$ to $m$}
-		\State $\mx{G} = Givens(i,j, \mx{A}[i,i], \mx{A}[j,i])$
-		\State $\mx{A} = \mx{G}\cdot \mx{A}$
-      	\State $\mx{Q} = \mx{Q}\cdot \mx{t(G)}$
+\FOR{$i$ from $1$  to $\min (m-1,n)$}
+	\FOR{$j$ from $i+1$ to $m$}
+		\STATE $\mx{G} = Givens(i,j, \mx{A}[i,i], \mx{A}[j,i])$
+		\STATE $\mx{A} = \mx{G}\cdot \mx{A}$
+      	\STATE $\mx{Q} = \mx{Q}\cdot \mx{t(G)}$
       	
-	\EndFor	
-\EndFor
+	\ENDFOR
+\ENDFOR
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \begin{Schunk}
 \begin{Sinput}
 > house = function(x) {
@@ -185,18 +182,18 @@ nazywamy macierzą rotacji Givensa.
 \end{frame}
 
 \begin{frame}
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Algorytm QR metodą transformacji Householdera}
 \begin{algorithmic}
-\For{$i$ from $1$  to $\min (m-1,n)$}
-	\State $u_{i} = House(A(i:m,i))$
-	\State $\mx{P_{i}^{'}} = \mx{I} - 2\cdot u_{i}\cdot u_{i}^{T}$
-	\State $\mx{A}(i:m, i:n) = \mx{P}_{i}^{'}\cdot \mx{A}(i:m, i:n)$
-\If {$i > 1$}
-      \State $\mx{Q}(i:n,1:(i-1)) = \mx{P}\cdot \mx{Q}(i:n,1:(i-1))$
-      \State $\mx{Q}(i:n,i:n) = \mx{P}\cdot \mx{Q}(i:n,i:n)$
-\EndIf
-\EndFor
+\FOR{$i$ from $1$  to $\min (m-1,n)$}
+	\STATE $u_{i} = House(A(i:m,i))$
+	\STATE $\mx{P_{i}^{'}} = \mx{I} - 2\cdot u_{i}\cdot u_{i}^{T}$
+	\STATE $\mx{A}(i:m, i:n) = \mx{P}_{i}^{'}\cdot \mx{A}(i:m, i:n)$
+\IF {$i > 1$}
+      \STATE $\mx{Q}(i:n,1:(i-1)) = \mx{P}\cdot \mx{Q}(i:n,1:(i-1))$
+      \STATE $\mx{Q}(i:n,i:n) = \mx{P}\cdot \mx{Q}(i:n,i:n)$
+\ENDIF
+\ENDFOR
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
@@ -216,7 +213,7 @@ Do wyżej wymienionych eksperymentów wykorzystamy losowo wybrane trzy macierze.
 Rozmiar macierzy nie wpływa istotnie na jakość naszych samodzielnie opisanych funkcji w stosunku do gotowej funkcji w R. Są one mniej dokładne niż wbudowany, gotowy algorytm dekompozycji QR w R. Ponadto algorytm metodą rotacji Givensa nie zawsze jest jakościowo lepszy od algorytmu metodą odbić Householdera. Zależy to od wymiarów oraz od losowości rozkładanej macierzy.
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \begin{Schunk}
 \begin{Sinput}
 > wymiary<-c(5,25,125)
