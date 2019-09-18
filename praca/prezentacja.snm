@@ -1,3 +1,4 @@
-\beamer@slide {Nier\IeC {\'o}wno\IeC {\'s}\IeC {\'c}-Bessela}{2}
-\beamer@slide {theorem-gram-schmidt}{3}
-\beamer@slide {theorem-qr-decomposition}{4}
+\beamer@slide {theorem-gram-schmidt}{2}
+\beamer@slide {lemma-matrix-formulation-of-gs}{3}
+\beamer@slide {lemma-gram-schmidt-matrix}{4}
+\beamer@slide {theorem-qr-decomposition}{5}

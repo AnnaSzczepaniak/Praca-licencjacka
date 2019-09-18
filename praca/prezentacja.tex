@@ -20,7 +20,7 @@
 \author{Anna Szczepaniak, 210094}
 \title{Algorytmy dekompozycji QR}
 \date{19.09.2019}
-\institute{Praca licencjacka przygotowana pod opieką dr, mgr inż. Piotra Kowalskiego}
+\institute{Praca licencjacka przygotowana pod opieką dr inż. Piotra Kowalskiego}
 \newcommand{\parauporzadkowana}[2]{\left\langle {#1}; {#2} \right\rangle}
 \newcommand{\zbior}[1]{\left\lbrace {#1} \right\rbrace }
 \newcommand{\domkniecie}[1]{\left[ {#1} \right] }
@@ -39,17 +39,6 @@
 \end{frame}
 
 
-
-\begin{frame}
-\begin{theorem}[Nierówność Bessela {\citep[Twierdzenie 14.22]{poreda11}}] \label{Nierówność-Bessela}
-Jeśli $(\vr{b}_{1}, \ldots, \vr{b}_{n})$ jest układem ortonormalnym w przestrzeni euklidesowej $\setR^k$, to dla każdego wektora $\vr{x}$ z przestrzeni $\setR^k$ spełniona jest nierówność 
-$$
-\sum_{i=1}^{n}\alpha_{i}^{2}\leq \Vert\vr{x}\Vert^{2},
-$$
-gdzie $\alpha_{i} = (\vr{x}|\vr{b}_{i})$. Ponadto, wektor $\vr{x} - \sum_{i=1}^{n} \alpha_{i} \cdot \vr{b}_{i}$ jest ortogonalny do podprzestrzeni $span(\vr{b}_{1}, \ldots, \vr{b}_{n})$.
-\end{theorem}
-\end{frame}
-
 \begin{frame}
 \begin{theorem}[Twierdzenie(Grama-Schmidta)\citep{poreda11}] \label{theorem-gram-schmidt}
 Dla każdego układu liniowo niezależnego wektorów $(\vr{x}_{1},\ldots,\vr{x}_{n})$ w przestrzeni euklidesowej istnieje układ ortonormalny $(\vr{b}_{1},\ldots, \vr{b}_{n})$ taki, że 
@@ -59,6 +48,51 @@ $$
 dla każdej liczby $k$ ze zbioru $(1,\ldots,n)$.
 \end{theorem}
 \end{frame}
+
+
+\begin{frame}
+\begin{lemma}[O postaci macierzowej w algorytmie Grama-Schmidta] \label{lemma-matrix-formulation-of-gs}
+Powyżej omówiony algorytm Grama Schmidta jest równoważny następującym transformacjom macierzy. Załóżmy, że wektory $v_{1}, \ldots, v_n$ są kolumnami macierzy $\mx{A}$ oraz że są liniowo niezależne. Wtedy z twierdzenia \ref{theorem-gram-schmidt} istnieją wektory $u_1, \ldots, u_n$ , które są transformacją wektorów $v_1, \ldots, v_n$ przez algorytm Grama-Schmidta. Niech $\mx{U}$ będzie macierzą utworzoną kolumnowo z~tych wektorów $u_1, \ldots, u_n$. Wtedy
+{\tiny
+$$
+U = A \cdot 
+\begin{bmatrix}
+1 & -\proj{u_1}{v_2} & \cdots & 0 \\
+0 & 1 & \cdots & 0 \\
+\vdots & \vdots & & \vdots \\
+0 & 0 & \cdots & 1
+\end{bmatrix} \cdot
+\begin{bmatrix}
+1 & 0 & -\proj{u_1}{v_3} &\cdots & 0 \\
+0 & 1 & -\proj{u_2}{v_3} &\cdots & 0 \\
+0 & 0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \vdots &  & \vdots \\
+0 & 0 & 0 & \cdots & 1
+\end{bmatrix}
+ \cdots
+\begin{bmatrix}
+1 & 0 & 0 & \cdots & 0 & -\proj{u_1}{v_n} \\
+0 & 1 & 0 & \cdots & 0 &-\proj{u_2}{v_n} \\
+0 & 0 & 1 & \cdots & 0 & -\proj{u_3}{v_n} \\
+\vdots & \vdots & \vdots &  & \vdots & \vdots \\
+0 & 0 & 0 & \cdots & 1 & -\proj{u_{n-1}}{v_n} \\
+0 & 0 & 0 & \cdots & 0 & 1
+\end{bmatrix}
+$$ 
+}
+\end{lemma}
+\end{frame}
+
+\begin{frame}
+\begin{lemma}[Macierz transformująca algorytmu Grama-Schmidta]\label{lemma-gram-schmidt-matrix}
+Niech $\mx{A} \in \setR^{m \times n}$ będzie macierzą, której kolumny są liniowo niezależne. Niech $\mx{U} \in \setR^{m \times n}$ będzie macierzą uzyskaną poprzez połączenie jako kolumn wektorów uzyskanych z algorytmu Grama-Schmidta. Wtedy istnieje trójkąta górna macierz $\mx{T} \in \setR^{n \times n}$ taka, że
+$$
+\mx{U} = \mx{A} \cdot \mx{T},
+$$
+gdzie $\mx{T} = [t_{ij}]_{i = 1, \ldots , n}^{j = 1, \ldots, n}$ i $t_{kk} = 1$, dla dowolnego $k \in \set{1,\ldots,n}$.
+\end{lemma}
+\end{frame}
+
 
 
 \begin{frame}
@@ -119,6 +153,44 @@ Macierz H jest macierzą symetryczną i ortogonalną.
 \end{frame}
 
 \begin{frame}
+\begin{example}
+\begin{enumerate}
+\item Wyznaczamy $P_{1}$ tak, że:
+$$
+\mx{A_{1} \equiv {P_{1}\cdot A}}= \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x 
+\end{bmatrix}.
+$$
+\item Wyznaczamy 
+$$
+P_{2} = \left[ 
+\begin{array}{c|c}
+1 & 0 \\\hline
+0 & P_2'
+\end{array}
+\right]
+$$ 
+tak, że
+$$
+\mx{A_{2} \equiv {P_{2}\cdot A_{1}}}= \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & 0 & x & x \\
+0 & 0 & x & x  \\
+0 & 0 & x & x 
+\end{bmatrix}.
+$$
+\end{enumerate}
+\end{example}
+\end{frame}
+
+
+
+\begin{frame}
 \begin{definition}[Macierz Givensa]
 Niech $ i,j \in {1, \ldots, n}$ i $\theta \in \setR$. Macierz $\mx{R}(i,j,\theta) \in \setR^{n\times n}$ zdefiniowana następująco:
 $$
@@ -137,6 +209,70 @@ $$
 nazywamy macierzą rotacji Givensa.
 \end{definition}
 \end{frame}
+
+\begin{frame}
+\begin{example}
+{\scriptsize
+$$
+\begin{bmatrix}
+x & x & x & x \\
+x & x & x & x \\
+x & x & x & x \\
+x & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(1,2)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+x & x & x & x \\
+x & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(1,3)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & x & x & x \\
+x & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(1,4)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & x & x & x \\
+0 & x & x & x   
+\end{bmatrix}  
+$$
+}
+$$
+\begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x \\
+0 & x & x & x  \\
+0 & x & x & x 
+\end{bmatrix}  \underrightarrow{\mx{G}(2,3)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & x & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(2,4)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & 0 & x & x   
+\end{bmatrix} 
+$$   
+
+$$
+\begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & 0 & x & x   
+\end{bmatrix} \underrightarrow{\mx{G}(3,4)} \begin{bmatrix}
+x & x & x & x \\
+0 & x & x & x \\
+0 & 0 & x & x \\
+0 & 0 & 0 & x   
+\end{bmatrix} 
+$$
+\end{example}
+\end{frame}
+
 
 \begin{frame}[fragile]
 \begin{Schunk}
@@ -225,12 +361,50 @@ nazywamy macierzą rotacji Givensa.
 \end{frame}
 
 
-\begin{frame}
-Rozmiar macierzy nie wpływa istotnie na jakość naszych samodzielnie opisanych funkcji w stosunku do gotowej funkcji w R. Są one mniej dokładne niż wbudowany, gotowy algorytm dekompozycji QR w R. Ponadto algorytm metodą rotacji Givensa nie zawsze jest jakościowo lepszy od algorytmu metodą odbić Householdera. Zależy to od wymiarów oraz od losowości rozkładanej macierzy.
+\begin{frame}[fragile]
+{\scriptsize
+Z eksperymentów, które przeprowadziliśmy wypływa wniosek, iż nasze algorytmy dekompozycji QR są nieco gorsze jakościowo od gotowej funkcji w R. 
+}
+\includegraphics[width=0.7\textwidth]{licencjat-027}
 \end{frame}
 
-\begin{frame}[fragile]
-\includegraphics{licencjat-027}
+\begin{frame}
+\frametitle{Bibliografia}
+\begin{thebibliography}{1}
+
+\bibitem{dokumentacjaR}
+Dokumentacja online języka r.
+\newblock \url{https://www.rdocumentation.org}.
+
+
+\bibitem{bjorck14}
+Åke Björck.
+\newblock {\em Numerical Methods for Least Squares Problems}.
+\newblock Siam, 1996.
+
+\bibitem{demmel12}
+James~W. Demmel.
+\newblock {\em Applied Numerical Linear Algebra}.
+\newblock Siam, 1997.
+
+\bibitem{poreda11}
+Jacek Jędrzejewski and Tadeusz Poreda.
+\newblock {\em Algebra liniowa z elementami geometrii analitycznej}.
+\newblock Politechnika Łodzka, 2011.
+
+\bibitem{wilkinson13}
+James~H. Wilkinson.
+\newblock {\em The algebraic eigenvalue problem}.
+\newblock Clarendon Press, Oxford University Press, 1988.
+
+\end{thebibliography}
 \end{frame}
+
+
+
+\bibliographystyle{plain}
+\bibliography{bibliografia}
+
+
 
 \end{document}
