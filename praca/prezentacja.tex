@@ -83,6 +83,16 @@ dla wszystkich $k = 1, 2, \ldots, n$.
 \end{theorem}
 \end{frame}
 
+\begin{frame}
+\begin{remark}
+Rozkładem $\mx{QR}$ nazwiemy również sytuacje, gdy 
+$$
+\mx{A}=\mx{Q}\mx{R}
+$$
+oraz $\transpose{\mx{Q}}\mx{Q}=\mx{I}$ i $\mx{R}$ jest macierzą trójkątną górną, niekoniecznie z $1$ na przekątnej. Powodem tego jest, że prezentowana tu postać oraz postać z twierdzenia \ref{theorem-qr-decomposition} są sobie równoważne.  
+\end{remark}
+\end{frame}
+
 
 \begin{frame}
 \begin{definition}[Macierz Householdera]
@@ -131,6 +141,50 @@ nazywamy macierzą rotacji Givensa.
 \begin{frame}[fragile]
 \begin{Schunk}
 \begin{Sinput}
+> house = function(x) {
++   norm_x = sqrt(t(x)\cdot x)
++   if (x[1] > 0) {
++     x[1] = x[1] + norm_x;
++   } else {
++     x[1] = x[1] - norm_x;
++   }
++   return(x)
++ }
+\end{Sinput}
+\end{Schunk}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\begin{Schunk}
+\begin{Sinput}
+> qr_householer = function(A)
++ {
++  R = A
++  dimm = dim(A)
++  n = dimm[2]
++   m = dimm[1]
++   Q = diag(n)
++   for (i in 1:min(m-1,n)){
++     u = house(R[i:m,i])
++     den =  (t(u) %*% u)[1,1]
++     P = diag(n+1-i) - 2/den * ( u%*% t(u)  ) 
++     R[i:m,i:n] = P %*% R[i:m,i:n]
++     if (i>1)
++       Q[i:n,1:(i-1)] = P %*% Q[i:n,1:(i-1)]
++     Q[i:n,i:n] = P %*% Q[i:n,i:n]
++   }
++   return(list(R=R, Q=t(Q)))
++ }
+\end{Sinput}
+\end{Schunk}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\begin{Schunk}
+\begin{Sinput}
 > givens = function(i,j,A){
 +   dimm = dim(A)
 +   n = dimm[1]
@@ -148,64 +202,26 @@ nazywamy macierzą rotacji Givensa.
 \end{Schunk}
 \end{frame}
 
-
-\begin{frame}
-\begin{algorithm}[H]
-\caption{Algorytm QR metodą rotacji Givensa}
-\begin{algorithmic}
-\FOR{$i$ from $1$  to $\min (m-1,n)$}
-	\FOR{$j$ from $i+1$ to $m$}
-		\STATE $\mx{G} = Givens(i,j, \mx{A}[i,i], \mx{A}[j,i])$
-		\STATE $\mx{A} = \mx{G}\cdot \mx{A}$
-      	\STATE $\mx{Q} = \mx{Q}\cdot \mx{t(G)}$
-      	
-	\ENDFOR
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-\end{frame}
-
 \begin{frame}[fragile]
 \begin{Schunk}
 \begin{Sinput}
-> house = function(x) {
-+   norm_x = sqrt(t(x)\cdot x)
-+   if (x[1] > 0) {
-+     x[1] = x[1] + norm_x;
-+   } else {
-+     x[1] = x[1] - norm_x;
+> qr_givens = function(A){
++   R = A
++   
++   n = dim(A)[2]
++   m = dim(A)[1]
++   Q = diag(n)
++   for (i in 1:(n-1)) {
++     for (j in (i+1):m) {
++       G = givens(i,j,R)
++       R = G %*% R
++       Q = Q %*% t(G)
++     }
 +   }
-+   return(x)
++   return(list(R=R, Q=Q))
 + }
 \end{Sinput}
 \end{Schunk}
-\end{frame}
-
-\begin{frame}
-\begin{algorithm}[H]
-\caption{Algorytm QR metodą transformacji Householdera}
-\begin{algorithmic}
-\FOR{$i$ from $1$  to $\min (m-1,n)$}
-	\STATE $u_{i} = House(A(i:m,i))$
-	\STATE $\mx{P_{i}^{'}} = \mx{I} - 2\cdot u_{i}\cdot u_{i}^{T}$
-	\STATE $\mx{A}(i:m, i:n) = \mx{P}_{i}^{'}\cdot \mx{A}(i:m, i:n)$
-\IF {$i > 1$}
-      \STATE $\mx{Q}(i:n,1:(i-1)) = \mx{P}\cdot \mx{Q}(i:n,1:(i-1))$
-      \STATE $\mx{Q}(i:n,i:n) = \mx{P}\cdot \mx{Q}(i:n,i:n)$
-\ENDIF
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-\end{frame}
-
-\begin{frame}
-Teraz czas na eksperymenty, które sprawdzą, jak bardzo dokładność naszych algorytmów różni się od gotowej funkcji R, służącej do rozkładu QR.
-Do wyżej wymienionych eksperymentów wykorzystamy losowo wybrane trzy macierze.
-\begin{enumerate}
-\item Wymiarów $5$ na $5$,
-\item Wymiarów $25$ na $25$, oraz
-\item Wymiarów $125$ na $125$.
-\end{enumerate}
 \end{frame}
 
 
@@ -214,24 +230,6 @@ Rozmiar macierzy nie wpływa istotnie na jakość naszych samodzielnie opisanych
 \end{frame}
 
 \begin{frame}[fragile]
-\begin{Schunk}
-\begin{Sinput}
-> wymiary<-c(5,25,125)
-> bledy1<-c(blad_qr_M_1,blad_qr_M_2,blad_qr_M_3)
-> bledy2<-c(blad_givens_M_1,blad_givens_M_2,blad_givens_M_3)
-> bledy3<-c(blad_householder_M_1,blad_householder_M_2,blad_householder_M_3)
-\end{Sinput}
-\end{Schunk}
-
-\begin{Schunk}
-\begin{Sinput}
-> plot(wymiary, bledy1, type = 'l', col = 'blue', ylim=c(0,5e-13), ylab = "Bledy")
-> lines(wymiary, bledy2, col='green')
-> lines(wymiary, bledy3, col='red')
-> legend(10,4e-13, c("qr in R", "qr givens", "qr householder"), 
-+        fill=c("blue", "green", "red"))
-\end{Sinput}
-\end{Schunk}
 \includegraphics{licencjat-027}
 \end{frame}
 
